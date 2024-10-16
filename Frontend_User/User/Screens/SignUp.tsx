@@ -17,6 +17,8 @@ import {
   getEmails,
   getUsernames,
 } from "./../Controller/UserController";
+import Toast from "react-native-toast-message";
+import { useNavigation } from "@react-navigation/native";
 
 export default function SignUpPage() {
   const [username, setUsername] = useState("");
@@ -27,6 +29,7 @@ export default function SignUpPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const navigation = useNavigation();
 
   const validateForm = () => {
     if (
@@ -37,34 +40,58 @@ export default function SignUpPage() {
       !password ||
       !confirmPassword
     ) {
-      Alert.alert("Error", "All fields are required");
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "All fields are required.",
+      });
       return false;
     }
 
     if (username.length < 3) {
-      Alert.alert("Error", "Username must be at least 3 characters long");
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Username must be at least 3 characters long.",
+      });
       return false;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      Alert.alert("Error", "Please enter a valid email address");
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Please enter a valid email address.",
+      });
       return false;
     }
 
     const phoneRegex = /^\d{10}$/;
     if (!phoneRegex.test(phone)) {
-      Alert.alert("Error", "Please enter a valid 10-digit phone number");
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Please enter a valid 10-digit phone number.",
+      });
       return false;
     }
 
     if (password.length < 8) {
-      Alert.alert("Error", "Password must be at least 8 characters long");
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Password must be at least 8 characters long.",
+      });
       return false;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert("Error", "Passwords do not match");
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Passwords do not match.",
+      });
       return false;
     }
 
@@ -77,24 +104,37 @@ export default function SignUpPage() {
         getUsernames(),
         getEmails(),
       ]);
-  
-      // Convert existing emails to lowercase for case-insensitive comparison
-      const lowerCaseExistingEmails = existingEmails.map(email => email.toLowerCase());
-  
+
+      const lowerCaseExistingEmails = existingEmails.map((email) =>
+        email.toLowerCase()
+      );
+
       if (existingUsernames.includes(username)) {
-        Alert.alert("Error", "Username already exists");
+        Toast.show({
+          type: "error",
+          text1: "Error",
+          text2: "Username already exists.",
+        });
         return false;
       }
-  
+
       if (lowerCaseExistingEmails.includes(email.toLowerCase())) {
-        Alert.alert("Error", "Email already exists");
+        Toast.show({
+          type: "error",
+          text1: "Error",
+          text2: "Email already exists.",
+        });
         return false;
       }
-  
+
       return true;
     } catch (error) {
       console.error("Error checking existing users:", error);
-      Alert.alert("Error", "Failed to check existing users");
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Failed to check existing users.",
+      });
       return false;
     }
   };
@@ -112,11 +152,19 @@ export default function SignUpPage() {
           address,
           password,
         });
-        console.log("User created:");
-        Alert.alert("Success", "Sign up successful!");
+        console.log("User created:", userData);
+        Toast.show({
+          type: "success",
+          text1: "Success",
+          text2: "Sign up successful!",
+        });
       } catch (error) {
         console.error(error);
-        Alert.alert("Error", "User creation failed");
+        Toast.show({
+          type: "error",
+          text1: "Error",
+          text2: "User creation failed.",
+        });
       }
     }
   };
@@ -182,6 +230,7 @@ export default function SignUpPage() {
               value={phone}
               onChangeText={setPhone}
               keyboardType="phone-pad"
+              maxLength={10}
             />
           </View>
 
@@ -262,7 +311,7 @@ export default function SignUpPage() {
 
           <View style={styles.signInContainer}>
             <Text style={styles.signInText}>Already have an account? </Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate("SignInPage")}>
               <Text style={styles.signInLink}>Sign In</Text>
             </TouchableOpacity>
           </View>

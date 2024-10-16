@@ -8,8 +8,6 @@ import HomeScreen from "./Collector/HomeScreen";
 import QRScannerScreen from "./Collector/QRScannerScreen";
 import BinDataScreen from "./Collector/BinDataScreen";
 import ProfileScreen from "./Collector/ProfileScreen";
-import SignInPage from "./User/Screens/SignIn";
-import SignUpPage from "./User/Screens/SignUp";
 
 export type RootStackParamList = {
   Login: undefined;
@@ -58,7 +56,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="SignInPage"
+        initialRouteName="Login"
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="Login" component={LoginScreen} />
@@ -67,16 +65,6 @@ export default function App() {
           name="BinData"
           component={BinDataScreen}
           options={{ headerShown: true }}
-        />
-        <Stack.Screen
-          name="SignUpPage"
-          component={SignUpPage}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="SignInPage"
-          component={SignInPage}
-          options={{ headerShown: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>

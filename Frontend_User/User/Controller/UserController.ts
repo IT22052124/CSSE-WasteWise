@@ -1,6 +1,8 @@
 import { db } from "../../storage/firebase";
 import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
 import bcrypt from "bcryptjs"; // for hashing passwords
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 // Create a new user
 export const createUser = async (userData) => {
@@ -20,7 +22,6 @@ export const createUser = async (userData) => {
   }
 };
 
-// Get user by ID
 export const getUserById = async (userId) => {
   try {
     const userDoc = await db.collection("users").doc(userId).get();
@@ -48,7 +49,7 @@ export const getEmails = async () => {
       }
     });
 
-    return emails; // Return the array of emails
+    return emails;
   } catch (error) {
     console.error("Error fetching emails:", error);
     throw new Error("Failed to fetch emails");
@@ -67,7 +68,7 @@ export const getUsernames = async () => {
       }
     });
 
-    return usernames; // Return the array of usernames
+    return usernames;
   } catch (error) {
     console.error("Error fetching usernames:", error);
     throw new Error("Failed to fetch usernames");
@@ -76,28 +77,40 @@ export const getUsernames = async () => {
 
 export const signInUser = async (email, password) => {
   try {
-    // Query the database for the user with the given email
     const q = query(collection(db, "users"), where("email", "==", email));
     const querySnapshot = await getDocs(q);
 
     if (querySnapshot.empty) {
-      throw new Error("No user found with this email");
+      return { success: false, message: "No user found with this email" };
     }
 
-    // Assuming there's only one user per email
     const userDoc = querySnapshot.docs[0];
     const userData = userDoc.data();
+    const userId = userDoc.id;
 
-    // Compare the provided password with the stored password
     if (password !== userData.password) {
-      throw new Error("Incorrect password");
+      return { success: false, message: "Incorrect password" };
     }
 
-    // Successful sign-in
-    return { message: "Sign in successful", user: userData };
+    return {
+      success: true,
+      message: "Sign in successful",
+      user: { ...userData, id: userId },
+    };
   } catch (error) {
     console.error("Error signing in user:", error);
-    // Throw a new error with a more specific message
-    throw new Error(error.message || "User sign-in failed");
+    return { success: false, message: "User sign-in failed" };
+  }
+};
+
+export const getUserDetails = async () => {
+  try {
+    const userData = await AsyncStorage.getItem('user');
+    if (userData) {
+      const user = JSON.parse(userData);
+      return user;
+    }
+  } catch (error) {
+    console.error("Error retrieving user data: ", error);
   }
 };
