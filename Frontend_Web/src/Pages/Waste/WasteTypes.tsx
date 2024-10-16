@@ -3,20 +3,27 @@ import {
   CardHeader,
   CardBody,
   Typography,
-  Avatar,
   Chip,
-  Tooltip,
-  Progress,
+  IconButton,
+  Menu,
+  MenuHandler,
+  MenuList,
+  MenuItem,
 } from "@material-tailwind/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
-import { authorsTableData, projectsTableData } from "@/data";
-import { getWasteTypes } from "@/controllers/WasteTypeController";
+import {
+  deleteWasteType,
+  getWasteTypes,
+} from "@/controllers/WasteTypeController";
 import { useEffect, useState } from "react";
 import { useMaterialTailwindController } from "@/context";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 export const WasteTypes = () => {
+  const navigate = useNavigate();
   const [wasteTypes, setWasteTypes] = useState<any[]>([]);
-  const [controller, dispatch] = useMaterialTailwindController();
+  const [controller] = useMaterialTailwindController();
   const { sidenavColor } = controller;
 
   useEffect(() => {
@@ -31,6 +38,37 @@ export const WasteTypes = () => {
 
     fetchData();
   }, []);
+
+  const handleDelete = async (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        try {
+          const fetch = async () => {
+            await deleteWasteType(id);
+            const updatedWasteTypes = await getWasteTypes();
+            setWasteTypes(updatedWasteTypes);
+          };
+          fetch();
+        } catch (error) {
+          console.error("Error deleting waste type:", error);
+        }
+        Swal.fire({
+          title: "Deleted!",
+          text: "Your file has been deleted.",
+          icon: "success",
+        });
+      }
+    });
+  };
+
   return (
     <div className="mt-12 mb-8 flex flex-col gap-12 min-h-screen">
       <Card>
@@ -55,7 +93,8 @@ export const WasteTypes = () => {
                   "Description",
                   "Guidelines",
                   "recyclable",
-                  "incentives",
+                  "Payback / incentives (LKR) ",
+                  "Price (LKR)",
                   "Bin Color",
                   "",
                 ].map((el) => (
@@ -65,7 +104,7 @@ export const WasteTypes = () => {
                   >
                     <Typography
                       variant="small"
-                      className="text-[11px] font-bold uppercase text-blue-gray-400"
+                      className="text-[11px] font-bold uppercase text-blue-gray-400 text-center"
                     >
                       {el}
                     </Typography>
@@ -83,11 +122,14 @@ export const WasteTypes = () => {
                     guidelines,
                     description,
                     binType,
+                    customBinColor,
+                    id,
+                    price,
                   },
                   key
                 ) => {
                   const className = `py-3 px-5 ${
-                    key === authorsTableData.length - 1
+                    key === wasteTypes.length - 1
                       ? ""
                       : "border-b border-blue-gray-50"
                   }`;
@@ -113,7 +155,9 @@ export const WasteTypes = () => {
                           {guidelines}
                         </Typography>
                       </td>
-                      <td className={className}>
+                      <td
+                        className={`${className} text-center  justify-center `}
+                      >
                         <Chip
                           variant="gradient"
                           color={recyclable ? "green" : "blue-gray"}
@@ -121,27 +165,64 @@ export const WasteTypes = () => {
                           className="py-0.5 px-2 text-[11px] font-medium w-fit"
                         />
                       </td>
-                      <td className={className}>
+                      <td className={className + " text-center"}>
                         <Typography className="text-xs font-semibold text-blue-gray-600">
-                          {incentives}
+                          {incentives === "None"
+                            ? incentives
+                            : parseFloat(incentives).toFixed(2)}
                         </Typography>
                       </td>
-                      <td className={className}>
+                      <td className={className + " text-center"}>
                         <Typography className="text-xs font-semibold text-blue-gray-600">
-                          {binType}
+                          {parseFloat(price)?.toFixed(2)}
                         </Typography>
                       </td>
+                      <td className={className + " text-center"}>
+                        <IconButton
+                          color={
+                            binType ? binType : customBinColor.toLowerCase()
+                          }
+                        ></IconButton>
+                      </td>
                       <td className={className}>
-                        <Typography
-                          as="a"
-                          href="#"
-                          className="text-xs font-semibold text-blue-gray-600"
-                        >
-                          <EllipsisVerticalIcon
-                            strokeWidth={2}
-                            className="h-5 w-5 text-inherit"
-                          />
-                        </Typography>
+                        <Menu>
+                          <MenuHandler>
+                            <IconButton variant="text" color="blue-gray">
+                              <EllipsisVerticalIcon
+                                strokeWidth={2}
+                                className="h-5 w-5 text-inherit"
+                              />
+                            </IconButton>
+                          </MenuHandler>
+                          <MenuList className="w-max border-0 text-center ">
+                            <MenuItem
+                              className="flex items-center"
+                              onClick={() =>
+                                navigate(`/dashboard/updatewastetypes/${id}`)
+                              }
+                            >
+                              <Typography
+                                variant="small"
+                                color="blue-gray"
+                                className="mb-1 font-normal "
+                              >
+                                <strong>Update</strong>
+                              </Typography>
+                            </MenuItem>
+                            <MenuItem
+                              className="flex items-center gap-3"
+                              onClick={() => handleDelete(id)}
+                            >
+                              <Typography
+                                variant="small"
+                                color="blue-gray"
+                                className="mb-1 font-normal"
+                              >
+                                <strong>Delete</strong>
+                              </Typography>
+                            </MenuItem>
+                          </MenuList>
+                        </Menu>
                       </td>
                     </tr>
                   );

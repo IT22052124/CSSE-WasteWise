@@ -10,9 +10,9 @@ import { Home, Profile, Tables, Notifications } from "@/Pages/dashboard";
 import { SignIn, SignUp } from "@/Pages/auth";
 import { AddBin } from "./Pages/Bins/AddBin";
 
-
 import { WasteTypes } from "./Pages/Waste/WasteTypes";
 import { AddWasteType } from "./Pages/Waste/AddWasteType";
+import { UpdateWasteType } from "./Pages/Waste/UpdateWasteType";
 
 const icon = {
   className: "w-5 h-5 text-inherit",
@@ -36,7 +36,7 @@ export const routes = [
         path: "/wastetypes",
         element: <WasteTypes />,
         inSidebar: true,
-        relatedPaths: ["/wastetypes", "/addwastetypes"],
+        relatedPaths: ["/wastetypes", "/addwastetypes", "/updatewastetypes"],
       },
       {
         icon: <HomeIcon {...icon} />,
@@ -44,7 +44,15 @@ export const routes = [
         path: "/addwastetypes",
         element: <AddWasteType />,
         inSidebar: false,
-        relatedPaths: ["/wastetypes", "/addwastetypes"],
+        relatedPaths: ["/wastetypes", "/addwastetypes", "/updatewastetypes"],
+      },
+      {
+        icon: <HomeIcon {...icon} />,
+        name: "Update Waste Types",
+        path: "/updatewastetypes/:id",
+        element: <UpdateWasteType />,
+        inSidebar: false,
+        relatedPaths: ["/wastetypes", "/addwastetypes", "/updatewastetypes"],
       },
       {
         icon: <UserCircleIcon {...icon} />,

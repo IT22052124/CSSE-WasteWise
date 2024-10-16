@@ -1,13 +1,18 @@
 import { Button, Switch, Typography } from "@material-tailwind/react";
-import { useState } from "react";
-import { addWasteType } from "@/controllers/WasteTypeController"; // Import the controller function
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  getWasteTypeById,
+  updateWasteType,
+} from "@/controllers/WasteTypeController"; // Import controller functions
 import { useMaterialTailwindController } from "@/context";
-import { useNavigate } from "react-router-dom";
 
-export const AddWasteType = () => {
+export const UpdateWasteType = () => {
+  const { id } = useParams(); // Get waste type ID from the route
   const [controller] = useMaterialTailwindController();
   const navigate = useNavigate();
   const { sidenavColor } = controller;
+
   const [formData, setFormData] = useState({
     wasteType: "",
     description: "",
@@ -21,6 +26,24 @@ export const AddWasteType = () => {
 
   const [binColor, setBinColor] = useState<string>("");
   const [open, setOpen] = useState(false);
+
+  // Fetch the waste type data when the component loads
+  useEffect(() => {
+    const fetchWasteType = async () => {
+      try {
+        const wasteTypeData = await getWasteTypeById(id);
+        setFormData(wasteTypeData);
+        setBinColor(
+          wasteTypeData.customBinColor !== "" ? "custom" : wasteTypeData.binType
+        );
+        setOpen(wasteTypeData.incentives > 0);
+      } catch (error) {
+        console.error("Failed to fetch waste type:", error);
+      }
+    };
+
+    fetchWasteType();
+  }, [id]);
 
   // Handle input changes
   const handleChange = (
@@ -64,10 +87,10 @@ export const AddWasteType = () => {
     e.preventDefault();
 
     try {
-      await addWasteType(formData);
+      await updateWasteType(id, formData);
       navigate("/dashboard/wastetypes");
     } catch (error) {
-      console.error("Failed to add waste type", error);
+      console.error("Failed to update waste type", error);
     }
   };
 
@@ -75,7 +98,7 @@ export const AddWasteType = () => {
     <div className="w-full max-w-2xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
       <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
         <Typography variant="h5" color="blue-gray" className="mb-1">
-          Add New Waste Type
+          Update Waste Type
         </Typography>
       </div>
       <div className="p-6">
@@ -139,7 +162,7 @@ export const AddWasteType = () => {
               variant="small"
               className="font-normal text-blue-gray-600"
             >
-               Price (LKR per 1 kg)
+              Price (LKR per 1 kg)
             </Typography>
             <input
               type="number"
@@ -151,6 +174,7 @@ export const AddWasteType = () => {
               className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
             />
           </div>
+
           <div className="flex items-center space-x-2">
             <Switch
               id="recyclable"
@@ -162,6 +186,7 @@ export const AddWasteType = () => {
               }}
             />
           </div>
+
           <div className="flex items-center space-x-2">
             <Switch
               id="Payback/Incentives"
@@ -197,6 +222,7 @@ export const AddWasteType = () => {
             <select
               id="binColor"
               name="binColor"
+              value={binColor}
               onChange={handleSelectChange}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
             >
@@ -235,7 +261,7 @@ export const AddWasteType = () => {
             fullWidth
             type="submit"
           >
-            Save Waste Type
+            Update Waste Type
           </Button>
         </form>
       </div>
