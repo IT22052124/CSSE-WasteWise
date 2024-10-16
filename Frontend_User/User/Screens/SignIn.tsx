@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -11,10 +11,10 @@ import {
   SafeAreaView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { signInUser } from "./../Controller/UserController";
+import { signInUser, addPageView } from "./../Controller/UserController";
 import Toast from "react-native-toast-message";
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
-import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
+import { useNavigation } from "@react-navigation/native";
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");
@@ -22,12 +22,19 @@ export default function SignInPage() {
   const [showPassword, setShowPassword] = useState(false);
   const navigation = useNavigation();
 
+  useEffect(() => {
+    const updatePageViews = async () => {
+      await addPageView();
+    };
+    updatePageViews();
+  });
+
   const handleSignIn = async () => {
     const response = await signInUser(email, password);
     if (response.success) {
       // Save user details to AsyncStorage
       try {
-        await AsyncStorage.setItem('user', JSON.stringify(response.user));
+        await AsyncStorage.setItem("user", JSON.stringify(response.user));
       } catch (error) {
         console.error("Error saving user data: ", error);
       }
@@ -35,9 +42,11 @@ export default function SignInPage() {
       Toast.show({
         type: "success",
         text1: "Welcome!",
-        text2: `Hello, ${response.user.username || "User"}! Sign in successful.`,
+        text2: `Hello, ${
+          response.user.username || "User"
+        }! Sign in successful.`,
       });
-      navigation.navigate('UserDetailsPage');
+      navigation.navigate("UserDetailsPage");
     } else {
       Toast.show({
         type: "error",
@@ -114,7 +123,7 @@ export default function SignInPage() {
 
           <View style={styles.signUpContainer}>
             <Text style={styles.signUpText}>Don't have an account? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('SignUpPage')}>
+            <TouchableOpacity onPress={() => navigation.navigate("SignUpPage")}>
               <Text style={styles.signUpLink}>Sign Up</Text>
             </TouchableOpacity>
           </View>
