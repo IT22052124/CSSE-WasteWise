@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useLocation, Route, Routes } from "react-router-dom";
-import routes from "../routes.ts";
+import routes from "../routess.ts";
 import Sidebar from "../components/Sidebar.jsx";
 import sidebarImage from "../assets/sidebar.jpg";
 

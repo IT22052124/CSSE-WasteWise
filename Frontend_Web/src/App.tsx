@@ -1,14 +1,12 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import AdminLayout from "./layouts/Admin";
-import "./App.css";
-
+import { Navigate, Route, Routes } from "react-router-dom";
+import { Dashboard, Auth } from "@/layouts";
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/admin/*" element={<AdminLayout />} />
-      </Routes>
-    </Router>
+    <Routes>
+      <Route path="/dashboard/*" element={<Dashboard />} />
+      <Route path="/auth/*" element={<Auth />} />
+      <Route path="*" element={<Navigate to="/dashboard/home" replace />} />
+    </Routes>
   );
 }
 

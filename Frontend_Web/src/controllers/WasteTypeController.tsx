@@ -1,0 +1,38 @@
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  getDocs,
+} from "firebase/firestore";
+import { db } from "@/storage/firebase";
+import { useNavigate } from "react-router-dom";
+
+export const addWasteType = async (wasteTypeData) => {
+  const navigate = useNavigate();
+  try {
+    const docRef = await addDoc(collection(db, "wasteTypes"), {
+      ...wasteTypeData,
+      createdAt: serverTimestamp(),
+    });
+    navigate("WasteTypes");
+    return docRef;
+  } catch (e) {
+    console.error("Error adding document: ", e);
+    throw e;
+  }
+};
+export const getWasteTypes = async () => {
+  try {
+    const wasteTypeCollection = collection(db, "wasteTypes");
+    const wasteTypeSnapshot = await getDocs(wasteTypeCollection);
+    const wasteTypes = wasteTypeSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    console.log("Waste types retrieved successfully:", wasteTypes);
+    return wasteTypes;
+  } catch (error) {
+    console.error("Error retrieving waste types:", error);
+    throw new Error("Failed to fetch waste types");
+  }
+};
