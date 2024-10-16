@@ -30,7 +30,8 @@ export const AddBin = () => {
     setBinColor(e.target.value);
     setFormData({
       ...formData,
-      type: e.target.value === "custom" ? formData.customBinColor : e.target.value,
+      type:
+        e.target.value === "custom" ? formData.customBinColor : e.target.value,
     });
   };
 
