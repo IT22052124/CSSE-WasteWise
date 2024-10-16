@@ -7,6 +7,7 @@ import { Ionicons } from "@expo/vector-icons";
 import SignInPage from "./User/Screens/SignIn";
 import SignUpPage from "./User/Screens/SignUp";
 import UserDetailsPage from "./User/Screens/Profile";
+import BinPurchasePage from "./User/Screens/PurchaseBin";
 
 export type RootStackParamList = {
   Login: undefined;
@@ -55,7 +56,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="SignInPage"
+        initialRouteName="BinPurchasePage"
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen
@@ -71,6 +72,11 @@ export default function App() {
         <Stack.Screen
           name="UserDetailsPage"
           component={UserDetailsPage}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="BinPurchasePage"
+          component={BinPurchasePage}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
