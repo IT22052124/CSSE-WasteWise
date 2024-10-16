@@ -13,6 +13,7 @@
     "@heroicons/react": "2.0.18",
     "@material-tailwind/react": "2.1.4",
     "apexcharts": "3.44.0",
+    "expo-camera": "^15.0.16",
     "firebase": "^10.14.1",
     "html2canvas": "^1.4.1",
     "prop-types": "^15.8.1",

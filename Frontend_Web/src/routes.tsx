@@ -77,7 +77,7 @@ export const routes = [
         path: "/bin",
         element: <Bins />,
         inSidebar: false,
-        relatedPaths: ["/bin", "/addbin/bin"],
+        relatedPaths: ["/bin", "/addbin"],
       },
       {
         icon: <TableCellsIcon {...icon} />,

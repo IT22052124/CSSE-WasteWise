@@ -1,33 +1,31 @@
+import React, { useState, useEffect, useRef } from "react";
 import { Button, Typography } from "@material-tailwind/react";
-import { useState, useEffect, useRef } from "react";
-import { addBin, getLastBinID } from "@/controllers/BinsController"; 
-import { getWasteTypes } from "@/controllers/WasteTypeController"; 
+import { addBin, getLastBinID } from "@/controllers/BinsController";
+import { getWasteTypes } from "@/controllers/WasteTypeController";
+import { getUserByEmail } from "@/controllers/UserController"; // Fetch user details by email
 import { useNavigate } from "react-router-dom";
-import {QRCodeCanvas} from "qrcode.react"; // Import QRCode
-import html2canvas from "html2canvas"; // Import html2canvas
+import { QRCodeCanvas } from "qrcode.react";
+import html2canvas from "html2canvas";
 
 export const AddBin = () => {
   const [formData, setFormData] = useState({
     binID: "",
     type: "",
-    user: "",
+    user: {}, // Store user as an object
     perKg: "",
     wasteLevel: 0,
     customBinColor: "",
   });
-  const [binColor, setBinColor] = useState<string>("");
+  const [userEmail, setUserEmail] = useState<string>(""); // Separate email input for lookup
   const [wasteTypes, setWasteTypes] = useState<string[]>([]);
-  const qrCodeRef = useRef<HTMLDivElement>(null); // Reference for QR code
-
+  const qrCodeRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  // Fetch waste types when the component mounts
   useEffect(() => {
     const fetchWasteTypes = async () => {
       try {
         const types = await getWasteTypes();
         setWasteTypes(types);
-        console.log(types);
       } catch (error) {
         console.error("Error fetching waste types:", error);
       }
@@ -36,24 +34,22 @@ export const AddBin = () => {
     fetchWasteTypes();
   }, []);
 
-  // Fetch the last binID and generate a new one
   const fetchNewBinID = async () => {
     try {
-      const lastBinID = await getLastBinID(); 
+      const lastBinID = await getLastBinID();
       const newBinID = lastBinID 
         ? `B${String(parseInt(lastBinID.replace('B', '')) + 1).padStart(3, '0')}`
-        : 'B001'; 
+        : 'B001';
 
       setFormData((prevState) => ({
         ...prevState,
-        binID: newBinID, 
+        binID: newBinID,
       }));
     } catch (error) {
       console.error("Error fetching last binID", error);
     }
   };
 
-  // Fetch new binID on component mount
   useEffect(() => {
     fetchNewBinID();
   }, []);
@@ -66,30 +62,37 @@ export const AddBin = () => {
     });
   };
 
-  // Handle Select changes for bin color
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setBinColor(e.target.value);
     setFormData({
       ...formData,
-      type:
-        e.target.value === "custom" ? formData.customBinColor : e.target.value,
+      type: e.target.value,
     });
   };
 
-  // Handle form submission
+  // Fetch the user object based on the entered email
+  const handleUserLookup = async () => {
+    try {
+      const user = await getUserByEmail(userEmail); // Fetch the user by their email
+      setFormData({
+        ...formData,
+        user, // Store the entire user object
+      });
+    } catch (error) {
+      console.error("Error fetching user", error);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
       await addBin(formData);
-      navigate("Bin");
-      console.log("Bin added successfully!");
+      navigate("/dashboard/bin");
     } catch (error) {
       console.error("Failed to add bin", error);
     }
   };
 
-  // Function to download the QR code
   const downloadQRCode = async () => {
     if (qrCodeRef.current) {
       const canvas = await html2canvas(qrCodeRef.current);
@@ -121,23 +124,26 @@ export const AddBin = () => {
               name="binID"
               value={formData.binID}
               disabled
-              className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm"
             />
           </div>
 
           <div className="space-y-2">
             <Typography variant="small" className="font-normal text-blue-gray-600">
-              User (Assigned User ID)
+              User Email (Assigned User)
             </Typography>
             <input
-              type="text"
-              id="user"
-              name="user"
-              value={formData.user}
-              onChange={handleChange}
-              placeholder="e.g., UserID123"
-              className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              type="email"
+              id="userEmail"
+              name="userEmail"
+              value={userEmail}
+              onChange={(e) => setUserEmail(e.target.value)}
+              placeholder="e.g., user@example.com"
+              className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm"
             />
+            <Button type="button" onClick={handleUserLookup}>
+              Lookup User
+            </Button>
           </div>
 
           <div className="space-y-2">
@@ -151,7 +157,7 @@ export const AddBin = () => {
               value={formData.perKg}
               onChange={handleChange}
               placeholder="Enter cost per kg"
-              className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm"
             />
           </div>
 
@@ -163,8 +169,8 @@ export const AddBin = () => {
               id="type"
               name="type"
               value={formData.type}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              onChange={handleSelectChange}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
             >
               <option value="">Select waste type</option>
               {wasteTypes.map((type) => (
@@ -172,26 +178,8 @@ export const AddBin = () => {
                   {type.wasteType}
                 </option>
               ))}
-              <option value="custom">Custom</option>
             </select>
           </div>
-
-          {binColor === "custom" && (
-            <div className="space-y-2">
-              <Typography variant="small" className="font-normal text-blue-gray-600">
-                Custom Bin Color
-              </Typography>
-              <input
-                type="text"
-                id="customBinColor"
-                name="customBinColor"
-                value={formData.customBinColor}
-                onChange={handleChange}
-                placeholder="Enter custom color"
-                className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-              />
-            </div>
-          )}
 
           <div className="space-y-2">
             <Typography variant="small" className="font-normal text-blue-gray-600">

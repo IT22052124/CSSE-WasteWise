@@ -1,42 +1,72 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Button } from 'react-native';
-import { BarCodeScanner } from 'expo-barcode-scanner';
+import { Text, View, StyleSheet, Button, Alert, TouchableOpacity } from 'react-native';
+import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../App';
+import { RootStackParamList } from '../App'; 
+import { findBinByID } from "../controller/BinController"; 
 
 type QRScannerScreenNavigationProp = StackNavigationProp<RootStackParamList, 'MainTabs'>;
 
 export default function QRScannerScreen() {
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-  const [scanned, setScanned] = useState(false);
+  const [facing, setFacing] = useState<CameraType>('back');
+  const [permission, requestPermission] = useCameraPermissions();
+  const [scanned, setScanned] = useState(false); 
   const navigation = useNavigation<QRScannerScreenNavigationProp>();
 
   useEffect(() => {
-    (async () => {
-      const { status } = await BarCodeScanner.requestPermissionsAsync();
-      setHasPermission(status === 'granted');
-    })();
-  }, []);
+    if (permission?.granted === false) {
+      Alert.alert('Permission required', 'We need your permission to show the camera');
+    }
+  }, [permission]);
 
-  const handleBarCodeScanned = ({ data }: { data: string }) => {
-    setScanned(true);
-    navigation.navigate('BinData', { binId: data });
+  const toggleCameraFacing = () => {
+    setFacing(current => (current === 'back' ? 'front' : 'back'));
   };
 
-  if (hasPermission === null) {
-    return <Text>Requesting for camera permission</Text>;
+  const handleBarcodeScanned = async ({ data }: { data: string }) => {
+    if (scanned) return; // Prevent multiple scans
+    setScanned(true);
+    try {
+      console.log('Scanned data:', data); // Log the scanned data
+      const binData = await findBinByID(data);
+      console.log(binData);
+      navigation.navigate('BinData', { binData });
+    } catch (error) {
+      Alert.alert('Error', 'Failed to fetch bin data. Please try again.');
+      console.error(error);
+    }
+  };
+
+  if (!permission) {
+    return <View style={styles.container}><Text>Loading camera permissions...</Text></View>;
   }
-  if (hasPermission === false) {
-    return <Text>No access to camera</Text>;
+
+  if (!permission.granted) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.message}>We need your permission to show the camera</Text>
+        <Button onPress={requestPermission} title="Grant Permission" />
+      </View>
+    );
   }
 
   return (
     <View style={styles.container}>
-      <BarCodeScanner
-        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-        style={StyleSheet.absoluteFillObject}
-      />
+      <CameraView
+        style={styles.camera}
+        facing={facing}
+        onBarcodeScanned={scanned ? undefined : handleBarcodeScanned} // Updated prop name
+        barcodeScannerSettings={{
+          barcodeTypes: ["qr"], // Specify the types of barcodes to scan
+        }}
+      >
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
+            <Text style={styles.text}>Flip Camera</Text>
+          </TouchableOpacity>
+        </View>
+      </CameraView>
       {scanned && (
         <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />
       )}
@@ -47,7 +77,29 @@ export default function QRScannerScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'column',
     justifyContent: 'center',
+  },
+  message: {
+    textAlign: 'center',
+    paddingBottom: 10,
+  },
+  camera: {
+    flex: 1,
+  },
+  buttonContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    backgroundColor: 'transparent',
+    margin: 64,
+  },
+  button: {
+    flex: 1,
+    alignSelf: 'flex-end',
+    alignItems: 'center',
+  },
+  text: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: 'white',
   },
 });
