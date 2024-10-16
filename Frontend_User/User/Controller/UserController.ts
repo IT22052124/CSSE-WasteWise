@@ -1,10 +1,18 @@
 import { db } from "../../storage/firebase";
-import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where,
+  updateDoc,
+  increment,
+  doc,
+  serverTimestamp,
+} from "firebase/firestore";
 import bcrypt from "bcryptjs"; // for hashing passwords
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-
-// Create a new user
 export const createUser = async (userData) => {
   const { username, email, phone, address, password } = userData;
 
@@ -105,12 +113,26 @@ export const signInUser = async (email, password) => {
 
 export const getUserDetails = async () => {
   try {
-    const userData = await AsyncStorage.getItem('user');
+    const userData = await AsyncStorage.getItem("user");
     if (userData) {
       const user = JSON.parse(userData);
       return user;
     }
   } catch (error) {
     console.error("Error retrieving user data: ", error);
+  }
+};
+
+export const addPageView = async () => {
+  try {
+    const pageViewRef = doc(db, "globalStats", "pageViewTracker");
+
+    await updateDoc(pageViewRef, {
+      views: increment(1),
+      lastViewedAt: serverTimestamp(),
+    });
+  } catch (error) {
+    console.error("Error incrementing page view:", error);
+    throw new Error("Failed to increment page view");
   }
 };
