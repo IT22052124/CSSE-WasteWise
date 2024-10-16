@@ -8,6 +8,7 @@ import {
 } from "@heroicons/react/24/solid";
 import { Home, Profile, Tables, Notifications } from "@/Pages/dashboard";
 import { SignIn, SignUp } from "@/Pages/auth";
+import { Bins } from "./Pages/Bins/Bins";
 import { AddBin } from "./Pages/Bins/AddBin";
 
 import { WasteTypes } from "./Pages/Waste/WasteTypes";
@@ -69,6 +70,14 @@ export const routes = [
         element: <AddBin />,
         inSidebar: false,
         relatedPaths: ["/bin", "/addbin"],
+      },
+      {
+        icon: <RectangleStackIcon {...icon} />,
+        name: "Bin",
+        path: "/bin",
+        element: <Bins />,
+        inSidebar: false,
+        relatedPaths: ["/bin", "/addbin/bin"],
       },
       {
         icon: <TableCellsIcon {...icon} />,
