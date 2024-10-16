@@ -1,10 +1,8 @@
-import { Button, Typography } from "@material-tailwind/react";
-import { useState, useEffect, useRef } from "react";
-import { addBin, getLastBinID } from "@/controllers/BinsController"; 
-import { getWasteTypes } from "@/controllers/WasteTypeController"; 
+import { Button, Switch, Typography } from "@material-tailwind/react";
+import { useState ,useEffect } from "react";
+import { addBin, getLastBinID } from "@/controllers/BinsController"; // Import the controller function
+import { getWasteTypes } from "@/controllers/WasteTypeController"; // Import the waste types function
 import { useNavigate } from "react-router-dom";
-import {QRCodeCanvas} from "qrcode.react"; // Import QRCode
-import html2canvas from "html2canvas"; // Import html2canvas
 
 export const AddBin = () => {
   const [formData, setFormData] = useState({
@@ -12,14 +10,14 @@ export const AddBin = () => {
     type: "",
     user: "",
     perKg: "",
+    qrCode: "",
     wasteLevel: 0,
     customBinColor: "",
   });
-  const [binColor, setBinColor] = useState<string>("");
-  const [wasteTypes, setWasteTypes] = useState<string[]>([]);
-  const qrCodeRef = useRef<HTMLDivElement>(null); // Reference for QR code
-
   const navigate = useNavigate();
+  const [binColor, setBinColor] = useState<string>("");
+  const [wasteTypes, setWasteTypes] = useState<string[]>([]); // State for waste types
+
 
   // Fetch waste types when the component mounts
   useEffect(() => {
@@ -35,31 +33,33 @@ export const AddBin = () => {
 
     fetchWasteTypes();
   }, []);
-
   // Fetch the last binID and generate a new one
   const fetchNewBinID = async () => {
     try {
-      const lastBinID = await getLastBinID(); 
+      const lastBinID = await getLastBinID(); // Get the last binID from backend, e.g., 'B004'
+      
+      // Extract the numeric part of the binID and increment it for the new binID
       const newBinID = lastBinID 
         ? `B${String(parseInt(lastBinID.replace('B', '')) + 1).padStart(3, '0')}`
-        : 'B001'; 
+        : 'B001'; // Default to 'B001' if no bins exist
 
       setFormData((prevState) => ({
         ...prevState,
-        binID: newBinID, 
+        binID: newBinID, // Automatically set the new binID
       }));
     } catch (error) {
       console.error("Error fetching last binID", error);
     }
   };
-
   // Fetch new binID on component mount
   useEffect(() => {
     fetchNewBinID();
   }, []);
 
   // Handle input changes
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -89,19 +89,6 @@ export const AddBin = () => {
     }
   };
 
-  // Function to download the QR code
-  const downloadQRCode = async () => {
-    if (qrCodeRef.current) {
-      const canvas = await html2canvas(qrCodeRef.current);
-      const dataURL = canvas.toDataURL("image/png");
-
-      const link = document.createElement("a");
-      link.href = dataURL;
-      link.download = `${formData.binID}_QRCode.png`;
-      link.click();
-    }
-  };
-
   return (
     <div className="w-full max-w-2xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
       <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
@@ -112,7 +99,10 @@ export const AddBin = () => {
       <div className="p-6">
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-2">
-            <Typography variant="small" className="font-normal text-blue-gray-600">
+            <Typography
+              variant="small"
+              className="font-normal text-blue-gray-600"
+            >
               Bin ID
             </Typography>
             <input
@@ -120,13 +110,17 @@ export const AddBin = () => {
               id="binID"
               name="binID"
               value={formData.binID}
-              disabled
+              onChange={handleChange}
+              disabled 
               className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
             />
           </div>
 
           <div className="space-y-2">
-            <Typography variant="small" className="font-normal text-blue-gray-600">
+            <Typography
+              variant="small"
+              className="font-normal text-blue-gray-600"
+            >
               User (Assigned User ID)
             </Typography>
             <input
@@ -141,7 +135,10 @@ export const AddBin = () => {
           </div>
 
           <div className="space-y-2">
-            <Typography variant="small" className="font-normal text-blue-gray-600">
+            <Typography
+              variant="small"
+              className="font-normal text-blue-gray-600"
+            >
               Cost Per Kg
             </Typography>
             <input
@@ -178,7 +175,10 @@ export const AddBin = () => {
 
           {binColor === "custom" && (
             <div className="space-y-2">
-              <Typography variant="small" className="font-normal text-blue-gray-600">
+              <Typography
+                variant="small"
+                className="font-normal text-blue-gray-600"
+              >
                 Custom Bin Color
               </Typography>
               <input
@@ -194,15 +194,21 @@ export const AddBin = () => {
           )}
 
           <div className="space-y-2">
-            <Typography variant="small" className="font-normal text-blue-gray-600">
+            <Typography
+              variant="small"
+              className="font-normal text-blue-gray-600"
+            >
               QR Code
             </Typography>
-            <div ref={qrCodeRef} className="flex flex-col items-center">
-              <QRCodeCanvas value={formData.binID} size={128} />
-              <Button onClick={downloadQRCode} className="mt-2" type="button">
-                Download QR Code
-              </Button>
-            </div>
+            <input
+              type="text"
+              id="qrCode"
+              name="qrCode"
+              value={formData.qrCode}
+              onChange={handleChange}
+              placeholder="Enter QR code string"
+              className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            />
           </div>
 
           <Button className="mt-6" fullWidth type="submit">
