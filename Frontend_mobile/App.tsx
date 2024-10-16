@@ -1,13 +1,15 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Ionicons } from '@expo/vector-icons';
-import LoginScreen from './Collector/Login';
-import HomeScreen from './Collector/HomeScreen';
-import QRScannerScreen from './Collector/QRScannerScreen';
-import BinDataScreen from './Collector/BinDataScreen';
-import ProfileScreen from './Collector/ProfileScreen';
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Ionicons } from "@expo/vector-icons";
+import LoginScreen from "./Collector/Login";
+import HomeScreen from "./Collector/HomeScreen";
+import QRScannerScreen from "./Collector/QRScannerScreen";
+import BinDataScreen from "./Collector/BinDataScreen";
+import ProfileScreen from "./Collector/ProfileScreen";
+import SignInPage from "./User/Screens/SignIn";
+import SignUpPage from "./User/Screens/SignUp";
 
 export type RootStackParamList = {
   Login: undefined;
@@ -31,14 +33,14 @@ function MainTabs() {
         tabBarIcon: ({ focused, color, size }) => {
           let iconName: keyof typeof Ionicons.glyphMap;
 
-          if (route.name === 'Home') {
-            iconName = focused ? 'home' : 'home-outline';
-          } else if (route.name === 'QRScanner') {
-            iconName = focused ? 'qr-code' : 'qr-code-outline';
-          } else if (route.name === 'Profile') {
-            iconName = focused ? 'person' : 'person-outline';
+          if (route.name === "Home") {
+            iconName = focused ? "home" : "home-outline";
+          } else if (route.name === "QRScanner") {
+            iconName = focused ? "qr-code" : "qr-code-outline";
+          } else if (route.name === "Profile") {
+            iconName = focused ? "person" : "person-outline";
           } else {
-            iconName = 'alert-circle';
+            iconName = "alert-circle";
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
@@ -55,10 +57,27 @@ function MainTabs() {
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
+      <Stack.Navigator
+        initialRouteName="SignInPage"
+        screenOptions={{ headerShown: false }}
+      >
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="MainTabs" component={MainTabs} />
-        <Stack.Screen name="BinData" component={BinDataScreen} options={{ headerShown: true }} />
+        <Stack.Screen
+          name="BinData"
+          component={BinDataScreen}
+          options={{ headerShown: true }}
+        />
+        <Stack.Screen
+          name="SignUpPage"
+          component={SignUpPage}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SignInPage"
+          component={SignInPage}
+          options={{ headerShown: false }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
