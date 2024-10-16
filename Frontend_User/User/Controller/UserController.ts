@@ -3,8 +3,6 @@ import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
 import bcrypt from "bcryptjs"; // for hashing passwords
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-
-// Create a new user
 export const createUser = async (userData) => {
   const { username, email, phone, address, password } = userData;
 
@@ -105,7 +103,7 @@ export const signInUser = async (email, password) => {
 
 export const getUserDetails = async () => {
   try {
-    const userData = await AsyncStorage.getItem('user');
+    const userData = await AsyncStorage.getItem("user");
     if (userData) {
       const user = JSON.parse(userData);
       return user;

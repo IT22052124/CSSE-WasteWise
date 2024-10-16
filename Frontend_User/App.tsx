@@ -8,57 +8,62 @@ import SignInPage from "./User/Screens/SignIn";
 import SignUpPage from "./User/Screens/SignUp";
 import UserDetailsPage from "./User/Screens/Profile";
 import BinPurchasePage from "./User/Screens/PurchaseBin";
+import PaymentPage from "./User/Screens/Payment";
+import PaymentHistoryPage from "./User/Screens/PaymentHistory";
+import BillHistory from "./User/Screens/Bill";
 
-export type RootStackParamList = {
-  Login: undefined;
-  MainTabs: undefined;
-  BinData: { binId: string };
-};
+const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
 
-export type MainTabParamList = {
-  Home: undefined;
-  QRScanner: undefined;
-  Profile: undefined;
-};
-
-const Stack = createStackNavigator<RootStackParamList>();
-const Tab = createBottomTabNavigator<MainTabParamList>();
-
-/*function MainTabs() {
+function BottomTabNavigator({ route }) {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
-          let iconName: keyof typeof Ionicons.glyphMap;
+          let iconName;
 
-          if (route.name === "Home") {
-            iconName = focused ? "home" : "home-outline";
-          } else if (route.name === "QRScanner") {
-            iconName = focused ? "qr-code" : "qr-code-outline";
-          } else if (route.name === "Profile") {
-            iconName = focused ? "person" : "person-outline";
-          } else {
-            iconName = "alert-circle";
+          if (route.name === "PaymentPage") {
+            iconName = focused ? "document" : "document-outline"; // Icon for company profile
+          } else if (route.name === "UserDetailsPage") {
+            iconName = focused ? "briefcase" : "briefcase-outline"; // Icon for posted jobs
+          } else if (route.name === "BillHistory") {
+            iconName = focused ? "briefcase" : "briefcase-outline"; // Icon for posted jobs
+          } else if (route.name === "PaymentHistoryPage") {
+            iconName = focused ? "document" : "document-outline"; // Icon for company profile
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="QRScanner" component={QRScannerScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Stack.Screen
+        name="PaymentPage"
+        component={PaymentPage}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="PaymentHistoryPage"
+        component={PaymentHistoryPage}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="BillHistory"
+        component={BillHistory}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="UserDetailsPage"
+        component={UserDetailsPage}
+        options={{ headerShown: false }}
+      />
     </Tab.Navigator>
   );
-}*/
+}
 
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName="BinPurchasePage"
-        screenOptions={{ headerShown: false }}
-      >
+      <Stack.Navigator initialRouteName="MainTabs">
         <Stack.Screen
           name="SignUpPage"
           component={SignUpPage}
@@ -70,6 +75,11 @@ export default function App() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
+          name="MainTabs"
+          component={BottomTabNavigator}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
           name="UserDetailsPage"
           component={UserDetailsPage}
           options={{ headerShown: false }}
@@ -77,6 +87,21 @@ export default function App() {
         <Stack.Screen
           name="BinPurchasePage"
           component={BinPurchasePage}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="PaymentPage"
+          component={PaymentPage}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="PaymentHistoryPage"
+          component={PaymentHistoryPage}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="BillHistory"
+          component={BillHistory}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
