@@ -58,7 +58,7 @@ export default function LoginScreen({ navigation }: Props) {
       >
 
 <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
-          <Image source={require("../assets/welcome.png")} style={styles.image} />
+          <Image source={require("../assets/loge.jpg")} style={styles.image} />
           <Text style={styles.header}>Welcome Back</Text>
           <View style={styles.inputContainer}>
             <Ionicons

@@ -9,24 +9,41 @@ import {
   Platform,
   ScrollView,
   SafeAreaView,
-  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { signInUser } from "./../Controller/UserController";
+import Toast from "react-native-toast-message";
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
+import { useNavigation } from '@react-navigation/native';
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const navigation = useNavigation();
 
   const handleSignIn = async () => {
-    try {
-      const userData = await signInUser(email, password);
-      console.log("User signed in:", userData);
-      // Proceed with user sign-in (e.g., navigate to another screen)
-    } catch (error) {
-      console.error(error);
-      Alert.alert("Sign In Error", error.message);
+    const response = await signInUser(email, password);
+    if (response.success) {
+      // Save user details to AsyncStorage
+      try {
+        await AsyncStorage.setItem('user', JSON.stringify(response.user));
+      } catch (error) {
+        console.error("Error saving user data: ", error);
+      }
+
+      Toast.show({
+        type: "success",
+        text1: "Welcome!",
+        text2: `Hello, ${response.user.username || "User"}! Sign in successful.`,
+      });
+      navigation.navigate('UserDetailsPage');
+    } else {
+      Toast.show({
+        type: "error",
+        text1: "Sign In Error",
+        text2: response.message,
+      });
     }
   };
 
@@ -97,7 +114,7 @@ export default function SignInPage() {
 
           <View style={styles.signUpContainer}>
             <Text style={styles.signUpText}>Don't have an account? </Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('SignUpPage')}>
               <Text style={styles.signUpLink}>Sign Up</Text>
             </TouchableOpacity>
           </View>

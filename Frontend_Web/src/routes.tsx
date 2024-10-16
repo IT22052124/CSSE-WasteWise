@@ -9,6 +9,7 @@ import {
 import { Home, Profile, Tables, Notifications } from "@/Pages/dashboard";
 import { SignIn, SignUp } from "@/Pages/auth";
 
+
 import { WasteTypes } from "./Pages/Waste/WasteTypes";
 import { AddWasteType } from "./Pages/Waste/AddWasteType";
 
