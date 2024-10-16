@@ -1,4 +1,11 @@
-import React, { ReactNode, useReducer, useContext, useMemo, Dispatch } from "react";
+import React, {
+  ReactNode,
+  useReducer,
+  useContext,
+  useMemo,
+  Dispatch,
+  useEffect,
+} from "react";
 import PropTypes from "prop-types";
 
 // Define the types for the state and action
@@ -17,7 +24,9 @@ interface Action {
 }
 
 // Create the context
-export const MaterialTailwind = React.createContext<[State, Dispatch<Action>] | null>(null);
+export const MaterialTailwind = React.createContext<
+  [State, Dispatch<Action>] | null
+>(null);
 MaterialTailwind.displayName = "MaterialTailwindContext";
 
 // Define the reducer function
@@ -45,10 +54,12 @@ interface ProviderProps {
   children: ReactNode;
 }
 
-export function MaterialTailwindControllerProvider({ children }: ProviderProps): JSX.Element {
+export function MaterialTailwindControllerProvider({
+  children,
+}: ProviderProps): JSX.Element {
   const initialState: State = {
     openSidenav: false,
-    sidenavColor: "dark",
+    sidenavColor: localStorage.getItem("sidenavColor") ||"dark",
     sidenavType: "white",
     transparentNavbar: true,
     fixedNavbar: false,
@@ -56,9 +67,16 @@ export function MaterialTailwindControllerProvider({ children }: ProviderProps):
   };
 
   const [controller, dispatch] = useReducer(reducer, initialState);
-  
+
   // Explicitly type the value variable as a tuple
-  const value: [State, Dispatch<Action>] = useMemo(() => [controller, dispatch], [controller]);
+  const value: [State, Dispatch<Action>] = useMemo(
+    () => [controller, dispatch],
+    [controller]
+  );
+
+  useEffect(() => {
+    localStorage.setItem("sidenavColor", controller.sidenavColor);
+  }, [controller.sidenavColor]);
 
   return (
     <MaterialTailwind.Provider value={value}>
@@ -81,7 +99,8 @@ export function useMaterialTailwindController() {
 }
 
 // Display name for the provider component
-MaterialTailwindControllerProvider.displayName = "MaterialTailwindControllerProvider";
+MaterialTailwindControllerProvider.displayName =
+  "MaterialTailwindControllerProvider";
 
 MaterialTailwindControllerProvider.propTypes = {
   children: PropTypes.node.isRequired,
@@ -94,9 +113,13 @@ export const setSidenavType = (dispatch: Dispatch<Action>, value: string) =>
   dispatch({ type: "SIDENAV_TYPE", value });
 export const setSidenavColor = (dispatch: Dispatch<Action>, value: string) =>
   dispatch({ type: "SIDENAV_COLOR", value });
-export const setTransparentNavbar = (dispatch: Dispatch<Action>, value: boolean) =>
-  dispatch({ type: "TRANSPARENT_NAVBAR", value });
+export const setTransparentNavbar = (
+  dispatch: Dispatch<Action>,
+  value: boolean
+) => dispatch({ type: "TRANSPARENT_NAVBAR", value });
 export const setFixedNavbar = (dispatch: Dispatch<Action>, value: boolean) =>
   dispatch({ type: "FIXED_NAVBAR", value });
-export const setOpenConfigurator = (dispatch: Dispatch<Action>, value: boolean) =>
-  dispatch({ type: "OPEN_CONFIGURATOR", value });
+export const setOpenConfigurator = (
+  dispatch: Dispatch<Action>,
+  value: boolean
+) => dispatch({ type: "OPEN_CONFIGURATOR", value });

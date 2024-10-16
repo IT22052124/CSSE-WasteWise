@@ -5,16 +5,14 @@ import {
   getDocs,
 } from "firebase/firestore";
 import { db } from "@/storage/firebase";
-import { useNavigate } from "react-router-dom";
 
 export const addWasteType = async (wasteTypeData) => {
-  const navigate = useNavigate();
   try {
     const docRef = await addDoc(collection(db, "wasteTypes"), {
       ...wasteTypeData,
       createdAt: serverTimestamp(),
     });
-    navigate("WasteTypes");
+    console.log("Document written with ID: ", docRef.id);
     return docRef;
   } catch (e) {
     console.error("Error adding document: ", e);
