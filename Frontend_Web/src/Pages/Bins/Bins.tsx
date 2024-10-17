@@ -113,7 +113,7 @@ import {
                           <Chip
                             variant="gradient"
                             color={wasteLevel > 70 ? "red" : "green"}
-                            value={`${wasteLevel}%`}
+                            value={`${wasteLevel.toFixed(2)}%`}
                             className="py-0.5 px-2 text-[11px] font-medium w-fit"
                           />
                         </td>

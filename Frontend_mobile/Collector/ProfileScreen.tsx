@@ -63,10 +63,7 @@ const UserDetailsPage = () => {
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.profileContainer}>
-          <Image
-            source={{
-              uri: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/placeholder-Ue5Ue5Ue5Ue5Ue5Ue5Ue5Ue5Ue5Ue5Ue5.png",
-            }}
+          <Image source={require("../assets/colles.jpeg")}
             style={styles.profileImage}
           />
         </View>
@@ -79,42 +76,6 @@ const UserDetailsPage = () => {
             bgColor="grey"
           />
         </View>
-
-        <View style={styles.infoContainer}>
-          <InfoCard
-            icon="mail-outline"
-            label="User Name"
-            value={user.email}
-            bgColor="#03A9F4"
-          />
-        </View>
-        <View style={styles.infoContainer}>
-          <InfoCard
-            icon="mail-outline"
-            label="Driving Liscenscn No"
-            value={user.drivingLicense
-            }
-            bgColor="#03A9F4"
-          />
-        </View>
-        <View style={styles.infoContainer}>
-          <InfoCard
-            icon="location-outline"
-            label="User Name"
-            value={user.address}
-            bgColor="#03A9F4"
-          />
-        </View>
-
-        <View style={styles.infoContainer}>
-          <InfoCard
-            icon="call-outline"
-            label="Phone"
-            value={user.phone}
-            bgColor="#03A9F4"
-          />
-        </View>
-
         <View style={styles.infoContainer}>
           <InfoCard
             icon="location-outline"
@@ -123,6 +84,36 @@ const UserDetailsPage = () => {
             bgColor="#03A9F4"
           />
         </View>
+        <View style={styles.infoContainer}>
+          <InfoCard
+            icon="call-outline"
+            label="Phone"
+            value={user.phone}
+            bgColor="green"
+          />
+        </View>
+
+        <View style={styles.infoContainer}>
+          <InfoCard
+            icon="mail-outline"
+            label="Email"
+            value={user.email}
+            bgColor="red"
+          />
+        </View>
+        <View style={styles.infoContainer}>
+          <InfoCard
+            icon="card-outline"
+            label="Driving Liscenscn No"
+            value={user.drivingLicense
+            }
+            bgColor="orange"
+          />
+        </View>
+       
+        
+
+        
 
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <View style={styles.logoutButtonContent}>
@@ -149,8 +140,8 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   profileImage: {
-    width: 120,
-    height: 120,
+    width: 150,
+    height: 150,
     borderRadius: 60,
     borderWidth: 2,
     borderColor: "#FFFFFF",

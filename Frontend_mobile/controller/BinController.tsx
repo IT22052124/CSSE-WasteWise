@@ -1,4 +1,4 @@
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs,updateDoc,doc } from "firebase/firestore";
 import { db } from "../storage/firebase";
 
 // Function to find a bin by binID
@@ -29,5 +29,19 @@ export const findBinByID = async (binID) => {
   } catch (error) {
     console.error(`Error retrieving bin with binID ${binID}:`, error);
     throw new Error("Failed to fetch bin by binID");
+  }
+};
+
+export const resetBinWasteLevel = async (binId) => {
+  try {
+    console.log(binId);
+    const binDocRef = doc(db, "bins", binId);
+    await updateDoc(binDocRef, {
+      wasteLevel: 0, // Reset waste level to 0
+    });
+    console.log(`Waste level for bin ${binId} has been reset to 0`);
+  } catch (error) {
+    console.error(`Error resetting waste level for bin ${binId}:`, error);
+    throw new Error("Failed to reset waste level");
   }
 };
