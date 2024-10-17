@@ -11,10 +11,11 @@ export const AddCollectionModel = () => {
   const { sidenavColor } = controller;
   const [formData, setFormData] = useState({
     modelName: "",
-    collectionFrequency: "",
+    collectionFrequency: "Weekly",
     chargingMethod: "",
     customFrequency: "",
     wasteTypes: [],
+    flatRatePrice: 0,
   });
 
   useEffect(() => {
@@ -29,9 +30,9 @@ export const AddCollectionModel = () => {
     fetchWasteTypes();
   });
 
-  const [customFrequency, setCustomFrequency] = useState<string>("");
   const [wasteTypes, setWasteTypes] = useState<string[]>([]);
   const [selectedWasteTypes, setSelectedWasteTypes] = useState<string[]>([]);
+  const [all, setAll] = useState(false);
 
   // Handle input changes
   const handleChange = (
@@ -45,19 +46,35 @@ export const AddCollectionModel = () => {
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target;
-    console.log(value, checked);
+
     if (checked) {
-      setSelectedWasteTypes([...selectedWasteTypes, value]);
+      setSelectedWasteTypes((prev) => {
+        const updated = [...prev, value];
+        setFormData({
+          ...formData,
+          wasteTypes: updated,
+        });
+        return updated;
+      });
     } else {
-      setSelectedWasteTypes(
-        selectedWasteTypes.filter((type) => type !== value)
-      );
+      setSelectedWasteTypes((prev) => {
+        const updated = prev.filter((type) => type !== value);
+        setFormData({
+          ...formData,
+          wasteTypes: updated,
+        });
+        return updated;
+      });
     }
-    setFormData({
-      ...formData,
-      wasteTypes: selectedWasteTypes,
-    });
   };
+
+  useEffect(() => {
+    if (selectedWasteTypes.length === wasteTypes.length) {
+      setAll(true);
+    } else {
+      setAll(false);
+    }
+  }, [selectedWasteTypes, wasteTypes]);
 
   // Handle Select changes
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -65,6 +82,22 @@ export const AddCollectionModel = () => {
     setFormData({
       ...formData,
       [name]: value,
+    });
+  };
+
+  const handleCheckboxChangeAll = () => {
+    const updatedAll = !all;
+    setAll(updatedAll);
+
+    if (updatedAll) {
+      setSelectedWasteTypes(wasteTypes);
+    } else {
+      setSelectedWasteTypes([]);
+    }
+
+    setFormData({
+      ...formData,
+      wasteTypes: updatedAll ? wasteTypes : [],
     });
   };
 
@@ -127,29 +160,9 @@ export const AddCollectionModel = () => {
               <option value="Daily">Daily</option>
               <option value="Weekly">Weekly</option>
               <option value="Monthly">Monthly</option>
-              <option value="Custom">Custom</option>
+              <option value="Custom">Yearly</option>
             </select>
           </div>
-
-          {formData.collectionFrequency === "Custom" && (
-            <div className="space-y-2">
-              <Typography
-                variant="small"
-                className="font-normal text-blue-gray-600"
-              >
-                Custom Frequency
-              </Typography>
-              <input
-                type="text"
-                id="customFrequency"
-                name="customFrequency"
-                value={customFrequency}
-                onChange={handleChange}
-                placeholder="Enter custom frequency"
-                className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-              />
-            </div>
-          )}
 
           {/* Charging Method */}
           <div className="space-y-2">
@@ -174,6 +187,25 @@ export const AddCollectionModel = () => {
               </option>
             </select>
           </div>
+          {formData.chargingMethod === "Flat-rate pricing" && (
+            <div className="space-y-2">
+              <Typography
+                variant="small"
+                className="font-normal text-blue-gray-600"
+              >
+                Price (Flat-rate) (LKR)
+              </Typography>
+              <input
+                type="text"
+                id="flatRatePrice"
+                name="flatRatePrice"
+                value={formData.flatRatePrice}
+                onChange={handleChange}
+                placeholder="Enter custom frequency"
+                className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              />
+            </div>
+          )}
 
           {/* Waste Types Collected */}
           <div className="space-y-2">
@@ -184,6 +216,16 @@ export const AddCollectionModel = () => {
               Waste Types Collected
             </Typography>
             <div className="space-y-1">
+              <Switch
+                id={`All`}
+                label={"All"}
+                checked={all}
+                onChange={handleCheckboxChangeAll}
+                value={"All"}
+                labelProps={{
+                  className: "text-sm font-normal text-blue-gray-500 m-3",
+                }}
+              />
               {wasteTypes.map((type, index) => (
                 <Switch
                   key={index}

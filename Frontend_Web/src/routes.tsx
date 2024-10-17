@@ -5,6 +5,9 @@ import {
   InformationCircleIcon,
   ServerStackIcon,
   RectangleStackIcon,
+  MapPinIcon,
+  CubeIcon,
+  DocumentDuplicateIcon,
 } from "@heroicons/react/24/solid";
 import { Home, Profile, Tables, Notifications } from "@/Pages/dashboard";
 import { SignIn, SignUp } from "@/Pages/auth";
@@ -20,6 +23,11 @@ import { UpdateWasteType } from "./Pages/WasteTypes/UpdateWasteType";
 import { AddCollectionModel } from "./Pages/CollectionModels/AddCollectionModel";
 import { CollectionModels } from "./Pages/CollectionModels/CollectionModels";
 import { UpdateCollectionModel } from "./Pages/CollectionModels/UpdateCollectionModel";
+
+//Locations Elements
+import { Locations } from "./Pages/Locations/Locations";
+import { UpdateLocation } from "./Pages/Locations/UpdateLocation";
+import { AddLocations } from "./Pages/Locations/AddLocation";
 
 const icon = {
   className: "w-5 h-5 text-inherit",
@@ -38,7 +46,7 @@ export const routes = [
         relatedPaths: ["/home"], // Add related paths
       },
       {
-        icon: <HomeIcon {...icon} />,
+        icon: <DocumentDuplicateIcon {...icon} />,
         name: "Waste Types",
         path: "/wastetypes",
         element: <WasteTypes />,
@@ -46,7 +54,7 @@ export const routes = [
         relatedPaths: ["/wastetypes", "/addwastetypes", "/updatewastetypes"],
       },
       {
-        icon: <HomeIcon {...icon} />,
+        icon: <DocumentDuplicateIcon {...icon} />,
         name: "Add Waste Types",
         path: "/addwastetypes",
         element: <AddWasteType />,
@@ -54,7 +62,7 @@ export const routes = [
         relatedPaths: ["/wastetypes", "/addwastetypes", "/updatewastetypes"],
       },
       {
-        icon: <HomeIcon {...icon} />,
+        icon: <DocumentDuplicateIcon {...icon} />,
         name: "Update Waste Types",
         path: "/updatewastetypes/:id",
         element: <UpdateWasteType />,
@@ -62,8 +70,8 @@ export const routes = [
         relatedPaths: ["/wastetypes", "/addwastetypes", "/updatewastetypes"],
       },
       {
-        icon: <HomeIcon {...icon} />,
-        name: "Waste Collection Models",
+        icon: <CubeIcon {...icon} />,
+        name: "Collection Models",
         path: "/collectionmodels",
         element: <CollectionModels />,
         inSidebar: true,
@@ -74,7 +82,7 @@ export const routes = [
         ],
       },
       {
-        icon: <HomeIcon {...icon} />,
+        icon: <CubeIcon {...icon} />,
         name: "Add Waste Collection Models",
         path: "/addcollectionmodel",
         element: <AddCollectionModel />,
@@ -86,7 +94,7 @@ export const routes = [
         ],
       },
       {
-        icon: <HomeIcon {...icon} />,
+        icon: <CubeIcon {...icon} />,
         name: "Update Waste Collection Models",
         path: "/updatecollectionmodel/:id",
         element: <UpdateCollectionModel />,
@@ -96,6 +104,30 @@ export const routes = [
           "/addcollectionmodel",
           "/updatecollectionmodel",
         ],
+      },
+      {
+        icon: <MapPinIcon {...icon} />,
+        name: "Locations",
+        path: "/locations",
+        element: <Locations />,
+        inSidebar: true,
+        relatedPaths: ["/locations", "/addlocation", "/updatelocation"],
+      },
+      {
+        icon: <MapPinIcon {...icon} />,
+        name: "Add Location",
+        path: "/addlocation",
+        element: <AddLocations />,
+        inSidebar: false,
+        relatedPaths: ["/locations", "/addlocation", "/updatelocation"],
+      },
+      {
+        icon: <MapPinIcon {...icon} />,
+        name: "Update Location",
+        path: "/updatelocation/:id",
+        element: <UpdateLocation />,
+        inSidebar: false,
+        relatedPaths: ["/locations", "/addlocation", "/updatelocation"],
       },
       {
         icon: <UserCircleIcon {...icon} />,
