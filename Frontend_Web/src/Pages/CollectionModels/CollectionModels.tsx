@@ -31,6 +31,7 @@ export const CollectionModels = () => {
       try {
         const data = await getCollectionModels(); // Fetching collection models instead of waste types
         setCollectionModels(data);
+        console.log(data);
       } catch (error) {
         console.error("Error fetching collection models:", error);
       }
@@ -118,7 +119,7 @@ export const CollectionModels = () => {
                     collectionFrequency,
                     wasteTypes,
                     flatRatePrice,
-                    routesAndLocations,
+                    locations,
                     id,
                   },
                   key
@@ -159,7 +160,10 @@ export const CollectionModels = () => {
                       </td>
                       <td className={className}>
                         <Typography className="text-xs font-semibold text-blue-gray-600">
-                          {routesAndLocations}
+                          { locations ? locations
+                            .filter((location) => location !== null) // Filter out null values
+                            .map((location) => location?.locationName) // Map to location names
+                            .join(", "): "Not Available"}
                         </Typography>
                       </td>
                       <td className={className}>

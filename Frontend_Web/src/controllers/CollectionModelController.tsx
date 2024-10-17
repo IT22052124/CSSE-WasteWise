@@ -7,6 +7,8 @@ import {
   deleteDoc,
   doc,
   getDoc,
+  query,
+  where,
 } from "firebase/firestore";
 import { db } from "@/storage/firebase";
 
@@ -15,6 +17,7 @@ export const addCollectionModel = async (collectionModelData) => {
   try {
     const docRef = await addDoc(collection(db, "collectionModels"), {
       ...collectionModelData,
+      locations: [],
       createdAt: serverTimestamp(),
     });
     console.log("Collection Model added with ID: ", docRef.id);
@@ -30,10 +33,33 @@ export const getCollectionModels = async () => {
   try {
     const collectionModelCollection = collection(db, "collectionModels");
     const collectionModelSnapshot = await getDocs(collectionModelCollection);
-    const collectionModels = collectionModelSnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+
+    const collectionModels: CollectionModel[] = await Promise.all(
+      collectionModelSnapshot.docs.map(async (docSnapshot) => {
+        const collectionModelData = {
+          id: docSnapshot.id,
+          ...docSnapshot.data(),
+        } as CollectionModel;
+
+        if (
+          collectionModelData.locations &&
+          collectionModelData.locations.length > 0
+        ) {
+          collectionModelData.locations = await Promise.all(
+            collectionModelData.locations.map(async (locationId) => {
+              const locationRef = doc(db, "locations", locationId);
+              const locationDoc = await getDoc(locationRef);
+              return locationDoc.exists()
+                ? ({ id: locationDoc.id, ...locationDoc.data() } as Location)
+                : null;
+            })
+          );
+        }
+
+        return collectionModelData;
+      })
+    );
+
     console.log("Collection models retrieved successfully:", collectionModels);
     return collectionModels;
   } catch (error) {
