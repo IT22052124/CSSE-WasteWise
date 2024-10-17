@@ -45,14 +45,13 @@ export const createPayment = async (amount, userID, method, slipUrl) => {
 
 export const getPaymentsByUserID = async (userID, method = null) => {
   try {
-    console.log(userID);
     // Step 1: Prepare the document reference for the userID
     const userRef = doc(db, "users", userID); // Reference to the user's document
 
     // Step 2: Construct the query
     let paymentQuery = query(
       collection(db, "payments"), // Query the payments collection
-      where("userID", "==", userRef) // Filter by user reference
+      where("userID", "==", userRef)
     );
 
     // If method is specified, add a method filter to the query
@@ -72,7 +71,7 @@ export const getPaymentsByUserID = async (userID, method = null) => {
       ...doc.data(), // Spread the document data
     }));
 
-    console.log("Payments retrieved:", payments);
+    payments.sort((a, b) => b.date - a.date);
 
     // Return the retrieved payments
     return payments;

@@ -11,6 +11,7 @@ import BinPurchasePage from "./User/Screens/PurchaseBin";
 import PaymentPage from "./User/Screens/Payment";
 import PaymentHistoryPage from "./User/Screens/PaymentHistory";
 import BillHistory from "./User/Screens/Bill";
+import "react-native-reanimated";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();

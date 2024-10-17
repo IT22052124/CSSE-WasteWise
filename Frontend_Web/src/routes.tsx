@@ -9,6 +9,7 @@ import {
   CubeIcon,
   DocumentDuplicateIcon,
   CreditCardIcon,
+  TrashIcon,
 } from "@heroicons/react/24/solid";
 import { Home, Profile, Tables, Notifications } from "@/Pages/dashboard";
 import { SignIn, SignUp } from "@/Pages/auth";
@@ -35,6 +36,9 @@ import{AddCollector} from "./Pages/Collector/addCollector";
 import{Collectors} from "./Pages/Collector/Collectors"
 
 import { Payments } from "./Pages/Payments/Payments";
+
+import { AddBinType } from "./Pages/BinType/AddBinType";
+
 
 const icon = {
   className: "w-5 h-5 text-inherit",
@@ -143,6 +147,14 @@ export const routes = [
         element: <Payments />,
         inSidebar: true,
         relatedPaths: ["/payments"],
+      },
+      {
+        icon: <TrashIcon {...icon} />,
+        name: "Add Bin Types",
+        path: "/addbintypes",
+        element: <AddBinType />,
+        inSidebar: false,
+        relatedPaths: ["/bintypes", "/addbintypes", "/updatebintypes"],
       },
       {
         icon: <UserCircleIcon {...icon} />,

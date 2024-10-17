@@ -14,6 +14,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { getPaymentsByUserID } from "./../Controller/paymentController";
 import { getUserDetails } from "./../Controller/UserController";
+import { useFocusEffect } from "@react-navigation/native";
 
 const PaymentHistoryPage = () => {
   const [payments, setPayments] = useState([]);
@@ -36,24 +37,27 @@ const PaymentHistoryPage = () => {
   }, []);
 
   // Fetch payments only when the userID is set
-  useEffect(() => {
+  const fetchPayments = async () => {
     if (!userID) return; // Don't fetch payments until the userID is available
 
     setLoading(true);
-    const fetchPayments = async () => {
-      try {
-        const paymentsData = await getPaymentsByUserID(userID); // Fetch payments using the userID
-        console.log("Fetched payments data:", paymentsData);
-        setPayments(paymentsData);
-      } catch (error) {
-        console.error("Error fetching payments:", error);
-      } finally {
-        setLoading(false); // Stop loading when the data is fetched
-      }
-    };
+    try {
+      const paymentsData = await getPaymentsByUserID(userID); // Fetch payments using the userID
+      console.log("Fetched payments data:", paymentsData);
+      setPayments(paymentsData);
+    } catch (error) {
+      console.error("Error fetching payments:", error);
+    } finally {
+      setLoading(false); // Stop loading when the data is fetched
+    }
+  };
 
-    fetchPayments(); // Trigger payment fetch when userID is ready
-  }, [userID]);
+  // Use useFocusEffect to fetch payments when the screen is focused
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchPayments(); // Trigger payment fetch when userID is available
+    }, [userID]) // Dependency on userID so it refetches if userID changes
+  );
 
   const renderPaymentItem = ({ item }) => (
     <View style={styles.paymentItem}>
