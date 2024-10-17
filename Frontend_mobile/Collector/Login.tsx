@@ -15,21 +15,22 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Toast from "react-native-toast-message";
+import { signInCollector } from '../controller/collectorController';
+import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
 
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../App';
 
- type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
- type Props = {
-  navigation: LoginScreenNavigationProp;
-};
+ 
 const { width } = Dimensions.get("window");
 
-export default function LoginScreen({ navigation }: Props) {
-  const [username, setUsername] = useState('');
+export default function LoginScreen() {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+
   const [fadeAnim] = useState(new Animated.Value(0));
 
+  const navigation = useNavigation();
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -39,11 +40,40 @@ export default function LoginScreen({ navigation }: Props) {
     }).start();
   }, []);
 
-  const handleLogin = () => {
-    // Implement login logic here
-    console.log('Login with:', username, password);
-    navigation.navigate('MainTabs');
+
+  
+
+  const handleLogin = async () => {
+    const response = await signInCollector(email, password);
+//console.log(email)
+    //console.log(password)
+    if (response.success) {
+      // Save user details to AsyncStorage
+      try {
+        await AsyncStorage.setItem("collector", JSON.stringify(response.collector));
+      } catch (error) {
+        console.error("Error saving user data: ", error);
+      }
+
+      Toast.show({
+        type: "success",
+        text1: "Welcome!",
+        text2: `Hello, ${
+        response.collector.email || "collector"
+        }! Sign in successful.`,
+      });
+      navigation.navigate("MainTabs");
+    } else {
+      console.log(response)
+      Toast.show({
+        type: "error",
+        text1: "Sign In Error",
+        text2: response.message,
+      });
+    }
   };
+
+  
 
   return (
     <KeyboardAvoidingView
@@ -71,8 +101,8 @@ export default function LoginScreen({ navigation }: Props) {
               style={styles.input}
               placeholder="Username"
               placeholderTextColor="#a0a0a0"
-              value={username}
-              onChangeText={setUsername}
+              value={email}
+              onChangeText={setEmail}
               keyboardType="email-address"
             />
           </View>
@@ -88,11 +118,22 @@ export default function LoginScreen({ navigation }: Props) {
               style={styles.input}
               placeholder="Password"
               placeholderTextColor="#a0a0a0"
-              secureTextEntry
+              secureTextEntry={!showPassword}
               value={password}
               onChangeText={setPassword}
             />
           </View>
+          <TouchableOpacity
+              onPress={() => setShowPassword(!showPassword)}
+              style={styles.eyeIcon}
+            >
+              <Ionicons
+                name={showPassword ? "eye-outline" : "eye-off-outline"}
+                size={24}
+                color="#4CAF50"
+              />
+            </TouchableOpacity>
+          
 
           <TouchableOpacity style={styles.button} onPress={handleLogin}>
             <Text style={styles.buttonText}>Login</Text>
@@ -117,6 +158,9 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "center",
     padding: 20,
+  },
+  eyeIcon: {
+    padding: 4,
   },
   content: {
     alignItems: "center",
