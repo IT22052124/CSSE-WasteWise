@@ -48,17 +48,23 @@ export default function BinDataScreen({ route }) {
     try {
       // Generate the next collectionID
       const newCollectionID = await generateNextCollectionID();
-
+   console.log()
       // Prepare data for submission
       const collectionDetails = {
         collectionID: newCollectionID, // Use the generated collectionID
         binID: binData.binID,
+        User:binData.user,
+        WasteType:binData.type,
         collectorID: user.collectorID,
         collectorname: user.name,
         wasteLevel: binData.wasteLevel, // Assuming this is static, but you can update as needed
         collectionDate: moment().format('YYYY-MM-DD HH:mm:ss'), // Current date and time
-        wasteType: binData.type,
+Payback: binData.type.incentives,
+        PerKg: binData.type.price
+        ,
       };
+
+      
 
       // Call the function to submit the collection details
       await addWasteCollection(collectionDetails);
@@ -94,7 +100,7 @@ export default function BinDataScreen({ route }) {
               <InfoItem label="Owner Phone" value={binData.user.phone} />
               <InfoItem label="Location" value={binData.user.address} />
               <InfoItem label="Waste level" value={binData.wasteLevel} />
-              <InfoItem label="Waste type" value={binData.type} />
+              <InfoItem label="Waste type" value={binData.type.wasteType} />
               <InfoItem label="Recyclable" value="yes" />
               <InfoItem label="Cost per Kg" value={binData.perKg} />
             </View>

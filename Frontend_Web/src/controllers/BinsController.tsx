@@ -65,8 +65,8 @@ export const getLastBinID = async () => {
     try {
       // Query the "bins" collection, order by "binID" in descending order, and limit the result to 1
       const binCollection = collection(db, "bins");
-      const lastBinQuery = query(binCollection, orderBy("binID", "desc"), limit(1));
-  
+      const lastBinQuery = query(binCollection, orderBy("binID", "desc"));
+       
       // Execute the query
       const binSnapshot = await getDocs(lastBinQuery);
   
@@ -99,3 +99,27 @@ export const getLastBinID = async () => {
       console.error("Error updating waste level:", error);
     }
   };
+
+  // Function to simulate waste level updates for all bins at a set interval
+ // Function to simulate waste level updates for all bins at a set interval
+export const autoUpdateWasteLevels = async (intervalInMs = 1200000) => { // 10 seconds
+  try {
+    setInterval(async () => {
+      // Get all bins
+      const bins = await getBins();
+
+      // Iterate over each bin to update the waste level
+      bins.forEach(async (bin) => {
+        // Generate a random increment for this bin
+        const increment = Math.random() * 2; // Random increment between 0 and 2 (adjust as needed)
+        const newWasteLevel = Math.min(bin.wasteLevel + increment, 100); // Cap at 100%
+
+        // Update waste level for this bin in the database
+        await updateBinWasteLevel(bin.id, newWasteLevel);
+        console.log(`Updated bin ${bin.id} to waste level ${newWasteLevel.toFixed(2)}%`);
+      });
+    }, intervalInMs); // Runs every 10 seconds
+  } catch (error) {
+    console.error("Error during auto waste level update:", error);
+  }
+};
