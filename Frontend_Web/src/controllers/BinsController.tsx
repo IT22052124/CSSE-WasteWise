@@ -7,7 +7,7 @@ import {
   updateDoc,
   query,
   orderBy,
-  limit
+  setDoc
 
 } from "firebase/firestore";
 import { db } from "@/storage/firebase";
@@ -82,5 +82,20 @@ export const getLastBinID = async () => {
     } catch (error) {
       console.error("Error retrieving last binID:", error);
       throw new Error("Failed to fetch last binID");
+    }
+  };
+
+  export const updateBinWasteLevel = async (documentId: string, newWasteLevel: number) => {
+    if (!documentId) {
+      console.error("Invalid document ID");
+      return;
+    }
+  
+    const binRef = doc(db, "bins", documentId);
+    try {
+      await updateDoc(binRef, { wasteLevel: newWasteLevel });
+      console.log(`Waste level updated for document ID ${documentId}: ${newWasteLevel}`);
+    } catch (error) {
+      console.error("Error updating waste level:", error);
     }
   };

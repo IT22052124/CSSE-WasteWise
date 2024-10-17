@@ -1,10 +1,78 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
-import { RouteProp } from '@react-navigation/native';
+import React, { useEffect, useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { addWasteCollection, getLastWasteCollectionID } from '../controller/wasteCollectionController'; // Assuming you have this function to handle the submission
+import moment from 'moment'; // To handle date formatting
+import { getCollectorDetails } from "../controller/collectorController";
+import { resetBinWasteLevel } from "../controller/BinController"; // Import your reset function
 
 export default function BinDataScreen({ route }) {
+  const [user, setUser] = useState(null);
   const { binData } = route.params;
-  console.log(binData);
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const userData = await getCollectorDetails();
+        setUser(userData);
+      } catch (error) {
+        console.error("Failed to fetch user details: ", error);
+      }
+    };
+
+    fetchUserDetails();
+  }, []);
+
+  // Helper function to generate the next collectionID
+  const generateNextCollectionID = async () => {
+    try {
+      const lastCollectionID = await getLastWasteCollectionID();
+      if (lastCollectionID) {
+        // Increment the last collection ID (e.g., "C004" becomes "C005")
+        const numericPart = parseInt(lastCollectionID.substring(1)); // Get the numeric part of the ID
+        const nextNumericPart = numericPart + 1;
+        return `P${nextNumericPart.toString().padStart(3, '0')}`; // Format with leading zeros if necessary
+      } else {
+        // If no collections exist, start with "C001"
+        return "P001";
+      }
+    } catch (error) {
+      console.error("Error generating collectionID:", error);
+      throw new Error("Failed to generate collectionID");
+    }
+  };
+
+  // Handle the "Collect Waste" button press
+  const handleCollectWaste = async () => {
+    try {
+      // Generate the next collectionID
+      const newCollectionID = await generateNextCollectionID();
+
+      // Prepare data for submission
+      const collectionDetails = {
+        collectionID: newCollectionID, // Use the generated collectionID
+        binID: binData.binID,
+        collectorID: user.collectorID,
+        collectorname: user.name,
+        wasteLevel: "90%", // Assuming this is static, but you can update as needed
+        collectionDate: moment().format('YYYY-MM-DD HH:mm:ss'), // Current date and time
+        wasteType: binData.type,
+      };
+
+      // Call the function to submit the collection details
+      await addWasteCollection(collectionDetails);
+
+      // Reset the waste level of the bin to 0
+      await resetBinWasteLevel(binData.id);
+
+      // Navigate back to the dashboard or the desired screen
+      navigation.navigate("Home");
+    } catch (error) {
+      console.error("Failed to collect waste", error);
+      Alert.alert("Error", "Failed to collect waste. Please try again.");
+    }
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -13,7 +81,7 @@ export default function BinDataScreen({ route }) {
           source={require('../assets/bin.jpg')}
           style={styles.binImage}
         />
-        
+
         {binData ? (
           <View style={styles.binInfo}>
             <View style={styles.infoHeader}>
@@ -25,7 +93,7 @@ export default function BinDataScreen({ route }) {
               <InfoItem label="Owner" value={binData.user.username} />
               <InfoItem label="Owner Phone" value={binData.user.phone} />
               <InfoItem label="Location" value={binData.user.address} />
-              <InfoItem label="Waste level" value="90%" />
+              <InfoItem label="Waste level" value={binData.wasteLevel} />
               <InfoItem label="Waste type" value={binData.type} />
               <InfoItem label="Recyclable" value="yes" />
               <InfoItem label="Cost per Kg" value={binData.perKg} />
@@ -34,8 +102,8 @@ export default function BinDataScreen({ route }) {
         ) : (
           <Text>No data available</Text>
         )}
-        
-        <TouchableOpacity style={styles.collectButton}>
+
+        <TouchableOpacity style={styles.collectButton} onPress={handleCollectWaste}>
           <Text style={styles.collectButtonText}>Collect Waste</Text>
         </TouchableOpacity>
       </View>
@@ -130,18 +198,18 @@ const styles = StyleSheet.create({
   },
   collectButton: {
     backgroundColor: '#2ecc71',
-    paddingVertical: 16, // Increased for more height
+    paddingVertical: 16,
     paddingHorizontal: 24,
     borderRadius: 25,
     marginTop: 20,
     width: 250,
-    justifyContent: 'center', // Centers text vertically
-    alignItems: 'center', // Centers text horizontally
-},
-collectButtonText: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  collectButtonText: {
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
-},
+  },
 });
