@@ -29,7 +29,7 @@ import { UpdateCollectionModel } from "./Pages/CollectionModels/UpdateCollection
 //Locations Elements
 import { Locations } from "./Pages/Locations/Locations";
 import { UpdateLocation } from "./Pages/Locations/UpdateLocation";
-import { AddLocations } from "./Pages/Locations/AddLocation";
+import { AddLocation } from "./Pages/Locations/AddLocation";
 
 //collector elemets
 import { AddCollector } from "./Pages/Collector/addCollector";
@@ -128,7 +128,7 @@ export const routes = [
         icon: <MapPinIcon {...icon} />,
         name: "Add Location",
         path: "/addlocation",
-        element: <AddLocations />,
+        element: <AddLocation />,
         inSidebar: false,
         relatedPaths: ["/locations", "/addlocation", "/updatelocation"],
       },
