@@ -5,6 +5,7 @@ import {
   getDoc,
   query,
   orderBy,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "@/storage/firebase";
 
@@ -59,5 +60,23 @@ export const getAllPayments = async () => {
   } catch (error) {
     console.error("Error retrieving payments with user emails:", error);
     throw new Error("Failed to retrieve payments with user emails");
+  }
+};
+
+export const updatePaymentStatus = async (paymentId, newStatus) => {
+  try {
+    // Create a reference to the specific payment document
+    console.log(paymentId, newStatus)
+    const paymentDocRef = doc(db, "payments", paymentId);
+    
+    // Update the payment status
+    await updateDoc(paymentDocRef, {
+      status: newStatus,
+    });
+
+    console.log(`Payment status updated to ${newStatus} for payment ID: ${paymentId}`);
+  } catch (error) {
+    console.error("Error updating payment status:", error);
+    throw new Error("Failed to update payment status");
   }
 };

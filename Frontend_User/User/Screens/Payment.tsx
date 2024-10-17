@@ -143,30 +143,40 @@ const PaymentPage = () => {
 
       setIsLoading(true);
 
-      if (bankSlip) {
-        const response = await fetch(bankSlip);
-        const blob = await response.blob();
-
-        const timestamp = new Date().getTime();
-
-        const storageRef = ref(
-          storage,
-          `paymentSlips/${userID},${timestamp}.png`
-        );
-        console.log("hi");
-        await uploadBytes(storageRef, blob);
-        const downloadURL = await getDownloadURL(storageRef);
-
-        setSlipURL(downloadURL);
-      }
+      const response = await fetch(bankSlip);
+      const blob = await response.blob();
+      const timestamp = new Date().getTime();
+      const storageRef = ref(
+        storage,
+        `paymentSlips/${userID},${timestamp}.png`
+      );
 
       try {
-        const paymentData = await createPayment(
-          paymentAmount,
-          userID,
-          paymentMethod,
-          slipURL
-        );
+        await uploadBytes(storageRef, blob); // Upload the file
+        const downloadURL = await getDownloadURL(storageRef); // Get the download URL
+        setSlipURL(downloadURL); // Set slipURL state
+
+        if (slipURL) {
+          // Ensure downloadURL is available before proceeding
+          const paymentData = await createPayment(
+            paymentAmount,
+            userID,
+            paymentMethod,
+            downloadURL // Use downloadURL here
+          );
+
+          // Payment succeeded
+          Toast.show({
+            type: "success",
+            text1: "Payment Success",
+          });
+        } else {
+          Toast.show({
+            type: "error",
+            text1: "Error",
+            text2: "Failed to get download URL.",
+          });
+        }
       } catch (error) {
         console.error(error);
         Toast.show({
@@ -176,10 +186,6 @@ const PaymentPage = () => {
         });
       }
 
-      Toast.show({
-        type: "success",
-        text1: "Payment Success",
-      });
       setIsLoading(false);
       resetFields();
     } else {
