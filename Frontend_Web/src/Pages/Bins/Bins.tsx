@@ -51,6 +51,7 @@ import {
                     "Bin ID",
                     "Type",
                     "User",
+                    "Address",
                     "Waste Level",
                     "Cost per kg",
                     "Bin Color",
@@ -100,7 +101,12 @@ import {
                         </td>
                         <td className={className}>
                           <Typography className="text-xs font-semibold text-blue-gray-600">
-                            {user}
+                            {user.username}
+                          </Typography>
+                        </td>
+                        <td className={className}>
+                          <Typography className="text-xs font-semibold text-blue-gray-600">
+                            {user.address}
                           </Typography>
                         </td>
                         <td className={className}>

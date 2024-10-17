@@ -1,6 +1,8 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { RouteProp } from '@react-navigation/native';
+import { doc, getDoc } from "firebase/firestore"; // Import Firestore functions
+import { db } from "../storage/firebase"; // Adjust the import based on your file structure
 import { RootStackParamList } from '../App';
 
 type BinDataScreenRouteProp = RouteProp<RootStackParamList, 'BinData'>;
@@ -10,24 +12,26 @@ type Props = {
 };
 
 export default function BinDataScreen({ route }: Props) {
-  const { binId } = route.params;
+  const { binData } = route.params;
+  console.log(binData);
+  // [binData, setBinData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Fetch bin data using binId
-  // This is a placeholder for the actual data
-  const binData = {
-    id: binId,
-    location: '123 Main St',
-    lastEmptied: '2023-05-01',
-    currentCapacity: '75%',
-  };
+ 
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Bin Data</Text>
-      <Text>Bin ID: {binData.id}</Text>
-      <Text>Location: {binData.location}</Text>
-      <Text>Last Emptied: {binData.lastEmptied}</Text>
-      <Text>Current Capacity: {binData.currentCapacity}</Text>
+      {binData ? (
+        <>
+          <Text>Bin ID: {binData.binID}</Text>
+          <Text>Location: {binData.user.address}</Text>
+          <Text>Last Emptied: {binData.user.username}</Text>
+          
+        </>
+      ) : (
+        <Text>No data available</Text>
+      )}
     </View>
   );
 }
