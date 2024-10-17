@@ -29,12 +29,7 @@ export const signInCollector = async (email, password) => {
     const collectorDoc = querySnapshot.docs[0];
     const collectorData = collectorDoc.data();
     const collectorId = collectorDoc.id;
-    console.log("x",collectorData)
-    console.log("x",)
 
-    // Log the stored hashed password for debugging
-    console.log("Stored hashed password:", collectorData.password);
-    console.log()
     // Compare the entered password with the hashed password stored in Firestore
     const passwordMatch = await bcrypt.compare(password.trim(), collectorData.password.trim());
 
@@ -131,17 +126,3 @@ export const getCollectorDetails = async () => {
   }
 };
 
-// Example function to increment a page view count
-export const addPageView = async () => {
-  try {
-    const pageViewRef = doc(db, "globalStats", "pageViewTracker");
-
-    await updateDoc(pageViewRef, {
-      views: increment(1),
-      lastViewedAt: serverTimestamp(),
-    });
-  } catch (error) {
-    console.error("Error incrementing page view:", error);
-    throw new Error("Failed to increment page view");
-  }
-};
