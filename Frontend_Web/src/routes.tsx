@@ -30,6 +30,10 @@ import { Locations } from "./Pages/Locations/Locations";
 import { UpdateLocation } from "./Pages/Locations/UpdateLocation";
 import { AddLocations } from "./Pages/Locations/AddLocation";
 
+//collector elemets
+import{AddCollector} from "./Pages/Collector/addCollector";
+import{Collectors} from "./Pages/Collector/Collectors"
+
 import { Payments } from "./Pages/Payments/Payments";
 
 const icon = {
@@ -171,6 +175,22 @@ export const routes = [
         element: <Tables />,
         inSidebar: true,
         relatedPaths: ["/tables"],
+      },
+      {
+        icon: <RectangleStackIcon {...icon} />,
+        name: "Collectors",
+        path: "/collectors",
+        element: <Collectors />,
+        inSidebar: false,
+        relatedPaths: ["/collectors", "/addcollector"],
+      },
+      {
+        icon: <RectangleStackIcon {...icon} />,
+        name: "addCollector",
+        path: "/addcollector",
+        element: <AddCollector />,
+        inSidebar: false,
+        relatedPaths: ["/collector", "/addcollector"],
       },
       {
         icon: <InformationCircleIcon {...icon} />,
