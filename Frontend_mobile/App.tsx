@@ -10,11 +10,10 @@ import BinDataScreen from "./Collector/BinDataScreen";
 import ProfileScreen from "./Collector/ProfileScreen";
 import Toast from "react-native-toast-message";
 
-
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-function BottomTabNavigator({ route }) {
+function BottomTabNavigator() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -23,39 +22,34 @@ function BottomTabNavigator({ route }) {
 
           if (route.name === "Home") {
             iconName = focused ? "home" : "home-outline";
-           } else if (route.name === "QRScanner") {
-             iconName = focused ? "qr-code" : "qr-code-outline";
-           } else if (route.name === "Profile") {
-             iconName = focused ? "person" : "person-outline";
-           } else {
-             iconName = "alert-circle";
-           }           
+          } else if (route.name === "QRScanner") {
+            iconName = focused ? "qr-code" : "qr-code-outline";
+          } else if (route.name === "Profile") {
+            iconName = focused ? "person" : "person-outline";
+          }
+
           return <Ionicons name={iconName} size={size} color={color} />;
         },
       })}
     >
-
-<Stack.Screen
-        name="HomeScreen"
+      <Tab.Screen
+        name="Home"
         component={HomeScreen}
         options={{ headerShown: false }}
       />
-      <Stack.Screen
+      <Tab.Screen
         name="QRScanner"
         component={QRScannerScreen}
         options={{ headerShown: false }}
       />
-     
-      <Stack.Screen
-        name="ProfileScreen"
+      <Tab.Screen
+        name="Profile"
         component={ProfileScreen}
         options={{ headerShown: false }}
       />
     </Tab.Navigator>
   );
 }
-
-    
 
 export default function App() {
   return (
@@ -64,23 +58,14 @@ export default function App() {
         initialRouteName="Login"
         screenOptions={{ headerShown: false }}
       >
-        <Stack.Screen
-         name="Login" component={LoginScreen}
-        />
-
-        <Stack.Screen 
-        name="MainTabs"
-         component={BottomTabNavigator} 
-        />
-
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="MainTabs" component={BottomTabNavigator} />
         <Stack.Screen
           name="BinData"
           component={BinDataScreen}
           options={{ headerShown: true }}
         />
       </Stack.Navigator>
-      <Toast ref={(ref) => Toast.setRef(ref)} />
-
     </NavigationContainer>
   );
 }
