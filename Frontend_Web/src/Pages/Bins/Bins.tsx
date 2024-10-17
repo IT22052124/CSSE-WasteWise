@@ -6,7 +6,7 @@ import {
     Chip,
   } from "@material-tailwind/react";
   import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
-  import { getBins } from "@/controllers/BinsController"; // Assuming you have a BinController to fetch bin data
+  import { getBins,autoUpdateWasteLevels} from "@/controllers/BinsController"; // Assuming you have a BinController to fetch bin data
   import { useEffect, useState } from "react";
   import { useMaterialTailwindController } from "@/context";
   
@@ -20,13 +20,20 @@ import {
         try {
           const data = await getBins(); // Fetch bin data
           setBins(data);
+          autoUpdateWasteLevels(); // Start auto-updating waste levels
         } catch (error) {
           console.error("Error fetching bins:", error);
         }
       };
   
-      fetchData();
-    }, []);
+      fetchData(); // Initial fetch
+  
+      // Set up interval for fetching data every 10 seconds
+      const intervalId = setInterval(fetchData, 60000); // 10000 ms = 10 seconds
+  
+      // Cleanup function to clear the interval on component unmount
+      return () => clearInterval(intervalId);
+    }, []); // Empty dependency array to run only on mount
   
     return (
       <div className="mt-12 mb-8 flex flex-col gap-12 min-h-screen">
@@ -96,7 +103,7 @@ import {
                         </td>
                         <td className={className}>
                           <Typography className="text-xs font-semibold text-blue-gray-600">
-                            {type}
+                            {type.wasteType}
                           </Typography>
                         </td>
                         <td className={className}>
@@ -124,7 +131,7 @@ import {
                         </td>
                         <td className={className}>
                           <Typography className="text-xs font-semibold text-blue-gray-600">
-                            {binType}
+                            {type.wasteType}
                           </Typography>
                         </td>
                         <td className={className}>

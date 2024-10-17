@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Button, Typography } from "@material-tailwind/react";
 import { addBin, getLastBinID } from "@/controllers/BinsController";
-import { getWasteTypes } from "@/controllers/WasteTypeController";
+import { getAllWasteTypes } from "@/controllers/BinTypeController";
 import { getUserByEmail } from "@/controllers/UserController"; // Fetch user details by email
 import { useNavigate } from "react-router-dom";
 import { QRCodeCanvas } from "qrcode.react";
@@ -10,21 +10,21 @@ import html2canvas from "html2canvas";
 export const AddBin = () => {
   const [formData, setFormData] = useState({
     binID: "",
-    type: "",
+    type: {}, // Store selected type as an object
     user: {}, // Store user as an object
     perKg: "",
     wasteLevel: 0,
     customBinColor: "",
   });
   const [userEmail, setUserEmail] = useState<string>(""); // Separate email input for lookup
-  const [wasteTypes, setWasteTypes] = useState<string[]>([]);
+  const [wasteTypes, setWasteTypes] = useState<{ wasteType: string }[]>([]); // Adjusted type for waste types
   const qrCodeRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchWasteTypes = async () => {
       try {
-        const types = await getWasteTypes();
+        const types = await getAllWasteTypes();
         setWasteTypes(types);
       } catch (error) {
         console.error("Error fetching waste types:", error);
@@ -63,20 +63,21 @@ export const AddBin = () => {
   };
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setFormData({
-      ...formData,
-      type: e.target.value,
-    });
+    const selectedType = wasteTypes.find(type => type.wasteType === e.target.value);
+    setFormData((prevState) => ({
+      ...prevState,
+      type: selectedType || {}, // Store the entire selected type object
+    }));
   };
 
   // Fetch the user object based on the entered email
   const handleUserLookup = async () => {
     try {
       const user = await getUserByEmail(userEmail); // Fetch the user by their email
-      setFormData({
-        ...formData,
+      setFormData((prevState) => ({
+        ...prevState,
         user, // Store the entire user object
-      });
+      }));
     } catch (error) {
       console.error("Error fetching user", error);
     }
@@ -168,7 +169,7 @@ export const AddBin = () => {
             <select
               id="type"
               name="type"
-              value={formData.type}
+              value={formData.type.wasteType || ""} // Use wasteType for controlled input
               onChange={handleSelectChange}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
             >
