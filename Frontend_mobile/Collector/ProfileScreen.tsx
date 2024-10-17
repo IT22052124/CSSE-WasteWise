@@ -1,32 +1,35 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  TextInput,
-  TouchableOpacity,
   StyleSheet,
-  Alert,
-  ActivityIndicator,
-  Image,
+  SafeAreaView,
   ScrollView,
+  TouchableOpacity,
+  Image,
+  ActivityIndicator,
 } from "react-native";
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../App';
 import { Ionicons } from "@expo/vector-icons";
+import { getCollectorDetails } from "../controller/collectorController";
+import { useNavigation } from "@react-navigation/native";
 
-type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList>;
+const UserDetailsPage = () => {
+  const [user, setUser] = useState(null);
+  const navigation = useNavigation();
 
-export default function ProfileScreen() {
-  const navigation = useNavigation<ProfileScreenNavigationProp>();
 
-  // This is a placeholder for the actual user data
-  const userData = {
-    name: 'John Doe',
-    id: '12345',
-    email: 'john.doe@example.com',
-    role: 'Waste Collector',
-  };
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const userData = await getCollectorDetails();
+        setUser(userData);
+      } catch (error) {
+        console.error("Failed to fetch user details: ", error);
+      }
+    };
+
+    fetchUserDetails();
+  }, []);
 
   const handleLogout = () => {
     // Implement logout logic here
@@ -40,76 +43,105 @@ export default function ProfileScreen() {
       </View>
       <View style={styles.infoContent}>
         <Text style={styles.infoLabel}>{label}</Text>
-        {value ? <Text style={styles.infoValue}>{value}</Text> : null}
+        <Text style={styles.infoValue}>{value}</Text>
       </View>
     </View>
   );
 
-  return (
-    <ScrollView style={styles.container}>
-      <View style={styles.profileContainer}>
-        <Image
-           source={require("../assets/welcome.png")} 
-          style={styles.profileImage}
-        />
-      </View>
-
-      <View style={styles.infoContainer}>
-        <InfoCard
-          icon="person-circle-outline"
-          label="ID"
-          value={userData.id}
-          bgColor="grey"
-        />
-      </View>
-      <View style={styles.infoContainer}>
-        <InfoCard
-          icon="location-outline"
-          label="Name"
-          value={userData.name}
-          bgColor="#03A9F4"
-        />
-      </View>
-      <View style={styles.infoContainer}>
-        <InfoCard
-          icon="mail-outline" // Changed icon to "mail-outline" for email
-          label="Email"
-          value={userData.email}
-          bgColor="#03A9F4"
-        />
-      </View>
-      <View style={styles.infoContainer}>
-        <InfoCard
-          icon="location-outline"
-          label="Role"
-          value={userData.role}
-          bgColor="#03A9F4"
-        />
-      </View>
-
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <View style={styles.logoutButtonContent}>
-          <Ionicons name="log-out-outline" size={24} color="#FFFFFF" />
-          <Text style={styles.logoutButtonText}>Logout</Text>
+  if (!user) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#4CAF50" />
+          <Text>Loading user details...</Text>
         </View>
-      </TouchableOpacity>
-    </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.profileContainer}>
+          <Image source={require("../assets/colles.jpeg")}
+            style={styles.profileImage}
+          />
+        </View>
+
+        <View style={styles.infoContainer}>
+          <InfoCard
+            icon="person-circle-outline"
+            label="Name"
+            value={user.name}
+            bgColor="grey"
+          />
+        </View>
+        <View style={styles.infoContainer}>
+          <InfoCard
+            icon="location-outline"
+            label="Address"
+            value={user.address}
+            bgColor="#03A9F4"
+          />
+        </View>
+        <View style={styles.infoContainer}>
+          <InfoCard
+            icon="call-outline"
+            label="Phone"
+            value={user.phone}
+            bgColor="green"
+          />
+        </View>
+
+        <View style={styles.infoContainer}>
+          <InfoCard
+            icon="mail-outline"
+            label="Email"
+            value={user.email}
+            bgColor="red"
+          />
+        </View>
+        <View style={styles.infoContainer}>
+          <InfoCard
+            icon="card-outline"
+            label="Driving Liscenscn No"
+            value={user.drivingLicense
+            }
+            bgColor="orange"
+          />
+        </View>
+       
+        
+
+        
+
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <View style={styles.logoutButtonContent}>
+            <Ionicons name="log-out-outline" size={24} color="#FFFFFF" />
+            <Text style={styles.logoutButtonText}>Logout</Text>
+          </View>
+        </TouchableOpacity>
+      </ScrollView>
+    </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F5F5F5",
-    padding :20,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    padding: 20,
   },
   profileContainer: {
     alignItems: "center",
-    marginBottom:40
+    marginBottom: 30,
   },
   profileImage: {
-    width: 120,
-    height: 120,
+    width: 150,
+    height: 150,
     borderRadius: 60,
     borderWidth: 2,
     borderColor: "#FFFFFF",
@@ -160,7 +192,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     flexDirection: "row",
     justifyContent: "center",
-
   },
   logoutButtonContent: {
     flexDirection: "row",
@@ -172,4 +203,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginLeft: 10,
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
 });
+
+export default UserDetailsPage;

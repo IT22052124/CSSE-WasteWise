@@ -3,37 +3,29 @@ import {
     CardHeader,
     CardBody,
     Typography,
-    Chip,
   } from "@material-tailwind/react";
   import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
-  import { getBins,autoUpdateWasteLevels} from "@/controllers/BinsController"; // Assuming you have a BinController to fetch bin data
+  import { getCollectors } from "@/controllers/collectorController"; // Fetch collector data
   import { useEffect, useState } from "react";
   import { useMaterialTailwindController } from "@/context";
   
-  export const Bins = () => {
-    const [bins, setBins] = useState<any[]>([]);
+  export const Collectors = () => {
+    const [collectors, setCollectors] = useState<any[]>([]);
     const [controller, dispatch] = useMaterialTailwindController();
     const { sidenavColor } = controller;
   
     useEffect(() => {
       const fetchData = async () => {
         try {
-          const data = await getBins(); // Fetch bin data
-          setBins(data);
-          autoUpdateWasteLevels(); // Start auto-updating waste levels
+          const data = await getCollectors(); // Fetch collector data
+          setCollectors(data);
         } catch (error) {
-          console.error("Error fetching bins:", error);
+          console.error("Error fetching collectors:", error);
         }
       };
   
-      fetchData(); // Initial fetch
-  
-      // Set up interval for fetching data every 10 seconds
-      const intervalId = setInterval(fetchData, 60000); // 10000 ms = 10 seconds
-  
-      // Cleanup function to clear the interval on component unmount
-      return () => clearInterval(intervalId);
-    }, []); // Empty dependency array to run only on mount
+      fetchData();
+    }, []);
   
     return (
       <div className="mt-12 mb-8 flex flex-col gap-12 min-h-screen">
@@ -47,21 +39,19 @@ import {
               variant="h6"
               color={sidenavColor !== "white" ? "white" : "grey"}
             >
-              Bins
+              Collectors
             </Typography>
           </CardHeader>
-          <CardBody className=" px-0 pt-0 pb-2">
+          <CardBody className="px-0 pt-0 pb-2">
             <table className="w-full min-w-[640px] table-auto">
               <thead>
                 <tr>
                   {[
-                    "Bin ID",
-                    "Type",
-                    "User",
-                    "Address",
-                    "Waste Level",
-                    "Cost per kg",
-                    "Bin Color",
+                    "Collector ID",
+                    "Name",
+                    "Email",
+                    "Phone",
+                    "Assigned Bins",
                     "",
                   ].map((el) => (
                     <th
@@ -79,61 +69,35 @@ import {
                 </tr>
               </thead>
               <tbody>
-                {bins?.map(
-                  (
-                    { binID, type, user, wasteLevel, perKg, binType },
-                    key
-                  ) => {
+                {collectors?.map(
+                  ({ collectorID, name, email, phone, assignedBins }, key) => {
                     const className = `py-3 px-5 ${
-                      key === bins.length - 1
-                        ? ""
-                        : "border-b border-blue-gray-50"
+                      key === collectors.length - 1 ? "" : "border-b border-blue-gray-50"
                     }`;
   
                     return (
-                      <tr key={binID}>
+                      <tr key={collectorID}>
                         <td className={className}>
-                          <div className="flex items-center gap-4">
-                            <div>
-                              <Typography className="text-xs font-normal text-blue-gray-500">
-                                {binID}
-                              </Typography>
-                            </div>
-                          </div>
-                        </td>
-                        <td className={className}>
-                          <Typography className="text-xs font-semibold text-blue-gray-600">
-                            {type.wasteType}
+                          <Typography className="text-xs font-normal text-blue-gray-500">
+                            {collectorID}
                           </Typography>
                         </td>
                         <td className={className}>
                           <Typography className="text-xs font-semibold text-blue-gray-600">
-                            {user.username}
+                            {name}
                           </Typography>
                         </td>
                         <td className={className}>
                           <Typography className="text-xs font-semibold text-blue-gray-600">
-                            {user.address}
-                          </Typography>
-                        </td>
-                        <td className={className}>
-                          <Chip
-                            variant="gradient"
-                            color={wasteLevel > 70 ? "red" : "green"}
-                            value={`${wasteLevel.toFixed(2)}%`}
-                            className="py-0.5 px-2 text-[11px] font-medium w-fit"
-                          />
-                        </td>
-                        <td className={className}>
-                          <Typography className="text-xs font-semibold text-blue-gray-600">
-                            {perKg}
+                            {email}
                           </Typography>
                         </td>
                         <td className={className}>
                           <Typography className="text-xs font-semibold text-blue-gray-600">
-                            {type.wasteType}
+                            {phone}
                           </Typography>
                         </td>
+                        
                         <td className={className}>
                           <Typography
                             as="a"
