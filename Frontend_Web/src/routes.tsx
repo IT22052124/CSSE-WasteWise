@@ -32,13 +32,13 @@ import { UpdateLocation } from "./Pages/Locations/UpdateLocation";
 import { AddLocations } from "./Pages/Locations/AddLocation";
 
 //collector elemets
-import{AddCollector} from "./Pages/Collector/addCollector";
-import{Collectors} from "./Pages/Collector/Collectors"
+import { AddCollector } from "./Pages/Collector/addCollector";
+import { Collectors } from "./Pages/Collector/Collectors";
 
 import { Payments } from "./Pages/Payments/Payments";
 
 import { AddBinType } from "./Pages/BinType/AddBinType";
-
+import { BinTypes } from "./Pages/BinType/BinTypes";
 
 const icon = {
   className: "w-5 h-5 text-inherit",
@@ -148,12 +148,21 @@ export const routes = [
         inSidebar: true,
         relatedPaths: ["/payments"],
       },
+
       {
         icon: <TrashIcon {...icon} />,
         name: "Add Bin Types",
         path: "/addbintypes",
         element: <AddBinType />,
         inSidebar: false,
+        relatedPaths: ["/bintypes", "/addbintypes", "/updatebintypes"],
+      },
+      {
+        icon: <TrashIcon {...icon} />,
+        name: "Bin Types",
+        path: "/bintypes",
+        element: <BinTypes />,
+        inSidebar: true,
         relatedPaths: ["/bintypes", "/addbintypes", "/updatebintypes"],
       },
       {
