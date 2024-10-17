@@ -8,6 +8,7 @@ import {
   MapPinIcon,
   CubeIcon,
   DocumentDuplicateIcon,
+  CreditCardIcon,
 } from "@heroicons/react/24/solid";
 import { Home, Profile, Tables, Notifications } from "@/Pages/dashboard";
 import { SignIn, SignUp } from "@/Pages/auth";
@@ -32,6 +33,8 @@ import { AddLocations } from "./Pages/Locations/AddLocation";
 //collector elemets
 import{AddCollector} from "./Pages/Collector/addCollector";
 import{Collectors} from "./Pages/Collector/Collectors"
+
+import { Payments } from "./Pages/Payments/Payments";
 
 const icon = {
   className: "w-5 h-5 text-inherit",
@@ -132,6 +135,14 @@ export const routes = [
         element: <UpdateLocation />,
         inSidebar: false,
         relatedPaths: ["/locations", "/addlocation", "/updatelocation"],
+      },
+      {
+        icon: <CreditCardIcon {...icon} />,
+        name: "Payments",
+        path: "/payments",
+        element: <Payments />,
+        inSidebar: true,
+        relatedPaths: ["/payments"],
       },
       {
         icon: <UserCircleIcon {...icon} />,
