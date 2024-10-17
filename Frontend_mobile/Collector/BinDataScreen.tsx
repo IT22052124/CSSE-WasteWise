@@ -55,7 +55,7 @@ export default function BinDataScreen({ route }) {
         binID: binData.binID,
         collectorID: user.collectorID,
         collectorname: user.name,
-        wasteLevel: "90%", // Assuming this is static, but you can update as needed
+        wasteLevel: binData.wasteLevel, // Assuming this is static, but you can update as needed
         collectionDate: moment().format('YYYY-MM-DD HH:mm:ss'), // Current date and time
         wasteType: binData.type,
       };
