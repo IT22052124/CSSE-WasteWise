@@ -60,7 +60,6 @@ export const getLocations = async () => {
           ...docSnapshot.data(),
         } as Location;
 
-        // Fetch the collection model details if collectionModelId exists
         if (locationData.collectionModel) {
           const collectionModelRef = doc(
             db,

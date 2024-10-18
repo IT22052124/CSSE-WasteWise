@@ -3,38 +3,46 @@ import { useEffect, useState } from "react";
 import {
   updateCollectionModel,
   getCollectionModelById,
-} from "@/controllers/CollectionModelController"; // Import controller functions
+  getCollectionModels,
+} from "@/controllers/CollectionModelController";
 import { useMaterialTailwindController } from "@/context";
 import { useNavigate, useParams } from "react-router-dom";
-import { getWasteTypesWithBinInfo } from "@/controllers/WasteTypeController";
+import { getBinTypes } from "@/controllers/BinTypeController";
+import Toast from "@/components/Toast/Toast";
 
 export const UpdateCollectionModel = () => {
   const [controller] = useMaterialTailwindController();
   const navigate = useNavigate();
   const { sidenavColor } = controller;
-  const { id } = useParams(); // Get the ID from URL parameters
+  const { id } = useParams();
+
   const [formData, setFormData] = useState({
     modelName: "",
     collectionFrequency: "Weekly",
     chargingMethod: "",
-    customFrequency: "",
-    wasteTypes: [],
+    binTypes: [],
     flatRatePrice: 0,
   });
 
+  const [errors, setErrors] = useState({
+    modelName: "",
+    collectionFrequency: "",
+    chargingMethod: "",
+    binTypes: "",
+    flatRatePrice: "",
+  });
+
+  const [binTypes, setBinTypes] = useState<string[]>([]);
+  const [selectedBinTypes, setSelectedBinTypes] = useState<string[]>([]);
+  const [all, setAll] = useState(false);
+
+  // Fetch existing collection model data
   useEffect(() => {
-    // Fetch the existing collection model to update
     const fetchCollectionModel = async () => {
       try {
         const data = await getCollectionModelById(id);
-        setFormData({
-          modelName: data.modelName,
-          collectionFrequency: data.collectionFrequency,
-          chargingMethod: data.chargingMethod,
-          wasteTypes: data.wasteTypes || [],
-          flatRatePrice: data.flatRatePrice || 0,
-        });
-        setSelectedWasteTypes(data.wasteTypes || []);
+        setFormData(data);
+        setSelectedBinTypes(data.binTypes || []);
       } catch (error) {
         console.error("Error fetching collection model:", error);
       }
@@ -43,63 +51,127 @@ export const UpdateCollectionModel = () => {
     fetchCollectionModel();
   }, [id]);
 
+  // Fetch bin types
   useEffect(() => {
-    const fetchWasteTypes = async () => {
+    const fetchBinTypes = async () => {
       try {
-        const data = await getWasteTypesWithBinInfo();
-        setWasteTypes(data.map((wasteType) => wasteType.wasteType));
+        const data = await getBinTypes();
+        setBinTypes(data);
       } catch (error) {
-        console.error("Error fetching waste types:", error);
+        console.error("Error fetching bin types:", error);
       }
     };
-    fetchWasteTypes();
+    fetchBinTypes();
   }, []);
 
-  const [wasteTypes, setWasteTypes] = useState<string[]>([]);
-  const [selectedWasteTypes, setSelectedWasteTypes] = useState<string[]>([]);
-  const [all, setAll] = useState(false);
+  // Check collection models name availability
+  const checkCollectionModelsName = async (modeltype: string) => {
+    if (modeltype) {
+      const exists = await getCollectionModels();
+      const isExist = exists.some(
+        (model) =>
+          model.modelName.toLowerCase() === modeltype.toLowerCase() &&
+          model.id !== id
+      );
+
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        modelName: isExist ? "This Model type name is already taken." : "",
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        modelName: "",
+      }));
+    }
+  };
 
   // Handle input changes
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+
+    if (name === "modelName") {
+      checkCollectionModelsName(value);
+    }
+    validateFields(name, value);
+  };
+
+  const validateFields = (name: string, value: string) => {
+    if (name === "flatRatePrice" && parseFloat(value) <= 0) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: "Price must be greater than 0.",
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: value
+          ? ""
+          : `${name.charAt(0).toUpperCase() + name.slice(1)} is required.`,
+      }));
+    }
+  };
+
+  const isFormValid = () => {
+    const areRequiredFieldsFilled =
+      formData.modelName &&
+      formData.collectionFrequency &&
+      formData.chargingMethod &&
+      formData.binTypes.length > 0;
+
+    const isFlatRatePriceValid =
+      formData.chargingMethod === "Flat-rate pricing"
+        ? formData.flatRatePrice > 0
+        : true;
+
+    const noErrors = Object.values(errors).every((error) => !error);
+
+    return areRequiredFieldsFilled && isFlatRatePriceValid && noErrors;
   };
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target;
 
+    let updatedBinTypes = selectedBinTypes;
+
     if (checked) {
-      setSelectedWasteTypes((prev) => {
-        const updated = [...prev, value];
-        setFormData({
-          ...formData,
-          wasteTypes: updated,
-        });
-        return updated;
-      });
+      updatedBinTypes = [...updatedBinTypes, value];
     } else {
-      setSelectedWasteTypes((prev) => {
-        const updated = prev.filter((type) => type !== value);
-        setFormData({
-          ...formData,
-          wasteTypes: updated,
-        });
-        return updated;
-      });
+      updatedBinTypes = updatedBinTypes.filter((type) => type !== value);
+    }
+
+    setSelectedBinTypes(updatedBinTypes);
+    setFormData({
+      ...formData,
+      binTypes: updatedBinTypes,
+    });
+
+    if (updatedBinTypes.length === 0) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        binTypes: "Please select at least one bin type.",
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        binTypes: "",
+      }));
     }
   };
 
   useEffect(() => {
-    if (selectedWasteTypes.length === wasteTypes.length) {
+    if (selectedBinTypes.length === binTypes.length) {
       setAll(true);
     } else {
       setAll(false);
     }
-  }, [selectedWasteTypes, wasteTypes]);
+  }, [selectedBinTypes, binTypes]);
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { value, name } = e.target;
@@ -107,31 +179,52 @@ export const UpdateCollectionModel = () => {
       ...formData,
       [name]: value,
     });
+    if (name === "collectionFrequency" || name === "chargingMethod") {
+      validateFields(name, value);
+    }
   };
 
   const handleCheckboxChangeAll = () => {
     const updatedAll = !all;
     setAll(updatedAll);
 
+    let updatedBinTypes;
     if (updatedAll) {
-      setSelectedWasteTypes(wasteTypes);
+      updatedBinTypes = binTypes.map((type) => type.binType);
     } else {
-      setSelectedWasteTypes([]);
+      updatedBinTypes = [];
     }
 
+    setSelectedBinTypes(updatedBinTypes);
     setFormData({
       ...formData,
-      wasteTypes: updatedAll ? wasteTypes : [],
+      binTypes: updatedBinTypes,
     });
+
+    if (updatedBinTypes.length === 0) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        binTypes: "Please select at least one bin type.",
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        binTypes: "",
+      }));
+    }
   };
 
-  // Handle form submission for update
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!isFormValid()) {
+      return;
+    }
+
     try {
-      await updateCollectionModel(id, formData); // Call update instead of add
+      await updateCollectionModel(id, formData); // Call the update function with ID
       navigate("/dashboard/collectionmodels");
+      Toast("Collection model updated successfully", "success");
     } catch (error) {
       console.error("Failed to update collection model", error);
     }
@@ -163,9 +256,22 @@ export const UpdateCollectionModel = () => {
               placeholder="e.g., Pay-As-You-Throw"
               className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
             />
+            {errors.modelName && (
+              <Typography
+                variant="small"
+                color={
+                  sidenavColor !== "dark"
+                    ? sidenavColor !== "white"
+                      ? sidenavColor
+                      : "gray"
+                    : "gray"
+                }
+              >
+                {errors.modelName}
+              </Typography>
+            )}
           </div>
 
-          {/* Collection Frequency */}
           <div className="space-y-2">
             <Typography
               variant="small"
@@ -184,11 +290,24 @@ export const UpdateCollectionModel = () => {
               <option value="Daily">Daily</option>
               <option value="Weekly">Weekly</option>
               <option value="Monthly">Monthly</option>
-              <option value="Custom">Yearly</option>
+              <option value="Custom">Custom</option>
             </select>
+            {errors.collectionFrequency && (
+              <Typography
+                variant="small"
+                color={
+                  sidenavColor !== "dark"
+                    ? sidenavColor !== "white"
+                      ? sidenavColor
+                      : "gray"
+                    : "gray"
+                }
+              >
+                {errors.collectionFrequency}
+              </Typography>
+            )}
           </div>
 
-          {/* Charging Method */}
           <div className="space-y-2">
             <Typography
               variant="small"
@@ -210,6 +329,20 @@ export const UpdateCollectionModel = () => {
                 Per collection request
               </option>
             </select>
+            {errors.chargingMethod && (
+              <Typography
+                variant="small"
+                color={
+                  sidenavColor !== "dark"
+                    ? sidenavColor !== "white"
+                      ? sidenavColor
+                      : "gray"
+                    : "gray"
+                }
+              >
+                {errors.chargingMethod}
+              </Typography>
+            )}
           </div>
 
           {formData.chargingMethod === "Flat-rate pricing" && (
@@ -229,6 +362,20 @@ export const UpdateCollectionModel = () => {
                 placeholder="Enter flat rate price"
                 className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
               />
+              {errors.flatRatePrice && (
+                <Typography
+                  variant="small"
+                  color={
+                    sidenavColor !== "dark"
+                      ? sidenavColor !== "white"
+                        ? sidenavColor
+                        : "gray"
+                      : "gray"
+                  }
+                >
+                  {errors.flatRatePrice}
+                </Typography>
+              )}
             </div>
           )}
 
@@ -251,27 +398,48 @@ export const UpdateCollectionModel = () => {
                   className: "text-sm font-normal text-blue-gray-500 m-3",
                 }}
               />
-              {wasteTypes.map((type, index) => (
+              {binTypes.map((type, index) => (
                 <Switch
                   key={index}
                   id={`WasteType-${index}`}
-                  label={type}
-                  checked={selectedWasteTypes.includes(type)}
+                  label={type.binType}
+                  checked={selectedBinTypes.includes(type.binType)}
                   onChange={handleCheckboxChange}
-                  value={type}
+                  value={type.binType} // This ensures the value is passed correctly to the handler
                   labelProps={{
                     className: "text-sm font-normal text-blue-gray-500 m-3",
                   }}
                 />
               ))}
+              {errors.binTypes && (
+                <Typography
+                  variant="small"
+                  color={
+                    sidenavColor !== "dark"
+                      ? sidenavColor !== "white"
+                        ? sidenavColor
+                        : "gray"
+                      : "gray"
+                  }
+                >
+                  {errors.binTypes}
+                </Typography>
+              )}
             </div>
           </div>
 
           <Button
             className="mt-6"
-            color={sidenavColor !== "dark" ? sidenavColor : "gray"}
+            color={
+              sidenavColor !== "dark"
+                ? sidenavColor !== "white"
+                  ? sidenavColor
+                  : "gray"
+                : "gray"
+            }
             fullWidth
             type="submit"
+            disabled={!isFormValid()}
           >
             Update Collection Model
           </Button>
