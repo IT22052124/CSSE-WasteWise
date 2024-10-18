@@ -24,7 +24,7 @@ function BottomTabNavigator({ route }) {
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 
-          if (route.name === "PaymentPage") {
+          if (route.name === "MyBins") {
             iconName = focused ? "document" : "document-outline"; // Icon for company profile
           } else if (route.name === "UserDetailsPage") {
             iconName = focused ? "briefcase" : "briefcase-outline"; // Icon for posted jobs
@@ -41,7 +41,7 @@ function BottomTabNavigator({ route }) {
       })}
     >
       <Stack.Screen
-        name="PaymentPage"
+        name="MyBins"
         component={MyBins}
         options={{ headerShown: false }}
       />
@@ -61,8 +61,8 @@ function BottomTabNavigator({ route }) {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="BinPurchasePage"
-        component={BinPurchasePage}
+        name="PaymentPage"
+        component={PaymentPage}
         options={{ headerShown: false }}
       />
     </Tab.Navigator>
