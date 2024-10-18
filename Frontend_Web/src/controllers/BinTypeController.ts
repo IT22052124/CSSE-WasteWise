@@ -7,6 +7,7 @@ import {
   doc,
   getDoc,
   updateDoc,
+  query,where
 } from "firebase/firestore";
 import { db } from "@/storage/firebase";
 
@@ -109,5 +110,39 @@ export const updateBinType = async (id, updatedData) => {
   } catch (error) {
     console.error("Error updating bin type:", error);
     throw error;
+  }
+};
+
+
+
+
+
+
+// Function to get bin type by binType
+export const getBinTypeByBinType = async (binType) => {
+  try {
+    const binTypesCollection = collection(db, "binTypes"); // Get reference to 'binTypes' collection
+    const binTypeQuery = query(binTypesCollection, where("binType", "==", binType)); // Create query for binType
+
+    const binTypeSnapshot = await getDocs(binTypeQuery); // Execute the query
+
+    if (!binTypeSnapshot.empty) {
+      const binTypeDoc = binTypeSnapshot.docs[0]; // Get the first document
+      const binTypeData = binTypeDoc.data(); // Retrieve data
+      const binTypeId = binTypeDoc.id; // Get the document ID
+
+      console.log("Bin type retrieved successfully:", binTypeData);
+
+      // Return both bin type data and document ID
+      return {
+        id: binTypeId, // Include the document ID
+        ...binTypeData, // Spread the bin type data
+      };
+    } else {
+      throw new Error("Bin type not found");
+    }
+  } catch (error) {
+    console.error(`Error retrieving bin type ${binType}:`, error);
+    throw new Error("Failed to retrieve bin type");
   }
 };

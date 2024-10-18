@@ -29,7 +29,7 @@ import {
       fetchData(); // Initial fetch
   
       // Set up interval for fetching data every 10 seconds
-      const intervalId = setInterval(fetchData, 60000); // 10000 ms = 10 seconds
+      const intervalId = setInterval(fetchData, 10000); // 10000 ms = 10 seconds
   
       // Cleanup function to clear the interval on component unmount
       return () => clearInterval(intervalId);
@@ -61,8 +61,7 @@ import {
                     "Address",
                     "Waste Level",
                     "Cost per kg",
-                    "Bin Color",
-                    "",
+                    "Edit",
                   ].map((el) => (
                     <th
                       key={el}
@@ -103,7 +102,7 @@ import {
                         </td>
                         <td className={className}>
                           <Typography className="text-xs font-semibold text-blue-gray-600">
-                            {type.wasteType}
+                            {type.binType}
                           </Typography>
                         </td>
                         <td className={className}>
@@ -129,11 +128,7 @@ import {
                             {perKg}
                           </Typography>
                         </td>
-                        <td className={className}>
-                          <Typography className="text-xs font-semibold text-blue-gray-600">
-                            {type.wasteType}
-                          </Typography>
-                        </td>
+                        
                         <td className={className}>
                           <Typography
                             as="a"

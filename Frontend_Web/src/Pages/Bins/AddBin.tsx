@@ -1,58 +1,104 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Button, Typography } from "@material-tailwind/react";
 import { addBin, getLastBinID } from "@/controllers/BinsController";
-import { getAllWasteTypes } from "@/controllers/BinTypeController";
-import { getUserByEmail } from "@/controllers/UserController"; // Fetch user details by email
-import { useNavigate } from "react-router-dom";
+import { getBinTypeByBinType } from "@/controllers/BinTypeController";
+import { getUserByEmail } from "@/controllers/UserController";
+import { useNavigate, useLocation } from "react-router-dom";
 import { QRCodeCanvas } from "qrcode.react";
 import html2canvas from "html2canvas";
 
 export const AddBin = () => {
   const [formData, setFormData] = useState({
     binID: "",
-    type: {}, // Store selected type as an object
-    user: {}, // Store user as an object
+    type: {},
+    user: {},
     perKg: "",
     wasteLevel: 0,
     customBinColor: "",
+    userRef: "",
+    wasteTypeRef: "",
   });
-  const [userEmail, setUserEmail] = useState<string>(""); // Separate email input for lookup
-  const [wasteTypes, setWasteTypes] = useState<{ wasteType: string }[]>([]); // Adjusted type for waste types
+
+  const [userEmail, setUserEmail] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false); // To handle form submission state
   const qrCodeRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
+  // Fetch new Bin ID on mount
   useEffect(() => {
-    const fetchWasteTypes = async () => {
+    const fetchNewBinID = async () => {
       try {
-        const types = await getAllWasteTypes();
-        setWasteTypes(types);
+        const lastBinID = await getLastBinID();
+        const newBinID = lastBinID
+          ? `B${String(parseInt(lastBinID.replace("B", "")) + 1).padStart(3, "0")}`
+          : "B001";
+
+        setFormData((prevState) => ({
+          ...prevState,
+          binID: newBinID,
+        }));
       } catch (error) {
-        console.error("Error fetching waste types:", error);
+        console.error("Error fetching last binID", error);
       }
     };
 
-    fetchWasteTypes();
-  }, []);
-
-  const fetchNewBinID = async () => {
-    try {
-      const lastBinID = await getLastBinID();
-      const newBinID = lastBinID 
-        ? `B${String(parseInt(lastBinID.replace('B', '')) + 1).padStart(3, '0')}`
-        : 'B001';
-
-      setFormData((prevState) => ({
-        ...prevState,
-        binID: newBinID,
-      }));
-    } catch (error) {
-      console.error("Error fetching last binID", error);
-    }
-  };
-
-  useEffect(() => {
     fetchNewBinID();
   }, []);
+
+  // Prefill bin type and user email from query parameters
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const prefilledBinType = params.get("binType");
+    const prefilledUserEmail = params.get("userEmail");
+
+    if (prefilledBinType) {
+      const fetchWasteType = async () => {
+        try {
+          const wasteType = await getBinTypeByBinType(prefilledBinType);
+          if (wasteType) {
+            setFormData((prevState) => ({
+              ...prevState,
+              type: wasteType,
+              wasteTypeRef: wasteType.id,
+            }));
+          }
+        } catch (error) {
+          console.error("Error fetching waste type by bin type:", error);
+        }
+      };
+
+      fetchWasteType();
+    }
+
+    if (prefilledUserEmail) {
+      setUserEmail(prefilledUserEmail);
+    }
+  }, [location.search]);
+
+  // Fetch the user object based on the entered email when userEmail changes
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (userEmail) {
+        try {
+          const user = await getUserByEmail(userEmail);
+          if (user) {
+            setFormData((prevState) => ({
+              ...prevState,
+              user,
+              userRef: user.id,
+            }));
+          } else {
+            console.error("User not found");
+          }
+        } catch (error) {
+          console.error("Error fetching user", error);
+        }
+      }
+    };
+
+    fetchUser();
+  }, [userEmail]);
 
   // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -62,47 +108,48 @@ export const AddBin = () => {
     });
   };
 
-  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedType = wasteTypes.find(type => type.wasteType === e.target.value);
-    setFormData((prevState) => ({
-      ...prevState,
-      type: selectedType || {}, // Store the entire selected type object
-    }));
-  };
-
-  // Fetch the user object based on the entered email
-  const handleUserLookup = async () => {
-    try {
-      const user = await getUserByEmail(userEmail); // Fetch the user by their email
-      setFormData((prevState) => ({
-        ...prevState,
-        user, // Store the entire user object
-      }));
-    } catch (error) {
-      console.error("Error fetching user", error);
-    }
-  };
-
+  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Ensure userRef and wasteTypeRef are set before submitting
+    if (!formData.userRef) {
+      console.error("User reference is missing.");
+      return;
+    }
+
+    if (!formData.wasteTypeRef) {
+      console.error("Waste type reference is missing.");
+      return;
+    }
+
+    setIsSubmitting(true); // Disable submit button during submission
+
+    const binData = {
+      ...formData,
+      userRef: formData.userRef,
+      wasteTypeRef: formData.wasteTypeRef,
+    };
+
     try {
-      await addBin(formData);
+      await addBin(binData);
       navigate("/dashboard/bin");
     } catch (error) {
       console.error("Failed to add bin", error);
+    } finally {
+      setIsSubmitting(false); // Re-enable submit button after submission
     }
   };
 
+  // Download QR code
   const downloadQRCode = async () => {
     if (qrCodeRef.current) {
       const canvas = await html2canvas(qrCodeRef.current);
-      const dataURL = canvas.toDataURL("image/png");
-
-      const link = document.createElement("a");
-      link.href = dataURL;
-      link.download = `${formData.binID}_QRCode.png`;
-      link.click();
+      const dataUrl = canvas.toDataURL("image/png");
+      const a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = `${formData.binID}_qrcode.png`;
+      a.click();
     }
   };
 
@@ -115,13 +162,13 @@ export const AddBin = () => {
       </div>
       <div className="p-6">
         <form className="space-y-4" onSubmit={handleSubmit}>
+          {/* Bin ID */}
           <div className="space-y-2">
             <Typography variant="small" className="font-normal text-blue-gray-600">
               Bin ID
             </Typography>
             <input
               type="text"
-              id="binID"
               name="binID"
               value={formData.binID}
               disabled
@@ -129,31 +176,41 @@ export const AddBin = () => {
             />
           </div>
 
+          {/* Waste Type */}
+          <div className="space-y-2">
+            <Typography variant="small" className="font-normal text-blue-gray-600">
+              Waste Type
+            </Typography>
+            <input
+              type="text"
+              name="wasteType"
+              value={formData.type?.binType || ""}
+              disabled
+              className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm"
+            />
+          </div>
+
+          {/* User Email */}
           <div className="space-y-2">
             <Typography variant="small" className="font-normal text-blue-gray-600">
               User Email (Assigned User)
             </Typography>
             <input
               type="email"
-              id="userEmail"
-              name="userEmail"
               value={userEmail}
               onChange={(e) => setUserEmail(e.target.value)}
               placeholder="e.g., user@example.com"
               className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm"
             />
-            <Button type="button" onClick={handleUserLookup}>
-              Lookup User
-            </Button>
           </div>
 
+          {/* Per Kg Cost */}
           <div className="space-y-2">
             <Typography variant="small" className="font-normal text-blue-gray-600">
               Cost Per Kg
             </Typography>
             <input
               type="text"
-              id="perKg"
               name="perKg"
               value={formData.perKg}
               onChange={handleChange}
@@ -162,42 +219,22 @@ export const AddBin = () => {
             />
           </div>
 
-          <div className="space-y-2">
-            <Typography variant="small" className="font-normal text-blue-gray-600">
-              Waste Bin Type
-            </Typography>
-            <select
-              id="type"
-              name="type"
-              value={formData.type.wasteType || ""} // Use wasteType for controlled input
-              onChange={handleSelectChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-            >
-              <option value="">Select waste type</option>
-              {wasteTypes.map((type) => (
-                <option key={type.wasteType} value={type.wasteType}>
-                  {type.wasteType}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="space-y-2">
-            <Typography variant="small" className="font-normal text-blue-gray-600">
-              QR Code
-            </Typography>
-            <div ref={qrCodeRef} className="flex flex-col items-center">
-              <QRCodeCanvas value={formData.binID} size={128} />
-              <Button onClick={downloadQRCode} className="mt-2" type="button">
-                Download QR Code
-              </Button>
-            </div>
-          </div>
-
-          <Button className="mt-6" fullWidth type="submit">
-            Save Bin
+          <Button
+            type="submit"
+            className="w-full mt-4 bg-green-500 hover:bg-green-600"
+            disabled={!formData.userRef || !formData.wasteTypeRef || isSubmitting}
+          >
+            {isSubmitting ? "Submitting..." : "Add Bin"}
           </Button>
         </form>
+
+        {/* QR Code */}
+        <div ref={qrCodeRef} className="mt-8 p-4 bg-white shadow-md rounded-lg">
+          <QRCodeCanvas value={`${formData.binID}`} />
+        </div>
+        <Button onClick={downloadQRCode} className="mt-4 bg-blue-500 hover:bg-blue-600">
+          Download QR Code
+        </Button>
       </div>
     </div>
   );

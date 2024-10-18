@@ -4,6 +4,7 @@ import { db } from "../storage/firebase";
 // Function to find a bin by binID
 export const findBinByID = async (binID) => {
   try {
+    console.log("xx",binID)
     // Query the "bins" collection where "binID" matches the provided binID
     const binCollection = collection(db, "bins");
     const binQuery = query(binCollection, where("binID", "==", binID));

@@ -84,7 +84,7 @@ Payback: binData.type.incentives,
     <ScrollView style={styles.container}>
       <View style={styles.content}>
         <Image
-          source={require('../assets/bin.jpg')}
+          source={require('../assets/bin1.jpg')}
           style={styles.binImage}
         />
 
