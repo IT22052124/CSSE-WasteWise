@@ -7,6 +7,8 @@ import {
   doc,
   getDoc,
   updateDoc,
+  query,
+  where
 } from "firebase/firestore";
 import { db } from "../storage/firebase";
 
@@ -33,3 +35,37 @@ export const getBinTypes = async () => {
     throw new Error("Failed to retrieve bin types");
   }
 };
+
+
+
+export const findBinsByUserEmail = async (email: string) => {
+  try {
+    // Reference the 'bins' collection in Firestore
+    const binsRef = collection(db, "bins");
+
+    // Create a query that looks for bins where the 'user.email' field matches the provided email
+    const q = query(binsRef, where("user.email", "==", email));
+
+    // Execute the query
+    const querySnapshot = await getDocs(q);
+
+    // If no bins are found, return an empty array
+    if (querySnapshot.empty) {
+      console.log("No bins found for this user.");
+      return [];
+    }
+
+    // Extract and return bin data
+    const bins = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    return bins;
+
+  } catch (error) {
+    console.error("Error finding bins by user email:", error);
+    throw new Error("Unable to find bins for the user.");
+  }
+};
+
