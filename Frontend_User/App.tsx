@@ -31,6 +31,8 @@ function BottomTabNavigator({ route }) {
             iconName = focused ? "briefcase" : "briefcase-outline"; // Icon for posted jobs
           } else if (route.name === "PaymentHistoryPage") {
             iconName = focused ? "document" : "document-outline"; // Icon for company profile
+          }else if (route.name === "BinPurchasePage") {
+            iconName = focused ? "document" : "document-outline"; // Icon for company profile
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
@@ -55,6 +57,11 @@ function BottomTabNavigator({ route }) {
       <Stack.Screen
         name="UserDetailsPage"
         component={UserDetailsPage}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="BinPurchasePage"
+        component={BinPurchasePage}
         options={{ headerShown: false }}
       />
     </Tab.Navigator>

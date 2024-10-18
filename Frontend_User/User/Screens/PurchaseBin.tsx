@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,40 +9,106 @@ import {
   Modal,
   TextInput,
   Alert,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-
-const binTypes = ['Plastic', 'Metal', 'Compost'];
-const capacities = ['Small', 'Medium', 'Large'];
-const prices = {
-  'Small': 20,
-  'Medium': 30,
-  'Large': 45
-};
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { getUserDetails } from "../../Controller/UserController";
+import { getBinTypes } from "../../Controller/BinController";
+import { useFocusEffect } from "@react-navigation/native";
 
 const BinPurchasePage = () => {
-  const [binType, setBinType] = useState('Plastic');
-  const [capacity, setCapacity] = useState('Small');
-  const [price, setPrice] = useState(prices['Small']);
+  const [binType, setBinType] = useState("");
+  const [capacity, setCapacity] = useState("");
+  const [price, setPrice] = useState(0);
+  const [charging, setCharging] = useState(0);
+  const [incentives, setIncentives] = useState(0);
+  const [recyclable, setRecyclable] = useState(false);
+  const [binTypes, setBinTypes] = useState([]);
+  const [availableCapacities, setAvailableCapacities] = useState([]);
   const [showTypeModal, setShowTypeModal] = useState(false);
   const [showCapacityModal, setShowCapacityModal] = useState(false);
   const [showCardModal, setShowCardModal] = useState(false);
-  const [cardNumber, setCardNumber] = useState('');
-  const [cardExpiry, setCardExpiry] = useState('');
-  const [cardCVV, setCardCVV] = useState('');
+  const [cardNumber, setCardNumber] = useState("");
+  const [cardExpiry, setCardExpiry] = useState("");
+  const [cardCVV, setCardCVV] = useState("");
+  const [userID, setUserID] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [wasteTypes, setWasteTypes] = useState([]);
 
-  const updatePrice = (cap: string) => {
-    setPrice(prices[cap]);
+  const handleExpiryDateChange = (text) => {
+    let formatted = text.replace(/[^0-9]/g, "");
+    if (formatted.length > 0) {
+      const month = parseInt(formatted.slice(0, 2));
+      const year = parseInt(formatted.slice(2, 4));
+      const currentYear = new Date().getFullYear() % 100;
+
+      if (month > 12) {
+        formatted = "12" + formatted.slice(2);
+      }
+      if (year < currentYear && formatted.length === 4) {
+        formatted = formatted.slice(0, 2) + currentYear.toString();
+      }
+    }
+    if (formatted.length > 2) {
+      formatted = formatted.slice(0, 2) + "/" + formatted.slice(2, 4);
+    }
+    setCardExpiry(formatted);
   };
 
-  const handleBinTypeChange = (type: string) => {
-    setBinType(type);
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const userData = await getUserDetails();
+        setUserID(userData.id);
+      } catch (error) {
+        console.error("Failed to fetch user details: ", error);
+      }
+    };
+
+    fetchUserDetails();
+  }, []);
+
+  const fetchBinTypes = async () => {
+    if (!userID) return;
+
+    setLoading(true);
+    try {
+      const binTypesData = await getBinTypes();
+      setBinTypes(binTypesData);
+    } catch (error) {
+      console.error("Error fetching binTypes:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchBinTypes();
+    }, [])
+  );
+
+  console.log(binTypes);
+
+  const handleBinTypeChange = (type) => {
+    setBinType(type.binType);
+    setAvailableCapacities(Object.keys(type.binSizes));
+    setCapacity(""); // Reset capacity on bin type change
+    setPrice(0); // Reset price
+    setCharging(type.chargingPerKg);
+    setIncentives(type.incentivesPerKg);
+    setRecyclable(type.recyclable);
+    setWasteTypes(type.wasteTypes);
     setShowTypeModal(false);
   };
 
-  const handleCapacityChange = (cap: string) => {
+  const handleCapacityChange = (cap) => {
     setCapacity(cap);
-    updatePrice(cap);
+    setPrice(
+      binTypes.find((bin) => bin.binType === binType).binSizes[
+        cap.toLowerCase()
+      ]
+    );
     setShowCapacityModal(false);
   };
 
@@ -53,19 +119,19 @@ const BinPurchasePage = () => {
   const handleCardSubmit = () => {
     if (cardNumber && cardExpiry && cardCVV) {
       setShowCardModal(false);
-      Alert.alert('Purchase Successful', 'Your bin has been purchased. Generating PDF receipt...');
+      Alert.alert("Purchase Successful", "Your bin has been purchased.");
       generatePDF();
     } else {
-      Alert.alert('Error', 'Please fill in all card details');
+      Alert.alert("Error", "Please fill in all card details");
     }
   };
 
   const generatePDF = () => {
-    console.log('Generating PDF for:');
+    console.log("Generating PDF for:");
     console.log(`Bin Type: ${binType}`);
     console.log(`Capacity: ${capacity}`);
     console.log(`Price: $${price}`);
-    Alert.alert('PDF Generated', 'Your receipt has been generated and saved.');
+    Alert.alert("PDF Generated", "Your receipt has been generated and saved.");
   };
 
   return (
@@ -73,54 +139,120 @@ const BinPurchasePage = () => {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>Purchase a Bin</Text>
 
-        <TouchableOpacity style={styles.pickerContainer} onPress={() => setShowTypeModal(true)}>
+        <TouchableOpacity
+          style={styles.pickerContainer}
+          onPress={() => setShowTypeModal(true)}
+        >
           <Text style={styles.label}>Bin Type</Text>
-          <Text style={styles.pickerText}>{binType}</Text>
+          <Text style={styles.pickerText}>{binType || "Select Bin Type"}</Text>
           <Ionicons name="chevron-down" size={24} color="#4CAF50" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.pickerContainer} onPress={() => setShowCapacityModal(true)}>
-          <Text style={styles.label}>Capacity</Text>
-          <Text style={styles.pickerText}>{capacity}</Text>
-          <Ionicons name="chevron-down" size={24} color="#4CAF50" />
-        </TouchableOpacity>
+        {binType && (
+          <>
+            <TouchableOpacity
+              style={styles.pickerContainer}
+              onPress={() => setShowCapacityModal(true)}
+            >
+              <Text style={styles.label}>Capacity</Text>
+              <Text style={styles.pickerText}>
+                {capacity || "Select Capacity"}
+              </Text>
+              <Ionicons name="chevron-down" size={24} color="#4CAF50" />
+            </TouchableOpacity>
 
-        <View style={styles.priceContainer}>
-          <Text style={styles.priceLabel}>Price:</Text>
-          <Text style={styles.price}>${price}</Text>
-        </View>
+            {wasteTypes.length > 0 && (
+              <View style={styles.wasteTypesContainer}>
+                <Text style={styles.wasteTypesTitle}>
+                  Accepted Waste Types:
+                </Text>
+                {wasteTypes.map((waste, index) => (
+                  <Text key={index} style={styles.wasteTypeText}>
+                    {waste}
+                  </Text>
+                ))}
+              </View>
+            )}
 
-        <TouchableOpacity style={styles.payButton} onPress={handlePayNow}>
-          <Ionicons name="card-outline" size={24} color="#FFFFFF" style={styles.payIcon} />
-          <Text style={styles.payButtonText}>Pay Now</Text>
-        </TouchableOpacity>
+            <View style={styles.priceContainer}>
+              <Text style={styles.priceLabel}>Price:</Text>
+              <Text style={styles.price}>
+                LKR {parseFloat(price).toFixed(2)}
+              </Text>
+            </View>
+
+            <View style={styles.priceContainer}>
+              <Text style={styles.priceLabel}>Charging per Kg:</Text>
+              <Text style={styles.price}>
+                LKR {parseFloat(charging).toFixed(2)}
+              </Text>
+            </View>
+
+            {recyclable && (
+              <View style={styles.priceContainer}>
+                <Text style={styles.priceLabel}>Incentives per Kg:</Text>
+                <Text style={styles.price}>
+                  LKR {parseFloat(incentives).toFixed(2)}
+                </Text>
+              </View>
+            )}
+
+            <TouchableOpacity style={styles.payButton} onPress={handlePayNow}>
+              <Ionicons
+                name="card-outline"
+                size={24}
+                color="#FFFFFF"
+                style={styles.payIcon}
+              />
+              <Text style={styles.payButtonText}>Pay Now</Text>
+            </TouchableOpacity>
+          </>
+        )}
 
         <Modal visible={showTypeModal} animationType="slide" transparent={true}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Select Bin Type</Text>
               {binTypes.map((type) => (
-                <TouchableOpacity key={type} style={styles.modalItem} onPress={() => handleBinTypeChange(type)}>
-                  <Text style={styles.modalItemText}>{type}</Text>
+                <TouchableOpacity
+                  key={type.id}
+                  style={styles.modalItem}
+                  onPress={() => handleBinTypeChange(type)}
+                >
+                  <Text style={styles.modalItemText}>{type.binType}</Text>
                 </TouchableOpacity>
               ))}
-              <TouchableOpacity style={styles.modalCloseButton} onPress={() => setShowTypeModal(false)}>
+              <TouchableOpacity
+                style={styles.modalCloseButton}
+                onPress={() => setShowTypeModal(false)}
+              >
                 <Text style={styles.modalCloseButtonText}>Close</Text>
               </TouchableOpacity>
             </View>
           </View>
         </Modal>
 
-        <Modal visible={showCapacityModal} animationType="slide" transparent={true}>
+        <Modal
+          visible={showCapacityModal}
+          animationType="slide"
+          transparent={true}
+        >
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Select Capacity</Text>
-              {capacities.map((cap) => (
-                <TouchableOpacity key={cap} style={styles.modalItem} onPress={() => handleCapacityChange(cap)}>
+              {availableCapacities.map((cap) => (
+                <TouchableOpacity
+                  key={cap}
+                  style={styles.modalItem}
+                  onPress={() => handleCapacityChange(cap)}
+                >
                   <Text style={styles.modalItemText}>{cap}</Text>
                 </TouchableOpacity>
               ))}
-              <TouchableOpacity style={styles.modalCloseButton} onPress={() => setShowCapacityModal(false)}>
+              <TouchableOpacity
+                style={styles.modalCloseButton}
+                onPress={() => setShowCapacityModal(false)}
+              >
                 <Text style={styles.modalCloseButtonText}>Close</Text>
               </TouchableOpacity>
             </View>
@@ -138,14 +270,16 @@ const BinPurchasePage = () => {
                 onChangeText={setCardNumber}
                 keyboardType="number-pad"
                 placeholderTextColor="#A9A9A9"
+                maxLength={16}
               />
               <TextInput
                 style={styles.input}
                 placeholder="Expiry Date (MM/YY)"
                 value={cardExpiry}
-                onChangeText={setCardExpiry}
+                onChangeText={handleExpiryDateChange}
                 keyboardType="number-pad"
                 placeholderTextColor="#A9A9A9"
+                maxLength={5}
               />
               <TextInput
                 style={styles.input}
@@ -155,11 +289,20 @@ const BinPurchasePage = () => {
                 keyboardType="number-pad"
                 secureTextEntry
                 placeholderTextColor="#A9A9A9"
+                maxLength={3}
               />
-              <TouchableOpacity style={styles.modalPayButton} onPress={handleCardSubmit}>
-                <Text style={styles.modalPayButtonText}>Pay ${price}</Text>
+              <TouchableOpacity
+                style={styles.modalPayButton}
+                onPress={handleCardSubmit}
+              >
+                <Text style={styles.modalPayButtonText}>
+                  Pay LKR {parseFloat(price).toFixed(2)}
+                </Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.modalCloseButton} onPress={() => setShowCardModal(false)}>
+              <TouchableOpacity
+                style={styles.modalCloseButton}
+                onPress={() => setShowCardModal(false)}
+              >
                 <Text style={styles.modalCloseButtonText}>Cancel</Text>
               </TouchableOpacity>
             </View>
@@ -173,139 +316,147 @@ const BinPurchasePage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: "#F5F5F5",
   },
   scrollContent: {
-    flexGrow: 1,
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 30,
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#4CAF50',
+    fontWeight: "bold",
+    color: "#4CAF50",
     marginBottom: 20,
-    textAlign: 'center',
+    textAlign: "center",
   },
   pickerContainer: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderRadius: 8,
-    marginBottom: 20,
-    padding: 15,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    marginBottom: 15,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#4CAF50",
   },
   label: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#4CAF50',
+    fontWeight: "bold",
+    color: "#4CAF50",
   },
   pickerText: {
     fontSize: 16,
-    color: '#000000',
+    color: "#333333",
   },
   priceContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
-    padding: 15,
-    marginBottom: 30,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginVertical: 10,
   },
   priceLabel: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#4CAF50',
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#333333",
   },
   price: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#4CAF50',
+    fontSize: 16,
+    color: "#4CAF50",
   },
   payButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: "#4CAF50",
+    paddingVertical: 15,
     borderRadius: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 16,
-  },
-  payIcon: {
-    marginRight: 8,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: 20,
   },
   payButtonText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: 'bold',
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  payIcon: {
+    marginRight: 10,
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
+    backgroundColor: "#FFFFFF",
+    margin: 20,
     padding: 20,
-    width: '80%',
+    borderRadius: 10,
+    alignItems: "center",
   },
   modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#4CAF50',
-    marginBottom: 15,
-    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 20,
   },
   modalItem: {
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
+    borderBottomColor: "#DDDDDD",
+    width: "100%",
+    alignItems: "center",
   },
   modalItemText: {
     fontSize: 16,
-    color: '#000000',
+    color: "#333333",
   },
   modalCloseButton: {
-    marginTop: 15,
-    padding: 10,
-    backgroundColor: '#E0E0E0',
+    marginTop: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: "#4CAF50",
     borderRadius: 5,
-    alignItems: 'center',
   },
   modalCloseButtonText: {
-    color: '#000000',
-    fontWeight: 'bold',
+    color: "#FFFFFF",
+    fontWeight: "bold",
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 10,
-    color: '#000000',
+    width: "100%",
+    borderBottomWidth: 1,
+    borderBottomColor: "#4CAF50",
+    marginBottom: 20,
+    paddingVertical: 5,
+    fontSize: 16,
   },
   modalPayButton: {
-    backgroundColor: '#4CAF50',
-    borderRadius: 5,
-    padding: 10,
-    alignItems: 'center',
-    marginTop: 10,
+    backgroundColor: "#4CAF50",
+    paddingVertical: 15,
+    borderRadius: 8,
+    width: "100%",
+    alignItems: "center",
   },
   modalPayButtonText: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
+    color: "#FFFFFF",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  wasteTypesContainer: {
+    marginVertical: 10,
+    padding: 10,
+    backgroundColor: "#E8F5E9",
+    borderRadius: 8,
+  },
+  wasteTypesTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#4CAF50",
+    marginBottom: 5,
+  },
+  wasteTypeText: {
+    fontSize: 14,
+    color: "#333333",
+    marginVertical: 2,
   },
 });
 
