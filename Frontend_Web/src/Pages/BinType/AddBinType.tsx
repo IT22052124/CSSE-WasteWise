@@ -30,6 +30,7 @@ export const AddBinType = () => {
 
   const [wasteTypes, setWasteTypes] = useState([]);
   const [waste, setWaste] = useState([]);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -63,16 +64,44 @@ export const AddBinType = () => {
     });
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.binType.trim()) {
+      newErrors.binType = "Bin Type name cannot be empty.";
+    }
+    if (wasteTypes.length === 0) {
+      newErrors.wasteTypes = "At least one waste type should be selected.";
+    }
+    if (formData.binSizes.small <= 0) {
+      newErrors.small = "Price for small bin cannot be zero or less.";
+    }
+    if (formData.binSizes.medium <= 0) {
+      newErrors.medium = "Price for medium bin cannot be zero or less.";
+    }
+    if (formData.binSizes.large <= 0) {
+      newErrors.large = "Price for large bin cannot be zero or less.";
+    }
+    if (formData.chargingPerKg <= 0) {
+      newErrors.chargingPerKg = "Charging per KG cannot be zero or less.";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0; // Form is valid if no errors
+  };
+
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
     setIsLoading(true);
-    // Include wasteTypes in the formData before submission
     const dataToSubmit = {
       ...formData,
-      wasteTypes: wasteTypes, // Add wasteTypes to the formData
+      wasteTypes: wasteTypes,
     };
-
     try {
       await createBinType(dataToSubmit);
       setIsLoading(false);
@@ -119,6 +148,9 @@ export const AddBinType = () => {
               placeholder="e.g., Organic Waste"
               className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
             />
+            {errors.binType && (
+              <p className="text-red-500 text-sm">{errors.binType}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -159,6 +191,9 @@ export const AddBinType = () => {
                 </span>
               ))}
             </div>
+            {errors.wasteTypes && (
+              <p className="text-red-500 text-sm">{errors.wasteTypes}</p>
+            )}
           </div>
 
           <div className="flex space-x-4">
@@ -183,6 +218,9 @@ export const AddBinType = () => {
                 placeholder="Enter price for small bin"
                 className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
               />
+              {errors.small && (
+                <p className="text-red-500 text-sm">{errors.small}</p>
+              )}
             </div>
 
             <div className="flex-1 space-y-2">
@@ -197,15 +235,18 @@ export const AddBinType = () => {
                 id="mediumPrice"
                 name="medium"
                 value={formData.binSizes.medium}
-                onChange={(e) =>
+                onChange={(e) => {
                   setFormData({
                     ...formData,
                     binSizes: { ...formData.binSizes, medium: e.target.value },
-                  })
-                }
+                  });
+                }}
                 placeholder="Enter price for medium bin"
                 className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
               />
+              {errors.medium && (
+                <p className="text-red-500 text-sm">{errors.medium}</p>
+              )}
             </div>
 
             <div className="flex-1 space-y-2">
@@ -229,6 +270,9 @@ export const AddBinType = () => {
                 placeholder="Enter price for large bin"
                 className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
               />
+              {errors.large && (
+                <p className="text-red-500 text-sm">{errors.large}</p>
+              )}
             </div>
           </div>
 
@@ -248,6 +292,9 @@ export const AddBinType = () => {
               placeholder="Enter charging per kg"
               className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
             />
+            {errors.chargingPerKg && (
+              <p className="text-red-500 text-sm">{errors.chargingPerKg}</p>
+            )}
           </div>
 
           <div className="space-y-2">
