@@ -11,6 +11,7 @@ import BinPurchasePage from "./User/Screens/PurchaseBin";
 import PaymentPage from "./User/Screens/Payment";
 import PaymentHistoryPage from "./User/Screens/PaymentHistory";
 import BillHistory from "./User/Screens/Bill";
+import MyBins from "./User/Screens/MyBins"
 import "react-native-reanimated";
 
 const Stack = createStackNavigator();
@@ -41,7 +42,7 @@ function BottomTabNavigator({ route }) {
     >
       <Stack.Screen
         name="PaymentPage"
-        component={PaymentPage}
+        component={MyBins}
         options={{ headerShown: false }}
       />
       <Stack.Screen
@@ -71,10 +72,15 @@ function BottomTabNavigator({ route }) {
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="MainTabs">
+      <Stack.Navigator initialRouteName="SignInPage">
         <Stack.Screen
           name="SignUpPage"
           component={SignUpPage}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="MyBins"
+          component={MyBins}
           options={{ headerShown: false }}
         />
         <Stack.Screen
