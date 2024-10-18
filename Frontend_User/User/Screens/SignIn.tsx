@@ -11,7 +11,7 @@ import {
   SafeAreaView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { signInUser, addPageView } from "./../Controller/UserController";
+import { signInUser, addPageView } from "../../Controller/UserController";
 import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
 import { useNavigation } from "@react-navigation/native";

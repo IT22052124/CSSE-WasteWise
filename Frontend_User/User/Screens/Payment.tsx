@@ -14,11 +14,11 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import { createPayment } from "./../Controller/paymentController";
+import { createPayment } from "../../Controller/paymentController";
 import Toast from "react-native-toast-message";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../../storage/firebase";
-import { getUserDetails } from "./../Controller/UserController";
+import { getUserDetails } from "../../Controller/UserController";
 
 const PaymentPage = () => {
   const [paymentAmount, setPaymentAmount] = useState("");

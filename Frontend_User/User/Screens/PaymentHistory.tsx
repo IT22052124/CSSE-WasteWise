@@ -12,8 +12,8 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { getPaymentsByUserID } from "./../Controller/paymentController";
-import { getUserDetails } from "./../Controller/UserController";
+import { getPaymentsByUserID } from "../../Controller/paymentController";
+import { getUserDetails } from "../../Controller/UserController";
 import { useFocusEffect } from "@react-navigation/native";
 
 const PaymentHistoryPage = () => {

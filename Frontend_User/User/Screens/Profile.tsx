@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { getUserDetails } from "./../Controller/UserController";
+import { getUserDetails } from "../../Controller/UserController";
 
 const UserDetailsPage = () => {
   const [user, setUser] = useState(null);
