@@ -1,16 +1,20 @@
 import { Button, Switch, Typography } from "@material-tailwind/react";
 import { useState, useEffect } from "react";
 import { useMaterialTailwindController } from "@/context";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
+  getBinTypeById,
+  updateBinType,
   getAllWasteTypes,
-  createBinType,
 } from "@/controllers/BinTypeController";
 
-export const AddBinType = () => {
+export const UpdateBinType = () => {
+  const { id } = useParams(); // Get binTypeId from URL
   const [controller] = useMaterialTailwindController();
   const navigate = useNavigate();
   const { sidenavColor } = controller;
+
+  console.log(id);
 
   const [formData, setFormData] = useState({
     binType: "",
@@ -32,18 +36,35 @@ export const AddBinType = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await getAllWasteTypes();
-        setWaste(data);
+        const data = await getBinTypeById(id); // Fetch bin type by id
+        // Set the formData with the entire response data
+
+        setFormData({
+          binType: data.binType || "", // Ensure fallback for undefined data
+          recyclable: data.recyclable || false,
+          incentivesPerKg: data.incentivesPerKg || 0,
+          chargingPerKg: data.chargingPerKg || 0,
+          binSizes: {
+            small: data.binSizes?.small || 0,
+            medium: data.binSizes?.medium || 0,
+            large: data.binSizes?.large || 0,
+          },
+          customBinColor: data.customBinColor || "",
+          selectedColor: data.selectedColor || "",
+        });
+
+        setWasteTypes(data.wasteTypes);
+
+        const wasteData = await getAllWasteTypes(); // Fetch waste types
+        setWaste(wasteData);
       } catch (error) {
-        console.error("Error fetching payments:", error);
+        console.error("Error fetching bin type or waste types:", error);
       }
     };
-
     fetchData();
-  }, []);
+  }, [id]);
 
-  console.log(waste);
-
+  console.log(formData)
   // Handle input changes
   const handleChange = (
     e: React.ChangeEvent<
@@ -67,28 +88,24 @@ export const AddBinType = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Include wasteTypes in the formData before submission
     const dataToSubmit = {
       ...formData,
       wasteTypes: wasteTypes, // Add wasteTypes to the formData
     };
-
     try {
-      await createBinType(dataToSubmit);
-      //navigate("/dashboard/wastetypes");
+      await updateBinType(id, dataToSubmit); // Update bin type by id
+      navigate("/dashboard/bintypes"); // Redirect after update
     } catch (error) {
-      console.error("Failed to add waste type", error);
+      console.error("Failed to update bin type", error);
     }
   };
 
-  // Add waste type to the list
   const addWasteTypeToList = (type) => {
     if (!wasteTypes.includes(type)) {
       setWasteTypes([...wasteTypes, type]);
     }
   };
 
-  // Remove waste type from the list
   const removeWasteTypeFromList = (type) => {
     setWasteTypes(wasteTypes.filter((t) => t !== type));
   };
@@ -97,11 +114,12 @@ export const AddBinType = () => {
     <div className="w-full max-w-2xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
       <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
         <Typography variant="h5" color="blue-gray" className="mb-1">
-          Add New Waste Bin Type
+          Update Waste Bin Type
         </Typography>
       </div>
       <div className="p-6">
         <form className="space-y-4" onSubmit={handleSubmit}>
+          {/* Add form fields similar to the AddBinType page, but pre-filled with formData */}
           <div className="space-y-2">
             <Typography
               variant="small"
@@ -309,14 +327,13 @@ export const AddBinType = () => {
               onChange={handleSwitchChange}
             />
           </div>
-
           <Button
             type="submit"
             variant="filled"
             color={sidenavColor !== "dark" ? sidenavColor : "gray"}
             className="w-full mt-4"
           >
-            Add Waste Bin Type
+            Update Waste Bin Type
           </Button>
         </form>
       </div>

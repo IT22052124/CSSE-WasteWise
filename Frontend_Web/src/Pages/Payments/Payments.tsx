@@ -99,8 +99,6 @@ export const Payments = () => {
     fetchData();
   }, [payments]);
 
-  console.log(payments);
-
   const handleDelete = async (id) => {
     Swal.fire({
       title: "Are you sure?",

@@ -39,6 +39,7 @@ import { Payments } from "./Pages/Payments/Payments";
 
 import { AddBinType } from "./Pages/BinType/AddBinType";
 import { BinTypes } from "./Pages/BinType/BinTypes";
+import { UpdateBinType } from "./Pages/BinType/UpdateBinType";
 
 const icon = {
   className: "w-5 h-5 text-inherit",
@@ -163,6 +164,14 @@ export const routes = [
         path: "/bintypes",
         element: <BinTypes />,
         inSidebar: true,
+        relatedPaths: ["/bintypes", "/addbintypes", "/updatebintypes"],
+      },
+      {
+        icon: <TrashIcon {...icon} />,
+        name: "Update Bin Type",
+        path: "/updatebintypes/:id",
+        element: <UpdateBinType />,
+        inSidebar: false,
         relatedPaths: ["/bintypes", "/addbintypes", "/updatebintypes"],
       },
       {
