@@ -69,3 +69,29 @@ export const findBinsByUserEmail = async (email: string) => {
   }
 };
 
+export const createBinRequest = async (binType, binTypeId, userId, capacity) => {
+  try {
+
+    const userRef = doc(db, "users", userId);
+    const binRef = doc(db, "binTypes", binTypeId);
+    // Create a new bin request object
+    const newBinRequest = {
+      binType: binType,
+      binTypeId: binRef,
+      userId: userRef,
+      capacity: capacity,
+      status: "Pending", // Set status to 'Pending'
+      createdAt: new Date(), // Optionally store the timestamp when the request was created
+    };
+
+    // Reference to the 'binRequests' collection
+    const binRequestsCollection = collection(db, "binRequests");
+
+    // Add a new document with an auto-generated ID
+    const docRef = await addDoc(binRequestsCollection, newBinRequest);
+
+    console.log("Bin request created successfully with ID: ", docRef.id);
+  } catch (error) {
+    console.error("Error creating bin request: ", error);
+  }
+};

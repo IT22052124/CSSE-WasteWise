@@ -9,14 +9,19 @@ import {
   Modal,
   TextInput,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { getUserDetails } from "../../Controller/UserController";
-import { getBinTypes } from "../../Controller/BinController";
+import { getBinTypes, createBinRequest } from "../../Controller/BinController";
 import { useFocusEffect } from "@react-navigation/native";
+import Toast from "react-native-toast-message";
+import * as Print from "expo-print";
+import * as Sharing from "expo-sharing";
 
 const BinPurchasePage = () => {
   const [binType, setBinType] = useState("");
+  const [binTypeId, setBinTypeId] = useState("");
   const [capacity, setCapacity] = useState("");
   const [price, setPrice] = useState(0);
   const [charging, setCharging] = useState(0);
@@ -34,6 +39,158 @@ const BinPurchasePage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [wasteTypes, setWasteTypes] = useState([]);
+
+  const generateRefNumber = (length: number): string => {
+    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let refNumber = "";
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      refNumber += characters[randomIndex];
+    }
+    return refNumber;
+  };
+
+  const generatePDF = async () => {
+    try {
+      const userDetails = await getUserDetails();
+      const referenceNumber = generateRefNumber(8);
+      const currentDate = new Date();
+      const formattedDate = currentDate.toISOString().split("T")[0];
+      const formattedTime = currentDate.toTimeString().split(" ")[0];
+
+      const html = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>WasteWise Bin Purchase Receipt</title>
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+                
+                body {
+                    font-family: 'Roboto', sans-serif;
+                    line-height: 1.6;
+                    color: #333;
+                    background-color: #f5f5f5;
+                    margin: 0;
+                    padding: 20px;
+                }
+                .container {
+                    max-width: 600px;
+                    margin: 0 auto;
+                    background-color: #ffffff;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                    overflow: hidden;
+                }
+                .header {
+                    background-color: #4CAF50;
+                    color: #ffffff;
+                    padding: 20px;
+                    text-align: center;
+                }
+                .header h1 {
+                    margin: 0;
+                    font-size: 28px;
+                    font-weight: 700;
+                }
+                .content {
+                    padding: 30px;
+                }
+                .details {
+                    background-color: #f9f9f9;
+                    border: 1px solid #e0e0e0;
+                    border-radius: 4px;
+                    padding: 20px;
+                    margin-bottom: 20px;
+                }
+                .details p {
+                    display: flex;
+                    justify-content: space-between;
+                    margin: 10px 0;
+                    font-size: 14px;
+                }
+                .details strong {
+                    color: #4CAF50;
+                }
+                .thank-you {
+                    text-align: center;
+                    font-size: 18px;
+                    color: #4CAF50;
+                    margin-top: 20px;
+                    font-weight: 700;
+                }
+                .footer {
+                    background-color: #f0f0f0;
+                    text-align: center;
+                    padding: 15px;
+                    font-size: 12px;
+                    color: #666;
+                }
+                .watermark {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%) rotate(-45deg);
+                    font-size: 100px;
+                    color: rgba(76, 175, 80, 0.05);
+                    pointer-events: none;
+                    z-index: 0;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>WasteWise Bin Purchase Receipt</h1>
+                </div>
+                <div class="content">
+                    <div class="watermark">RECEIPT</div>
+                    <div class="details">
+                        <p><strong>Reference Number:</strong> <span>${referenceNumber}</span></p>
+                        <p><strong>Date:</strong> <span>${formattedDate}</span></p>
+                        <p><strong>Time:</strong> <span>${formattedTime}</span></p>
+                        <p><strong>User Email:</strong> <span>${
+                          userDetails.email
+                        }</span></p>
+                        <p><strong>Bin Type:</strong> <span>${binType}</span></p>
+                        <p><strong>Capacity:</strong> <span>${capacity}</span></p>
+                        <p><strong>Amount:</strong> <span>LKR ${parseFloat(
+                          price
+                        ).toFixed(2)}</span></p>
+                        <p><strong>Payment Status:</strong> <span>Success</span></p>
+                    </div>
+                    <div class="thank-you">
+                        Thank you for your purchase!
+                    </div>
+                </div>
+                <div class="footer">
+                    This is an official receipt. No signature is required.
+                </div>
+            </div>
+        </body>
+        </html>
+      `;
+
+      const { uri } = await Print.printToFileAsync({
+        html,
+        base64: false,
+      });
+
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(uri, {
+          UTI: ".pdf",
+          mimeType: "application/pdf",
+        });
+      } else {
+        Alert.alert("Error", "Sharing is not available on your device");
+      }
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      Alert.alert("Error", "Failed to generate receipt");
+    }
+  };
 
   const handleExpiryDateChange = (text) => {
     let formatted = text.replace(/[^0-9]/g, "");
@@ -55,43 +212,26 @@ const BinPurchasePage = () => {
     setCardExpiry(formatted);
   };
 
-  useEffect(() => {
-    const fetchUserDetails = async () => {
-      try {
-        const userData = await getUserDetails();
-        setUserID(userData.id);
-      } catch (error) {
-        console.error("Failed to fetch user details: ", error);
-      }
-    };
-
-    fetchUserDetails();
-  }, []);
-
-  const fetchBinTypes = async () => {
-    if (!userID) return;
-
-    setLoading(true);
-    try {
-      const binTypesData = await getBinTypes();
-      setBinTypes(binTypesData);
-    } catch (error) {
-      console.error("Error fetching binTypes:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useFocusEffect(
     React.useCallback(() => {
-      fetchBinTypes();
+      const fetchUserAndBinTypes = async () => {
+        try {
+          const userData = await getUserDetails();
+          setUserID(userData.id);
+          const binTypesData = await getBinTypes();
+          setBinTypes(binTypesData);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      };
+
+      fetchUserAndBinTypes();
     }, [])
   );
 
-  console.log(binTypes);
-
   const handleBinTypeChange = (type) => {
     setBinType(type.binType);
+    setBinTypeId(type.id);
     setAvailableCapacities(Object.keys(type.binSizes));
     setCapacity(""); // Reset capacity on bin type change
     setPrice(0); // Reset price
@@ -113,25 +253,54 @@ const BinPurchasePage = () => {
   };
 
   const handlePayNow = () => {
+    if (!binType || !capacity) {
+      Toast.show({
+        type: "error",
+        text1: "Please Select Bin Capacity",
+      });
+      return;
+    }
     setShowCardModal(true);
   };
 
-  const handleCardSubmit = () => {
+  const handleCardSubmit = async () => {
+    setIsLoading(true);
     if (cardNumber && cardExpiry && cardCVV) {
-      setShowCardModal(false);
-      Alert.alert("Purchase Successful", "Your bin has been purchased.");
-      generatePDF();
-    } else {
-      Alert.alert("Error", "Please fill in all card details");
-    }
-  };
+      if (!binType || !binTypeId || !userID || !capacity) {
+        Alert.alert("Error", "Please fill in all fields");
+        return;
+      }
 
-  const generatePDF = () => {
-    console.log("Generating PDF for:");
-    console.log(`Bin Type: ${binType}`);
-    console.log(`Capacity: ${capacity}`);
-    console.log(`Price: $${price}`);
-    Alert.alert("PDF Generated", "Your receipt has been generated and saved.");
+      try {
+        await createBinRequest(binType, binTypeId, userID, capacity);
+        Toast.show({
+          type: "success",
+          text1: "Bin requested successfully",
+        });
+
+        await generatePDF();
+        // Reset the form or perform additional actions
+        setBinType("");
+        setBinTypeId("");
+        setCapacity("");
+        setCardCVV("");
+        setCardExpiry("");
+        setCardNumber("");
+        setIsLoading(false);
+        setShowCardModal(false);
+      } catch (error) {
+        Toast.show({
+          type: "error",
+          text1: "Failed to send bin request",
+        });
+        console.error(error);
+      }
+    } else {
+      Toast.show({
+        type: "error",
+        text1: "Please fill in all card details",
+      });
+    }
   };
 
   return (
@@ -294,10 +463,15 @@ const BinPurchasePage = () => {
               <TouchableOpacity
                 style={styles.modalPayButton}
                 onPress={handleCardSubmit}
+                disabled={isLoading}
               >
-                <Text style={styles.modalPayButtonText}>
-                  Pay LKR {parseFloat(price).toFixed(2)}
-                </Text>
+                {isLoading ? (
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                ) : (
+                  <Text style={styles.modalPayButtonText}>
+                    Pay LKR {parseFloat(price).toFixed(2)}
+                  </Text>
+                )}
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.modalCloseButton}
@@ -457,6 +631,23 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#333333",
     marginVertical: 2,
+  },
+  generatePdfButton: {
+    backgroundColor: "#4CAF50",
+    paddingVertical: 15,
+    borderRadius: 8,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: 20,
+  },
+  generatePdfButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  pdfIcon: {
+    marginRight: 10,
   },
 });
 

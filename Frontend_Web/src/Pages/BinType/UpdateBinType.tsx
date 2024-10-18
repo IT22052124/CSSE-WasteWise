@@ -7,14 +7,15 @@ import {
   updateBinType,
   getAllWasteTypes,
 } from "@/controllers/BinTypeController";
+import { PulseLoader } from "react-spinners";
 
 export const UpdateBinType = () => {
   const { id } = useParams(); // Get binTypeId from URL
   const [controller] = useMaterialTailwindController();
   const navigate = useNavigate();
   const { sidenavColor } = controller;
+  const [isLoading, setIsLoading] = useState(false);
 
-  console.log(id);
 
   const [formData, setFormData] = useState({
     binType: "",
@@ -64,7 +65,7 @@ export const UpdateBinType = () => {
     fetchData();
   }, [id]);
 
-  console.log(formData)
+  console.log(formData);
   // Handle input changes
   const handleChange = (
     e: React.ChangeEvent<
@@ -87,13 +88,14 @@ export const UpdateBinType = () => {
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    setIsLoading(true);
     const dataToSubmit = {
       ...formData,
       wasteTypes: wasteTypes, // Add wasteTypes to the formData
     };
     try {
       await updateBinType(id, dataToSubmit); // Update bin type by id
+      setIsLoading(false);
       navigate("/dashboard/bintypes"); // Redirect after update
     } catch (error) {
       console.error("Failed to update bin type", error);
@@ -332,8 +334,13 @@ export const UpdateBinType = () => {
             variant="filled"
             color={sidenavColor !== "dark" ? sidenavColor : "gray"}
             className="w-full mt-4"
+            disabled={isLoading}
           >
-            Update Waste Bin Type
+            {isLoading ? (
+              <PulseLoader size={10} color="#ffffff" /> // White loader
+            ) : (
+              "Update Waste Bin Type"
+            )}
           </Button>
         </form>
       </div>
