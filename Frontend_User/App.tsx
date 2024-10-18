@@ -72,7 +72,7 @@ function BottomTabNavigator({ route }) {
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="SignInPage">
+      <Stack.Navigator initialRouteName="MainTabs">
         <Stack.Screen
           name="SignUpPage"
           component={SignUpPage}
