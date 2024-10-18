@@ -9,6 +9,7 @@ import {
   MenuHandler,
   MenuList,
   MenuItem,
+  Button,
 } from "@material-tailwind/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import {
@@ -76,7 +77,7 @@ export const CollectionModels = () => {
         <CardHeader
           variant="gradient"
           color={sidenavColor !== "dark" ? sidenavColor : "gray"}
-          className="mb-8 p-6"
+          className="mb-8 p-6 flex justify-between items-center"
         >
           <Typography
             variant="h6"
@@ -84,6 +85,13 @@ export const CollectionModels = () => {
           >
             Collection Models
           </Typography>
+          <Button
+            variant="contained"
+            color={sidenavColor === "white" ? "black" : "white"}
+            onClick={() => navigate(`/dashboard/addcollectionmodel`)}
+          >
+            Add Model
+          </Button>
         </CardHeader>
         <CardBody className=" px-0 pt-0 pb-2">
           <table className="w-full min-w-[640px] table-auto">
@@ -94,7 +102,7 @@ export const CollectionModels = () => {
                   "Collection Frequency",
                   "Waste Types",
                   "Price (LKR)",
-                  "Routes and Locations",
+                  "Locations",
                   "",
                 ].map((el) => (
                   <th
@@ -131,14 +139,12 @@ export const CollectionModels = () => {
                   }`;
 
                   return (
-                    <tr key={modelName}>
+                    <tr key={id}>
                       <td className={className}>
-                        <div className="flex items-center gap-4">
-                          <div>
-                            <Typography className="text-xs font-normal text-blue-gray-500">
-                              {modelName}
-                            </Typography>
-                          </div>
+                        <div>
+                          <Typography className="text-xs font-normal text-blue-gray-500">
+                            {modelName}
+                          </Typography>
                         </div>
                       </td>
                       <td className={className}>
@@ -158,14 +164,26 @@ export const CollectionModels = () => {
                             : "Not Available"}
                         </Typography>
                       </td>
-                      <td className={className}>
-                        <Typography className="text-xs font-semibold text-blue-gray-600">
-                          { locations ? locations
-                            .filter((location) => location !== null) // Filter out null values
-                            .map((location) => location?.locationName) // Map to location names
-                            .join(", "): "Not Available"}
+                      <td className={className + " text-center"}>
+                        <Typography className="text-xs font-semibold text-blue-gray-600 text-center">
+                          {locations &&
+                          locations.length > 0 &&
+                          locations.some((location) => location !== null) ? (
+                            locations
+                              .filter((location) => location !== null) // Filter out null values
+                              .map((location) => location?.locationName) // Map to location names
+                              .join(", ")
+                          ) : (
+                            <Chip
+                              variant="gradient"
+                              color={"red"}
+                              value={"No Locations Assigned"}
+                              className="py-0.5 px-2 text-[11px] font-medium w-fit mx-auto"
+                            />
+                          )}
                         </Typography>
                       </td>
+
                       <td className={className}>
                         <Menu>
                           <MenuHandler>

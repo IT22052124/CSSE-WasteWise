@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { addCollectionModel } from "@/controllers/CollectionModelController"; // Import the controller function
 import { useMaterialTailwindController } from "@/context";
 import { useNavigate } from "react-router-dom";
-import { getWasteTypes } from "@/controllers/WasteTypeController";
+import { getWasteTypesWithBinInfo } from "@/controllers/WasteTypeController";
 
 export const AddCollectionModel = () => {
   const [controller] = useMaterialTailwindController();
@@ -21,7 +21,7 @@ export const AddCollectionModel = () => {
   useEffect(() => {
     const fetchWasteTypes = async () => {
       try {
-        const data = await getWasteTypes();
+        const data = await getWasteTypesWithBinInfo();
         setWasteTypes(data.map((wasteType) => wasteType.wasteType));
       } catch (error) {
         console.error("Error fetching waste types:", error);

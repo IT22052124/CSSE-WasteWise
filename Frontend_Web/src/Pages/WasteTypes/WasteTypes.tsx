@@ -5,6 +5,7 @@ import {
   Typography,
   Chip,
   IconButton,
+  Button,
   Menu,
   MenuHandler,
   MenuList,
@@ -13,7 +14,7 @@ import {
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import {
   deleteWasteType,
-  getWasteTypes,
+  getWasteTypesWithBinInfo,
 } from "@/controllers/WasteTypeController";
 import { useEffect, useState } from "react";
 import { useMaterialTailwindController } from "@/context";
@@ -29,8 +30,9 @@ export const WasteTypes = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await getWasteTypes();
+        const data = await getWasteTypesWithBinInfo();
         setWasteTypes(data);
+        console.log(data);
       } catch (error) {
         console.error("Error fetching waste types:", error);
       }
@@ -53,7 +55,7 @@ export const WasteTypes = () => {
         try {
           const fetch = async () => {
             await deleteWasteType(id);
-            const updatedWasteTypes = await getWasteTypes();
+            const updatedWasteTypes = await getWasteTypesWithBinInfo();
             setWasteTypes(updatedWasteTypes);
           };
           fetch();
@@ -75,7 +77,7 @@ export const WasteTypes = () => {
         <CardHeader
           variant="gradient"
           color={sidenavColor !== "dark" ? sidenavColor : "gray"}
-          className="mb-8 p-6"
+          className="mb-8 p-6 flex justify-between items-center"
         >
           <Typography
             variant="h6"
@@ -83,48 +85,83 @@ export const WasteTypes = () => {
           >
             Waste Types
           </Typography>
+          <Button
+            variant="contained"
+            color={sidenavColor === "white" ? "black" : "white"}
+            onClick={() => navigate(`/dashboard/addwastetypes`)}
+          >
+            Add Type
+          </Button>
         </CardHeader>
         <CardBody className=" px-0 pt-0 pb-2">
           <table className="w-full min-w-[640px] table-auto">
             <thead>
               <tr>
-                {[
-                  "Type Name",
-                  "Description",
-                  "Guidelines",
-                  "recyclable",
-                  "Payback / incentives (LKR) ",
-                  "Price (LKR)",
-                  "Bin Color",
-                  "",
-                ].map((el) => (
-                  <th
-                    key={el}
-                    className="border-b border-blue-gray-50 py-3 px-5 text-left"
-                  >
-                    <Typography
-                      variant="small"
-                      className="text-[11px] font-bold uppercase text-blue-gray-400 text-center"
+                {["Type Name", "Description", "Guidelines", "Recyclable"].map(
+                  (el) => (
+                    <th
+                      key={el}
+                      className="border-b border-blue-gray-50 py-3 px-5 text-left"
+                      rowSpan={2} 
                     >
-                      {el}
-                    </Typography>
-                  </th>
-                ))}
+                      <Typography
+                        variant="small"
+                        className="text-[11px] font-bold uppercase text-blue-gray-400 text-center"
+                      >
+                        {el}
+                      </Typography>
+                    </th>
+                  )
+                )}
+                
+                <th
+                  colSpan={2} 
+                  className="border-b border-blue-gray-50 py-3 px-5 text-center "
+                >
+                  <Typography
+                    variant="small"
+                    className="text-[12px] font-bold uppercase text-blue-gray-600"
+                  >
+                    Connected Bin
+                  </Typography>
+                </th>
+                <th
+                  className="border-b border-blue-gray-50 py-3 px-5 text-left"
+                  rowSpan={2}
+                ></th>
+              </tr>
+
+              <tr>
+                {["Bin Name", "Bin Color"].map(
+                  (el) => (
+                    <th
+                      key={el}
+                      className="border-b border-blue-gray-50 py-3 px-5 text-left"
+                    >
+                      <Typography
+                        variant="small"
+                        className="text-[11px] font-bold uppercase text-blue-gray-400 text-center"
+                      >
+                        {el}
+                      </Typography>
+                    </th>
+                  )
+                )}
               </tr>
             </thead>
+
             <tbody>
               {wasteTypes?.map(
                 (
                   {
                     wasteType,
                     recyclable,
-                    incentives,
                     guidelines,
                     description,
-                    binType,
-                    customBinColor,
+                    selectedColor,
                     id,
-                    price,
+                    Bin,
+                    binType,
                   },
                   key
                 ) => {
@@ -162,28 +199,28 @@ export const WasteTypes = () => {
                           variant="gradient"
                           color={recyclable ? "green" : "blue-gray"}
                           value={recyclable ? "Yes" : "No"}
-                          className="py-0.5 px-2 text-[11px] font-medium w-fit"
+                          className="py-0.5 px-2 text-[11px] font-medium w-fit mx-auto"
                         />
                       </td>
-                      <td className={className + " text-center"}>
-                        <Typography className="text-xs font-semibold text-blue-gray-600">
-                          {incentives === "None"
-                            ? incentives
-                            : parseFloat(incentives).toFixed(2)}
-                        </Typography>
-                      </td>
-                      <td className={className + " text-center"}>
-                        <Typography className="text-xs font-semibold text-blue-gray-600">
-                          {parseFloat(price)?.toFixed(2)}
-                        </Typography>
-                      </td>
-                      <td className={className + " text-center"}>
-                        <IconButton
-                          color={
-                            binType ? binType : customBinColor.toLowerCase()
-                          }
-                        ></IconButton>
-                      </td>
+                      {Bin ? (
+                        <>
+                          <td className={className + " text-center"}>
+                            <Typography className="text-xs font-semibold text-blue-gray-600">
+                              {binType}
+                            </Typography>
+                          </td>
+
+                          <td className={className + " text-center"}>
+                            <IconButton color={selectedColor}></IconButton>
+                          </td>
+                        </>
+                      ) : (
+                        <td className={className + " text-center"} colSpan={2}>
+                          <Typography className="text-xs font-semibold text-blue-gray-600">
+                            No Bin Connected
+                          </Typography>
+                        </td>
+                      )}
                       <td className={className}>
                         <Menu>
                           <MenuHandler>

@@ -3,8 +3,8 @@ import {
   CardHeader,
   CardBody,
   Typography,
-  Chip,
   IconButton,
+  Button,
   Menu,
   MenuHandler,
   MenuList,
@@ -73,7 +73,7 @@ export const Locations = () => {
         <CardHeader
           variant="gradient"
           color={sidenavColor !== "dark" ? sidenavColor : "gray"}
-          className="mb-8 p-6"
+          className="mb-8 p-6 flex justify-between items-center"
         >
           <Typography
             variant="h6"
@@ -81,6 +81,13 @@ export const Locations = () => {
           >
             Locations
           </Typography>
+          <Button
+            variant="contained"
+            color={sidenavColor === "white" ? "black" : "white"}
+            onClick={() => navigate(`/dashboard/addlocation`)}
+          >
+            Add Location
+          </Button>
         </CardHeader>
         <CardBody className="px-0 pt-0 pb-2">
           <table className="w-full min-w-[640px] table-auto">
