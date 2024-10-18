@@ -6,11 +6,13 @@ import {
   getAllWasteTypes,
   createBinType,
 } from "@/controllers/BinTypeController";
+import { PulseLoader } from "react-spinners";
 
 export const AddBinType = () => {
   const [controller] = useMaterialTailwindController();
   const navigate = useNavigate();
   const { sidenavColor } = controller;
+  const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     binType: "",
@@ -42,8 +44,6 @@ export const AddBinType = () => {
     fetchData();
   }, []);
 
-  console.log(waste);
-
   // Handle input changes
   const handleChange = (
     e: React.ChangeEvent<
@@ -66,7 +66,7 @@ export const AddBinType = () => {
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    setIsLoading(true);
     // Include wasteTypes in the formData before submission
     const dataToSubmit = {
       ...formData,
@@ -75,7 +75,8 @@ export const AddBinType = () => {
 
     try {
       await createBinType(dataToSubmit);
-      //navigate("/dashboard/wastetypes");
+      setIsLoading(false);
+      navigate("/dashboard/bintypes");
     } catch (error) {
       console.error("Failed to add waste type", error);
     }
@@ -315,8 +316,13 @@ export const AddBinType = () => {
             variant="filled"
             color={sidenavColor !== "dark" ? sidenavColor : "gray"}
             className="w-full mt-4"
+            disabled={isLoading}
           >
-            Add Waste Bin Type
+            {isLoading ? (
+              <PulseLoader size={10} color="#ffffff" /> // White loader
+            ) : (
+              "Add Waste Bin Type"
+            )}
           </Button>
         </form>
       </div>
