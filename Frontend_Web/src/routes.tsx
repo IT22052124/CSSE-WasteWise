@@ -41,6 +41,9 @@ import { AddBinType } from "./Pages/BinType/AddBinType";
 import { BinTypes } from "./Pages/BinType/BinTypes";
 import { UpdateBinType } from "./Pages/BinType/UpdateBinType";
 
+
+import {BinRequests} from "./Pages/Bins/BinReq";
+
 const icon = {
   className: "w-5 h-5 text-inherit",
 };
@@ -165,6 +168,14 @@ export const routes = [
         element: <BinTypes />,
         inSidebar: true,
         relatedPaths: ["/bintypes", "/addbintypes", "/updatebintypes"],
+      },
+      {
+        icon: <TrashIcon {...icon} />,
+        name: "Bin request",
+        path: "/binreq",
+        element: <BinRequests />,
+        inSidebar: true,
+        relatedPaths: ["/binreq"],
       },
       {
         icon: <TrashIcon {...icon} />,
