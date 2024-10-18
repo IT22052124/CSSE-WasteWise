@@ -14,30 +14,56 @@ export const addWasteType = async (wasteTypeData) => {
   try {
     const docRef = await addDoc(collection(db, "wasteTypes"), {
       ...wasteTypeData,
-      incentives:
-        wasteTypeData.incentives === 0 ? "None" : wasteTypeData.incentives,
       createdAt: serverTimestamp(),
     });
-    console.log("Document written with ID: ", docRef.id);
     return docRef;
   } catch (e) {
     console.error("Error adding document: ", e);
     throw e;
   }
 };
-export const getWasteTypes = async () => {
+
+export const getWasteTypesWithBinInfo = async () => {
   try {
+    // Fetch waste types
     const wasteTypeCollection = collection(db, "wasteTypes");
     const wasteTypeSnapshot = await getDocs(wasteTypeCollection);
     const wasteTypes = wasteTypeSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
-    console.log("Waste types retrieved successfully:", wasteTypes);
-    return wasteTypes;
+
+    // Fetch bin types
+    const binTypeCollection = collection(db, "binTypes");
+    const binTypeSnapshot = await getDocs(binTypeCollection);
+    const binTypes = binTypeSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    // Map waste types and merge matching bin type data
+    const wasteTypesWithBinInfo = wasteTypes.map((wasteType) => {
+      const matchingBinType = binTypes.find((binType) =>
+        binType.wasteTypes.includes(wasteType.wasteType)
+      );
+
+      if (matchingBinType) {
+        return {
+          ...wasteType,
+          binType: matchingBinType.binType,
+          chargingPerKg: matchingBinType.chargingPerKg,
+          incentivesPerKg: matchingBinType.incentivesPerKg,
+          selectedColor: matchingBinType.selectedColor,
+          Bin: true,
+        };
+      }
+      return wasteType;
+    });
+
+    return wasteTypesWithBinInfo;
   } catch (error) {
-    console.error("Error retrieving waste types:", error);
-    throw new Error("Failed to fetch waste types");
+    console.error("Error retrieving waste types with bin info:", error);
+    throw new Error("Failed to fetch waste types and bin info");
   }
 };
 
@@ -48,7 +74,6 @@ export const updateWasteType = async (id, updatedWasteTypeData) => {
       ...updatedWasteTypeData,
       updatedAt: serverTimestamp(),
     });
-    console.log("Waste type updated with ID: ", id);
   } catch (e) {
     console.error("Error updating document: ", e);
     throw e;
@@ -59,7 +84,6 @@ export const deleteWasteType = async (id) => {
   try {
     const wasteTypeRef = doc(db, "wasteTypes", id);
     await deleteDoc(wasteTypeRef);
-    console.log("Waste type deleted with ID: ", id);
   } catch (e) {
     console.error("Error deleting document: ", e);
     throw e;
@@ -73,10 +97,8 @@ export const getWasteTypeById = async (id: string) => {
 
     if (wasteTypeDoc.exists()) {
       const wasteTypeData = { id: wasteTypeDoc.id, ...wasteTypeDoc.data() };
-      console.log("Waste type retrieved successfully:", wasteTypeData);
       return wasteTypeData;
     } else {
-      console.log("No such document!");
       throw new Error("Waste type not found");
     }
   } catch (error) {

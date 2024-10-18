@@ -6,6 +6,7 @@ import { ThemeProvider } from "@material-tailwind/react";
 import { MaterialTailwindControllerProvider } from "@/context";
 import "../public/css/tailwind.css";
 import "sweetalert2/src/sweetalert2.scss";
+import ToastContainer from "./components/Toast/ToastContainer.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -13,6 +14,7 @@ createRoot(document.getElementById("root")!).render(
       <ThemeProvider>
         <MaterialTailwindControllerProvider>
           <App />
+          <ToastContainer />
         </MaterialTailwindControllerProvider>
       </ThemeProvider>
     </BrowserRouter>

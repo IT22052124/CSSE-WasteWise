@@ -2,6 +2,7 @@ import { db } from "../storage/firebase";
 import {
   collection,
   addDoc,
+  getDoc,
   getDocs,
   query,
   where,
@@ -9,6 +10,7 @@ import {
   increment,
   doc,
   serverTimestamp,
+  setDoc,
 } from "firebase/firestore";
 import bcrypt from "bcryptjs"; // for hashing passwords
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -125,14 +127,23 @@ export const getUserDetails = async () => {
 
 export const addPageView = async () => {
   try {
-    const pageViewRef = doc(db, "globalStats", "pageViewTracker");
-
-    await updateDoc(pageViewRef, {
-      views: increment(1),
-      lastViewedAt: serverTimestamp(),
-    });
+    const today = new Date().toISOString().split("T")[0];
+    const pageViewRef = doc(db, "globalStats", today);
+    const docSnapshot = await getDoc(pageViewRef);
+    if (docSnapshot.exists()) {
+      await updateDoc(pageViewRef, {
+        views: increment(1),
+        lastViewedAt: serverTimestamp(),
+      });
+    } else {
+      await setDoc(pageViewRef, {
+        views: 1,
+        createdAt: serverTimestamp(),
+        lastViewedAt: serverTimestamp(),
+      });
+    }
   } catch (error) {
-    console.error("Error incrementing page view:", error);
-    throw new Error("Failed to increment page view");
+    console.error("Error updating page view:", error);
+    throw new Error("Failed to update page view");
   }
 };

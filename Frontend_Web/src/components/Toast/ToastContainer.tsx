@@ -1,9 +1,9 @@
-import { Bounce, ToastContainer as ToastC } from "react-toastify";
+import { Bounce, ToastContainer as Toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const ToastContainer = () => {
   return (
-    <ToastC
+    <Toast
       position="top-right"
       autoClose={5000}
       hideProgressBar={false}
