@@ -1,7 +1,7 @@
-import { createBinType } from "../src/controllers/BinTypeController"; // Adjust the path as needed
+import { createBinType } from "../controllers/BinTypeController"; // Adjust the path as needed
 import * as firestore from "firebase/firestore";
 
-import { db } from "../src/storage/firebase"; // This import can stay if you need the db instance
+import { db } from "../storage/firebase"; // This import can stay if you need the db instance
 
 // Mock Firebase Firestore methods
 jest.mock("firebase/firestore", () => ({
