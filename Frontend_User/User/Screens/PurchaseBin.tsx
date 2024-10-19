@@ -265,13 +265,29 @@ const BinPurchasePage = () => {
   };
 
   const handleCardSubmit = async () => {
-    setIsLoading(true);
     if (cardNumber && cardExpiry && cardCVV) {
       if (!binType || !binTypeId || !userID || !capacity) {
         Alert.alert("Error", "Please fill in all fields");
         return;
       }
 
+      if (cardNumber.length !== 16 || isNaN(cardNumber)) {
+        Toast.show({
+          type: "error",
+          text1: "Card number must be 16 digits.",
+        });
+        return;
+      }
+
+      // Validate the CVV length (should be 3 digits)
+      if (cardCVV.length !== 3 || isNaN(cardCVV)) {
+        Toast.show({
+          type: "error",
+          text1: "CVV must be 3 digits.",
+        });
+        return;
+      }
+      setIsLoading(true);
       try {
         await createBinRequest(binType, binTypeId, userID, capacity);
         Toast.show({

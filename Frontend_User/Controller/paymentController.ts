@@ -103,7 +103,6 @@ const generatePaymentID = async () => {
   return `P${String(nextID).padStart(4, "0")}`;
 };
 
-
 export const getWasteCollectionsByUserID = async (userID) => {
   try {
     // Step 1: Prepare the document reference for the userID
@@ -171,8 +170,8 @@ export const getWasteCollectionsByUserID = async (userID) => {
 
     // Step 7: Sort results by month, with the current month first
     result.sort((a, b) => {
-      const [yearA, monthA] = a.month.split(' ');
-      const [yearB, monthB] = b.month.split(' ');
+      const [yearA, monthA] = a.month.split(" ");
+      const [yearB, monthB] = b.month.split(" ");
 
       // Convert month names to numeric values for sorting
       const monthIndex = {
