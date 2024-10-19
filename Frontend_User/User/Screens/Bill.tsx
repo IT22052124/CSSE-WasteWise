@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   StatusBar,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
@@ -77,18 +78,18 @@ export default function BillHistory() {
       <View style={styles.amountsContainer}>
         <View style={styles.amountRow}>
           <Text style={styles.amountLabel}>Total Amount:</Text>
-          <Text style={styles.amount}>₹{item.totalAmount.toFixed(2)}</Text>
+          <Text style={styles.amount}>LKR {item.totalAmount.toFixed(2)}</Text>
         </View>
         <View style={styles.amountRow}>
           <Text style={styles.amountLabel}>Total Payback:</Text>
           <Text style={styles.amount}>
-            ₹{item.totalPayBackAmount.toFixed(2)}
+            LKR {item.totalPayBackAmount.toFixed(2)}
           </Text>
         </View>
         <View style={styles.amountRow}>
-          <Text style={styles.amountLabel}>Outstanding Amount:</Text>
+          <Text style={styles.amountLabel}>Net Amount:</Text>
           <Text style={styles.amount}>
-            ₹{item.totalAmountToBePaid.toFixed(2)}
+          LKR {item.totalAmountToBePaid.toFixed(2)}
           </Text>
         </View>
       </View>
@@ -102,9 +103,13 @@ export default function BillHistory() {
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
-        <Text style={styles.loadingText}>Loading...</Text>
+        <ActivityIndicator
+          size="large"
+          color="#4CAF50"
+          style={{ marginTop: 50 }}
+        />
       </SafeAreaView>
-    );
+    )
   }
 
   return (
@@ -115,7 +120,7 @@ export default function BillHistory() {
         <View style={styles.outstandingContainer}>
           <Text style={styles.outstandingLabel}>Outstanding</Text>
           <Text style={styles.outstandingAmount}>
-            ₹{outstandingAmount.toFixed(2)}
+            LKR {outstandingAmount.toFixed(2)}
           </Text>
         </View>
       </View>
