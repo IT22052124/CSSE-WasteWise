@@ -4,6 +4,9 @@ import {
     CardBody,
     Typography,
     Chip,
+    MenuItem,
+    MenuList,
+    Menu,
   } from "@material-tailwind/react";
   import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
   import { getBins,autoUpdateWasteLevels,deleteBin} from "@/controllers/BinsController"; // Assuming you have a BinController to fetch bin data
@@ -156,19 +159,23 @@ import {
                             {perKg}
                           </Typography>
                         </td>
-                        
                         <td className={className}>
-                          <Typography
-                            as="a"
-                            href="#"
-                            className="text-xs font-semibold text-blue-gray-600"
-                          >
-                            <EllipsisVerticalIcon
-                              strokeWidth={2}
-                              className="h-5 w-5 text-inherit"
-                            />
-                          </Typography>
-                        </td>
+                       
+                            <MenuItem
+                              className="flex items-center gap-3"
+                              onClick={() => handleDelete(id)}
+                            >
+                              <Typography
+                                variant="small"
+                                color="blue-gray"
+                                className="mb-1 font-normal"
+                              >
+                                <strong>Delete</strong>
+                              </Typography>
+                            </MenuItem>
+                          </MenuList>
+                        </Menu>
+                      </td>
                       </tr>
                     );
                   }
