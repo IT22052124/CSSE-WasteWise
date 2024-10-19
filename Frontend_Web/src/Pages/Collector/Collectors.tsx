@@ -3,13 +3,17 @@ import {
     CardHeader,
     CardBody,
     Typography,
+    Button
   } from "@material-tailwind/react";
   import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
   import { getCollectors } from "@/controllers/collectorController"; // Fetch collector data
   import { useEffect, useState } from "react";
   import { useMaterialTailwindController } from "@/context";
-  
+  import { useNavigate } from "react-router-dom";
+
   export const Collectors = () => {
+    const navigate = useNavigate();
+
     const [collectors, setCollectors] = useState<any[]>([]);
     const [controller, dispatch] = useMaterialTailwindController();
     const { sidenavColor } = controller;
@@ -33,7 +37,7 @@ import {
           <CardHeader
             variant="gradient"
             color={sidenavColor !== "dark" ? sidenavColor : "gray"}
-            className="mb-8 p-6"
+            className="mb-8 p-6 flex justify-between items-center"
           >
             <Typography
               variant="h6"
@@ -41,6 +45,13 @@ import {
             >
               Collectors
             </Typography>
+            <Button
+            variant="contained"
+            color={sidenavColor === "white" ? "black" : "white"}
+            onClick={() => navigate(`/dashboard/addcollector`)}
+          >
+            Add Type
+          </Button>
           </CardHeader>
           <CardBody className="px-0 pt-0 pb-2">
             <table className="w-full min-w-[640px] table-auto">

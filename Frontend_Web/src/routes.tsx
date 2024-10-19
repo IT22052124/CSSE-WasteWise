@@ -198,7 +198,7 @@ export const routes = [
         name: "profile",
         path: "/profile",
         element: <Profile />,
-        inSidebar: true,
+        inSidebar: false,
         relatedPaths: ["/profile"],
       },
       {
@@ -223,7 +223,7 @@ export const routes = [
         name: "Collectors",
         path: "/collectors",
         element: <Collectors />,
-        inSidebar: false,
+        inSidebar:true,
         relatedPaths: ["/collectors", "/addcollector"],
       },
       {
