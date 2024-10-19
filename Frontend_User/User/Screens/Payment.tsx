@@ -19,8 +19,10 @@ import Toast from "react-native-toast-message";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../../storage/firebase";
 import { getUserDetails } from "../../Controller/UserController";
+import { useNavigation } from "@react-navigation/native";
 
 const PaymentPage = () => {
+  const navigation = useNavigation();
   const [paymentAmount, setPaymentAmount] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
   const [cardHolder, setCardHolder] = useState("");
@@ -326,6 +328,15 @@ const PaymentPage = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Payment</Text>
+      </View>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
@@ -337,7 +348,6 @@ const PaymentPage = () => {
             scrollViewRef.current.scrollToEnd({ animated: true })
           }
         >
-          <Text style={styles.title}>Payment</Text>
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Outstanding Amount</Text>
             <Text style={styles.amount}>₹{outstandingAmount.toFixed(2)}</Text>
@@ -427,6 +437,21 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F5F5F5",
+  },
+  header: {
+    backgroundColor: "#4CAF50",
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+    paddingTop: 40,
+  },
+  backButton: {
+    marginRight: 16,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#FFFFFF",
   },
   scrollContent: {
     padding: 20,
