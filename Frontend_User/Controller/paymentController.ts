@@ -82,7 +82,7 @@ export const getPaymentsByUserID = async (userID, method = null) => {
 };
 
 // Function to generate the next Payment ID
-const generatePaymentID = async () => {
+export const generatePaymentID = async () => {
   const paymentQuery = query(
     collection(db, "payments"),
     orderBy("paymentID", "desc"), // Order by paymentID in descending order
