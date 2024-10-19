@@ -199,8 +199,13 @@ export const getDocData = async (docRef) => {
   }
 };
 
-
-export const deleteBin = async (id) => {
-  const binTypeRef = doc(db, "bins", id); // "binTypes" is your Firestore collection name
-  await deleteDoc(binTypeRef); // Delete the document
+export const deleteBin = async (id: string) => {
+  try {
+    console.log("Attempting to delete bin with ID:", id);
+    const binTypeRef = doc(db, "bins", id); // "bins" is your Firestore collection name
+    await deleteDoc(binTypeRef); // Delete the document
+    console.log(`Bin with ID: ${id} successfully deleted.`);
+  } catch (error) {
+    console.error("Error deleting bin:", error);
+  }
 };
