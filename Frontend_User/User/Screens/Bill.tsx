@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,26 +10,49 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { getWasteCollectionsByUserID } from "./../../Controller/paymentController";
+import { getUserDetails } from "../../Controller/UserController";
 
 type Bill = {
-  id: string;
   month: string;
-  monthlyBill: number;
-  payback: number;
+  totalAmount: number;
+  totalPayBackAmount: number;
+  totalWaste: number;
+  totalAmountToBePaid: number;
 };
-
-const bills: Bill[] = [
-  { id: "1", month: "January", monthlyBill: 1000, payback: 70 },
-  { id: "2", month: "February", monthlyBill: 1000, payback: 70 },
-  { id: "3", month: "March", monthlyBill: 1000, payback: 70 },
-  { id: "4", month: "April", monthlyBill: 1000, payback: 70 },
-  { id: "5", month: "May", monthlyBill: 1000, payback: 70 },
-];
-
-const outstandingAmount = 3500; // This should be calculated or fetched from your data source
 
 export default function BillHistory() {
   const navigation = useNavigation();
+  const [bills, setBills] = useState<Bill[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [outstandingAmount, setOutstandingAmount] = useState(0); // Initialize outstanding amount
+  const [userID, setUserID] = useState(null);
+
+  useEffect(() => {
+    const fetchBills = async () => {
+      try {
+        const userData = await getUserDetails();
+        setUserID(userData.id);
+        if (userID) {
+          const fetchedBills = await getWasteCollectionsByUserID(userID);
+          setBills(fetchedBills);
+
+          // Calculate outstanding amount from fetched bills
+          const totalOutstanding = fetchedBills.reduce(
+            (total, bill) => total + bill.totalAmountToBePaid,
+            0
+          );
+          setOutstandingAmount(totalOutstanding);
+        }
+      } catch (error) {
+        console.error("Error fetching bills:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBills();
+  }, []);
 
   const renderItem = ({ item }: { item: Bill }) => (
     <View style={styles.billItem}>
@@ -39,12 +62,20 @@ export default function BillHistory() {
       </View>
       <View style={styles.amountsContainer}>
         <View style={styles.amountRow}>
-          <Text style={styles.amountLabel}>Monthly Bill:</Text>
-          <Text style={styles.amount}>₹{item.monthlyBill.toFixed(2)}</Text>
+          <Text style={styles.amountLabel}>Total Amount:</Text>
+          <Text style={styles.amount}>₹{item.totalAmount.toFixed(2)}</Text>
         </View>
         <View style={styles.amountRow}>
-          <Text style={styles.amountLabel}>Payback:</Text>
-          <Text style={styles.amount}>₹{item.payback.toFixed(2)}</Text>
+          <Text style={styles.amountLabel}>Total Payback:</Text>
+          <Text style={styles.amount}>
+            ₹{item.totalPayBackAmount.toFixed(2)}
+          </Text>
+        </View>
+        <View style={styles.amountRow}>
+          <Text style={styles.amountLabel}>Outstanding Amount:</Text>
+          <Text style={styles.amount}>
+            ₹{item.totalAmountToBePaid.toFixed(2)}
+          </Text>
         </View>
       </View>
     </View>
@@ -53,6 +84,14 @@ export default function BillHistory() {
   const handlePayment = () => {
     navigation.navigate("PaymentPage");
   };
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.loadingText}>Loading...</Text>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -69,7 +108,7 @@ export default function BillHistory() {
       <FlatList
         data={bills}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.month} // Use month as key, adjust if needed
         contentContainerStyle={styles.listContent}
       />
       <TouchableOpacity style={styles.payButton} onPress={handlePayment}>
@@ -174,5 +213,10 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 18,
     fontWeight: "bold",
+  },
+  loadingText: {
+    textAlign: "center",
+    fontSize: 18,
+    color: "#4CAF50",
   },
 });
