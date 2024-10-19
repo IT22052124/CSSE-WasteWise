@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button, Typography } from "@material-tailwind/react";
 import { addCollector ,getLastCollectorID} from "@/controllers/collectorController"; // Import the function to add a collector
 import { useNavigate } from "react-router-dom";
-import bcrypt from "bcryptjs"; // Import bcrypt for password hashing
+import { toast } from 'react-toastify'; // Import toast
 
 export const AddCollector = () => {
   const [formData, setFormData] = useState({
@@ -51,9 +51,10 @@ export const AddCollector = () => {
     e.preventDefault();
 
     try {
-      // Hash the password before adding the collector
+
       //const hashedPassword = await bcrypt.hash(formData.password, 10);
-      await addCollector({ ...formData }); // Add the collector with hashed password
+      await addCollector({ ...formData });
+      toast.success("New Bin Created successfully!");
       navigate("/dashboard/collectors"); // Navigate to the collectors list page
     } catch (error) {
       console.error("Failed to add collector", error);

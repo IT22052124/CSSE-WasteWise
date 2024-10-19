@@ -151,6 +151,22 @@ export const getBinRequests = async () => {
 };
 
 
+export const getBinHistory = async () => {
+  try {
+    const binRequestsCollection = collection(db, "binRequests");
+    const q = query(binRequestsCollection, where("status", "==", "success"));
+    const binRequestsSnapshot = await getDocs(q);
+    const binRequests = binRequestsSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    return binRequests;
+  } catch (error) {
+    console.error("Error fetching pending bin requests:", error);
+    throw error;
+  }
+};
+
 // Function to update the bin request status based on RequestID
 export const updateBinRequestStatusByRequestID = async (requestID: string) => {
   try {

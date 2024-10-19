@@ -3,13 +3,15 @@ import {
     CardHeader,
     CardBody,
     Typography,
-    Button
+    Button,
+    IconButton,
   } from "@material-tailwind/react";
-  import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
-  import { getCollectors } from "@/controllers/collectorController"; // Fetch collector data
+  import { EllipsisVerticalIcon, TrashIcon } from "@heroicons/react/24/outline"; // Importing the TrashIcon
+  import { getCollectors,deleteCollector  } from "@/controllers/collectorController"; // Fetch collector data
   import { useEffect, useState } from "react";
   import { useMaterialTailwindController } from "@/context";
   import { useNavigate } from "react-router-dom";
+  import { toast } from 'react-toastify'; // Import toast
 
   export const Collectors = () => {
     const navigate = useNavigate();
@@ -17,7 +19,8 @@ import {
     const [collectors, setCollectors] = useState<any[]>([]);
     const [controller, dispatch] = useMaterialTailwindController();
     const { sidenavColor } = controller;
-  
+
+
     useEffect(() => {
       const fetchData = async () => {
         try {
@@ -31,6 +34,19 @@ import {
       fetchData();
     }, []);
   
+    const handleDelete = async (id: string) => {
+      try {
+        await deleteCollector(id);
+        toast.success("Collector deleted successfully!");
+        navigate("/dashboard/collectors"); // Navigate to the collectors list page
+
+
+        } catch (error) {
+        console.error("Error deleting bin:", error);
+      }
+    };
+
+
     return (
       <div className="mt-12 mb-8 flex flex-col gap-12 min-h-screen">
         <Card>
@@ -63,7 +79,7 @@ import {
                     "Email",
                     "Phone",
                     "Assigned Bins",
-                    "",
+                    "action",
                   ].map((el) => (
                     <th
                       key={el}
@@ -81,7 +97,7 @@ import {
               </thead>
               <tbody>
                 {collectors?.map(
-                  ({ collectorID, name, email, phone, assignedBins }, key) => {
+                  ({id, collectorID, name, email, phone, address }, key) => {
                     const className = `py-3 px-5 ${
                       key === collectors.length - 1 ? "" : "border-b border-blue-gray-50"
                     }`;
@@ -108,19 +124,27 @@ import {
                             {phone}
                           </Typography>
                         </td>
-                        
                         <td className={className}>
-                          <Typography
-                            as="a"
-                            href="#"
-                            className="text-xs font-semibold text-blue-gray-600"
-                          >
-                            <EllipsisVerticalIcon
-                              strokeWidth={2}
-                              className="h-5 w-5 text-inherit"
-                            />
+                          <Typography className="text-xs font-semibold text-blue-gray-600">
+                            {address}
                           </Typography>
                         </td>
+                        
+                        
+                        <td className={className}>
+                      <div className="flex items-center gap-4">
+                        {/* Edit Icon */}
+                        
+                        {/* Delete Icon */}
+                        <IconButton
+                          color="red"
+                          size="sm"
+                          onClick={() => handleDelete(id)}
+                        >
+                          <TrashIcon strokeWidth={2} className="h-5 w-5" />
+                        </IconButton>
+                      </div>
+                    </td>
                       </tr>
                     );
                   }

@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#2ecc71",
+    color: "#2980B9",
     marginBottom: 20,
     textAlign: "center",
   },
