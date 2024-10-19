@@ -141,6 +141,13 @@ export const getWasteCollectionsByUserID = async (userID) => {
       const amount = PerKg * wasteWeight;
       const payBackAmount = Payback * wasteWeight;
 
+      if (amount < 0 || payBackAmount < 0) {
+        console.error(
+          "Invalid calculation: Amount or Payback Amount is negative."
+        );
+        return; // Skip this iteration
+      }
+
       // Accumulate data by month
       if (!wasteData[month]) {
         wasteData[month] = {
@@ -232,5 +239,4 @@ export const getTotalPaymentByUserID = async (userID) => {
     console.error("Error retrieving total payment:", error);
     throw new Error("Failed to retrieve total payment");
   }
-  
 };

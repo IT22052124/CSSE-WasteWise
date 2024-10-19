@@ -24,7 +24,7 @@ jest.mock("firebase/firestore", () => {
 describe("PaymentController", () => {
   const userID = "user123";
   const mockUserRef = {};
-  const mockUserRef2 = { path: 'users/user123' };
+  const mockUserRef2 = { path: "users/user123" };
   beforeEach(() => {
     jest.clearAllMocks(); // Clear mocks before each test
   });
@@ -169,6 +169,107 @@ describe("PaymentController", () => {
         totalPayBackAmount: 19, // (2 * 5) + (3 * 3)
         totalWaste: 8, // 5 + 3
         totalAmountToBePaid: 76, // totalAmount - totalPayBackAmount
+      },
+    ];
+
+    expect(result).toEqual(expectedResult); // This test should pass
+  });
+
+  test("getWasteCollectionsByUserID should return an empty array if no waste collections exist", async () => {
+    (firestore.doc as jest.Mock).mockReturnValue(mockUserRef); // Mock the user document reference
+
+    // Mock the Firestore documents returned for waste collection
+    (firestore.getDocs as jest.Mock).mockResolvedValueOnce({
+      empty: true,
+      docs: [],
+    });
+
+    const result = await getWasteCollectionsByUserID(userID);
+
+    expect(result).toEqual([]); // Expect an empty array
+    expect(firestore.getDocs).toHaveBeenCalled(); // Ensure getDocs was called
+  });
+
+  test("getWasteCollectionsByUserID should skip negative amount calculations", async () => {
+    (firestore.doc as jest.Mock).mockReturnValue(mockUserRef2); // Mock the user document reference
+
+    // Mock the Firestore documents returned for waste collection with negative PerKg
+    (firestore.getDocs as jest.Mock).mockResolvedValueOnce({
+      empty: false,
+      docs: [
+        {
+          data: () => ({
+            PerKg: -5, // Negative PerKg
+            Payback: 2,
+            wasteWeight: 10,
+            collectedAt: { toDate: () => new Date("2024-10-05") },
+          }),
+        },
+        {
+          data: () => ({
+            PerKg: 5,
+            Payback: 2,
+            wasteWeight: 10,
+            collectedAt: { toDate: () => new Date("2024-10-10") },
+          }),
+        },
+      ],
+    });
+
+    const result = await getWasteCollectionsByUserID(userID);
+
+    // Expected total calculations (only the valid entry counts)
+    const expectedResult = [
+      {
+        userRef: "users/user123",
+        month: "October 2024",
+        totalAmount: 50, // (5 * 10)
+        totalPayBackAmount: 20, // (2 * 10)
+        totalWaste: 10, // 10
+        totalAmountToBePaid: 30, // totalAmount - totalPayBackAmount
+      },
+    ];
+
+    expect(result).toEqual(expectedResult); // This test should pass
+  });
+
+  test("getWasteCollectionsByUserID should skip calculations if payback amount is negative", async () => {
+    (firestore.doc as jest.Mock).mockReturnValue(mockUserRef2); // Mock the user document reference
+
+    // Mock the Firestore documents returned for waste collection with negative Payback
+    (firestore.getDocs as jest.Mock).mockResolvedValueOnce({
+      empty: false,
+      docs: [
+        {
+          data: () => ({
+            PerKg: 5,
+            Payback: -2, // Negative Payback
+            wasteWeight: 10,
+            collectedAt: { toDate: () => new Date("2024-10-05") },
+          }),
+        },
+        {
+          data: () => ({
+            PerKg: 5,
+            Payback: 2,
+            wasteWeight: 10,
+            collectedAt: { toDate: () => new Date("2024-10-10") },
+          }),
+        },
+      ],
+    });
+
+    const result = await getWasteCollectionsByUserID(userID);
+
+    // Expected total calculations (only the valid entry counts)
+    const expectedResult = [
+      {
+        userRef: "users/user123",
+        month: "October 2024",
+        totalAmount: 50, // (5 * 10)
+        totalPayBackAmount: 20, // (2 * 10)
+        totalWaste: 10, // 10
+        totalAmountToBePaid: 30, // totalAmount - totalPayBackAmount
       },
     ];
 
