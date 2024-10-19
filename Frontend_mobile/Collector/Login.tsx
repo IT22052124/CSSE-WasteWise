@@ -1,33 +1,29 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   Image,
   KeyboardAvoidingView,
   Platform,
   Animated,
   Dimensions,
   ScrollView,
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import Toast from "react-native-toast-message";
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import Toast from 'react-native-toast-message';
 import { signInCollector } from '../controller/collectorController';
-import { useNavigation } from "@react-navigation/native";
-import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 
-
- 
-const { width } = Dimensions.get("window");
+const { width } = Dimensions.get('window');
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-
   const [fadeAnim] = useState(new Animated.Value(0));
 
   const navigation = useNavigation();
@@ -40,55 +36,44 @@ export default function LoginScreen() {
     }).start();
   }, []);
 
-
-  
-
   const handleLogin = async () => {
     const response = await signInCollector(email, password);
-//console.log(email)
-    //console.log(password)
+
     if (response.success) {
       // Save user details to AsyncStorage
       try {
-        await AsyncStorage.setItem("collector", JSON.stringify(response.collector));
+        await AsyncStorage.setItem('collector', JSON.stringify(response.collector));
       } catch (error) {
-        console.error("Error saving user data: ", error);
+        console.error('Error saving user data: ', error);
       }
 
       Toast.show({
-        type: "success",
-        text1: "Welcome!",
-        text2: `Hello, ${
-        response.collector.email || "collector"
-        }! Sign in successful.`,
+        type: 'success',
+        text1: 'Welcome!',
+        text2: `Hello, ${response.collector.email || 'collector'}! Sign in successful.`,
       });
-      navigation.navigate("MainTabs");
+      navigation.navigate('MainTabs');
     } else {
-      console.log(response)
       Toast.show({
-        type: "error",
-        text1: "Sign In Error",
-        text2: response.message,
+        type: 'error', // Change this to a valid toast type like 'error'
+        text1: 'Login Failed',
+        text2: 'Incorrect Password or email',
       });
     }
   };
 
-  
-
   return (
     <KeyboardAvoidingView
-    style={styles.container}
-    behavior={Platform.OS === "ios" ? "padding" : "height"}
-    keyboardVerticalOffset={100} // Adjust this offset based on your layout
-  >
-
-<ScrollView 
-        contentContainerStyle={styles.scrollContainer} 
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={100} // Adjust this offset based on your layout
+    >
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled" // Allow taps while keyboard is open
       >
-
-<Animated.View style={[styles.content, { opacity: fadeAnim }]}>
-          <Image source={require("../assets/loge.jpg")} style={styles.image} />
+        <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
+          <Image source={require('../assets/loge.jpg')} style={styles.image} />
           <Text style={styles.header}>Welcome Back</Text>
           <View style={styles.inputContainer}>
             <Ionicons
@@ -113,8 +98,7 @@ export default function LoginScreen() {
               color="#007AFF"
               style={styles.icon}
             />
-
-          <TextInput
+            <TextInput
               style={styles.input}
               placeholder="Password"
               placeholderTextColor="#a0a0a0"
@@ -124,69 +108,64 @@ export default function LoginScreen() {
             />
           </View>
           <TouchableOpacity
-              onPress={() => setShowPassword(!showPassword)}
-              style={styles.eyeIcon}
-            >
-              <Ionicons
-                name={showPassword ? "eye-outline" : "eye-off-outline"}
-                size={24}
-                color="#4CAF50"
-              />
-            </TouchableOpacity>
-          
+            onPress={() => setShowPassword(!showPassword)}
+            style={styles.eyeIcon}
+          >
+            <Ionicons
+              name={showPassword ? 'eye-outline' : 'eye-off-outline'}
+              size={24}
+              color="#4CAF50"
+            />
+          </TouchableOpacity>
 
           <TouchableOpacity style={styles.button} onPress={handleLogin}>
             <Text style={styles.buttonText}>Login</Text>
           </TouchableOpacity>
-
-          </Animated.View>
-          </ScrollView>
-              </KeyboardAvoidingView>
-
-
-
-     
-    
+          <Toast ref={(ref) => Toast.setRef(ref)} />
+        </Animated.View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: '#FFFFFF',
   },
   scrollContainer: {
     flexGrow: 1,
-    justifyContent: "center",
+    justifyContent: 'center',
     padding: 20,
   },
   eyeIcon: {
     padding: 4,
   },
   content: {
-    alignItems: "center",
+    alignItems: 'center',
   },
   image: {
     width: width * 0.8,
     height: width * 0.6,
-    resizeMode: "contain",
+    resizeMode: 'contain',
     marginBottom: 10,
   },
   header: {
     fontSize: 30,
-    fontWeight: "bold",
-    textAlign: "center",
+    fontWeight: 'bold',
+    textAlign: 'center',
     marginBottom: 30,
-    color: "#007AFF",
-    textShadowColor: "rgba(0, 0, 0, 0.2)",
-    backgroundColor: "rgba(255,255,255,0.8)",
+    color: '#007AFF',
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    backgroundColor: 'rgba(255,255,255,0.8)',
     textShadowRadius: 3,
     borderRadius: 10,
   },
   inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     borderWidth: 1,
-    borderColor: "#E0E0E0",
+    borderColor: '#E0E0E0',
     borderRadius: 25,
     marginBottom: 15,
     paddingHorizontal: 15,
@@ -198,16 +177,16 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 50,
     fontSize: 16,
-    color: "#333333",
+    color: '#333333',
   },
   button: {
-    backgroundColor: "#007AFF",
+    backgroundColor: '#007AFF',
     borderRadius: 25,
     padding: 15,
-    alignItems: "center",
+    alignItems: 'center',
     marginTop: 20,
-    width: "100%",
-    shadowColor: "#000",
+    width: '100%',
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -217,9 +196,8 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   buttonText: {
-    color: "#FFFFFF",
-    fontWeight: "bold",
+    color: '#FFFFFF',
+    fontWeight: 'bold',
     fontSize: 18,
   },
- 
 });

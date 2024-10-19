@@ -64,6 +64,14 @@ export const routes = [
         relatedPaths: ["/home"], // Add related paths
       },
       {
+        icon: <RectangleStackIcon {...icon} />,
+        name: "Bins",
+        path: "/bin",
+        element: <Bins />,
+        inSidebar:true,
+        relatedPaths: ["/bin"],
+      },
+      {
         icon: <DocumentDuplicateIcon {...icon} />,
         name: "Waste Types",
         path: "/wastetypes",
@@ -217,7 +225,7 @@ export const routes = [
         name: "profile",
         path: "/profile",
         element: <Profile />,
-        inSidebar: true,
+        inSidebar: false,
         relatedPaths: ["/profile"],
       },
       {
@@ -226,16 +234,9 @@ export const routes = [
         path: "/addbin",
         element: <AddBin />,
         inSidebar: false,
-        relatedPaths: ["/bin", "/addbin"],
+        relatedPaths: [ "/addbin"],
       },
-      {
-        icon: <RectangleStackIcon {...icon} />,
-        name: "Bin",
-        path: "/bin",
-        element: <Bins />,
-        inSidebar: false,
-        relatedPaths: ["/bin", "/addbin"],
-      },
+     
       {
         icon: <TableCellsIcon {...icon} />,
         name: "tables",
@@ -249,7 +250,7 @@ export const routes = [
         name: "Collectors",
         path: "/collectors",
         element: <Collectors />,
-        inSidebar: false,
+        inSidebar:true,
         relatedPaths: ["/collectors", "/addcollector"],
       },
       {

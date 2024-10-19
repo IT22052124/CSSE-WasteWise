@@ -12,11 +12,17 @@ import {
   serverTimestamp,
   setDoc,
 } from "firebase/firestore";
-import bcrypt from "bcryptjs"; // for hashing passwords
+import bcrypt from "bcryptjs";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const createUser = async (userData) => {
   const { username, email, phone, address, password } = userData;
+
+  //const salt = await bcrypt.genSalt(10);
+
+  //const hashedPassword = await bcrypt.hash(password, salt);
+
+  //console.log(hashedPassword);
 
   try {
     await addDoc(collection(db, "users"), {
@@ -97,8 +103,11 @@ export const signInUser = async (email, password) => {
     const userDoc = querySnapshot.docs[0];
     const userData = userDoc.data();
     const userId = userDoc.id;
+    //const hashedPassword = userData.password;
 
-    if (password !== userData.password) {
+    //const isMatch = await bcrypt.compare(password, hashedPassword);
+
+    if (password != userData.password) {
       return { success: false, message: "Incorrect password" };
     }
 

@@ -11,7 +11,7 @@ import BinPurchasePage from "./User/Screens/PurchaseBin";
 import PaymentPage from "./User/Screens/Payment";
 import PaymentHistoryPage from "./User/Screens/PaymentHistory";
 import BillHistory from "./User/Screens/Bill";
-import MyBins from "./User/Screens/MyBins"
+import MyBins from "./User/Screens/MyBins";
 import "react-native-reanimated";
 
 const Stack = createStackNavigator();
@@ -24,16 +24,14 @@ function BottomTabNavigator({ route }) {
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 
-          if (route.name === "MyBins") {
-            iconName = focused ? "document" : "document-outline"; // Icon for company profile
-          } else if (route.name === "UserDetailsPage") {
-            iconName = focused ? "briefcase" : "briefcase-outline"; // Icon for posted jobs
-          } else if (route.name === "BillHistory") {
-            iconName = focused ? "briefcase" : "briefcase-outline"; // Icon for posted jobs
-          } else if (route.name === "PaymentHistoryPage") {
-            iconName = focused ? "document" : "document-outline"; // Icon for company profile
-          }else if (route.name === "BinPurchasePage") {
-            iconName = focused ? "document" : "document-outline"; // Icon for company profile
+          if (route.name === "Bins") {
+            iconName = focused ? "trash" : "trash-outline"; // Trash icon for bins
+          } else if (route.name === "Profile") {
+            iconName = focused ? "person" : "person-outline"; // Person icon for user profile
+          } else if (route.name === "Bills") {
+            iconName = focused ? "receipt" : "receipt-outline"; // Receipt icon for bill history
+          } else if (route.name === "Payments") {
+            iconName = focused ? "card" : "card-outline"; // Credit card icon for payment history
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
@@ -41,28 +39,24 @@ function BottomTabNavigator({ route }) {
       })}
     >
       <Stack.Screen
-        name="MyBins"
+        name="Bins"
         component={MyBins}
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="PaymentHistoryPage"
-        component={PaymentHistoryPage}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="BillHistory"
+        name="Bills"
         component={BillHistory}
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="UserDetailsPage"
-        component={UserDetailsPage}
+        name="Payments"
+        component={PaymentHistoryPage}
         options={{ headerShown: false }}
       />
+
       <Stack.Screen
-        name="PaymentPage"
-        component={PaymentPage}
+        name="Profile"
+        component={UserDetailsPage}
         options={{ headerShown: false }}
       />
     </Tab.Navigator>
@@ -72,14 +66,14 @@ function BottomTabNavigator({ route }) {
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="MainTabs">
+      <Stack.Navigator initialRouteName="SignInPage">
         <Stack.Screen
           name="SignUpPage"
           component={SignUpPage}
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="MyBins"
+          name="Bins"
           component={MyBins}
           options={{ headerShown: false }}
         />
@@ -94,7 +88,7 @@ export default function App() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="UserDetailsPage"
+          name="Profile"
           component={UserDetailsPage}
           options={{ headerShown: false }}
         />
@@ -109,12 +103,12 @@ export default function App() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="PaymentHistoryPage"
+          name="Payments"
           component={PaymentHistoryPage}
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="BillHistory"
+          name="Bills"
           component={BillHistory}
           options={{ headerShown: false }}
         />

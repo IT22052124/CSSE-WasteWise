@@ -6,7 +6,6 @@ import {
     Chip,
     Button,
   } from "@material-tailwind/react";
-  import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
   import { useEffect, useState } from "react";
   import { getBinRequests, getDocData } from "@/controllers/BinsController";
   import { useMaterialTailwindController } from "@/context";
@@ -22,6 +21,7 @@ import {
       const fetchData = async () => {
         try {
           const data = await getBinRequests();
+          console.log(data)
   
           const resolvedRequests = await Promise.all(
             data.map(async (request) => {
@@ -46,10 +46,11 @@ import {
       fetchData();
     }, []);
   
-    const handleCreateBin = (binType: string, userEmail: string) => {
-      // Navigate to the bin creation page with pre-filled waste type and user email
-      navigate(`/dashboard/addbin?binType=${binType}&userEmail=${userEmail}`);
+    const handleCreateBin = (binType: string, userEmail: string, capacity: string, ReqID:string) => {
+      // Navigate to the bin creation page with pre-filled waste type, user email, and capacity
+      navigate(`/dashboard/addbin?binType=${binType}&userEmail=${userEmail}&capacity=${capacity}&ReqID=${ReqID}`);
     };
+    
   
     return (
       <div className="mt-12 mb-8 flex flex-col gap-12 min-h-screen">
@@ -77,13 +78,13 @@ import {
                 </tr>
               </thead>
               <tbody>
-                {binRequests.map(({ id, binType, user, address, capacity, status, createdAt, userEmail }, key) => {
+                {binRequests.map(({ id,ReqID, binType, user, address, capacity, status, createdAt, userEmail }, key) => {
                   const className = `py-3 px-5 ${key === binRequests.length - 1 ? "" : "border-b border-blue-gray-50"}`;
   
                   return (
                     <tr key={id}>
                       <td className={className}>
-                        <Typography className="text-xs font-normal text-blue-gray-500">{id}</Typography>
+                        <Typography className="text-xs font-normal text-blue-gray-500">{ReqID}</Typography>
                       </td>
                       <td className={className}>
                         <Typography className="text-xs font-semibold text-blue-gray-600">{binType}</Typography>
@@ -111,7 +112,7 @@ import {
                         </Typography>
                       </td>
                       <td className={className}>
-                        <Button size="sm" onClick={() => handleCreateBin(binType, userEmail)}>
+                        <Button size="sm" onClick={() => handleCreateBin(binType, userEmail,capacity,ReqID)}>
                           Create Bin
                         </Button>
                       </td>
