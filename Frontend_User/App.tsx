@@ -60,11 +60,6 @@ function BottomTabNavigator({ route }) {
         component={UserDetailsPage}
         options={{ headerShown: false }}
       />
-      <Stack.Screen
-        name="PaymentPage"
-        component={PaymentPage}
-        options={{ headerShown: false }}
-      />
     </Tab.Navigator>
   );
 }
@@ -72,7 +67,7 @@ function BottomTabNavigator({ route }) {
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="SignUpPage">
+      <Stack.Navigator initialRouteName="SignInPage">
         <Stack.Screen
           name="SignUpPage"
           component={SignUpPage}

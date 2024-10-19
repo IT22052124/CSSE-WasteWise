@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 type Bill = {
   id: string;
@@ -28,6 +29,8 @@ const bills: Bill[] = [
 const outstandingAmount = 3500; // This should be calculated or fetched from your data source
 
 export default function BillHistory() {
+  const navigation = useNavigation();
+
   const renderItem = ({ item }: { item: Bill }) => (
     <View style={styles.billItem}>
       <View style={styles.monthContainer}>
@@ -48,8 +51,7 @@ export default function BillHistory() {
   );
 
   const handlePayment = () => {
-    // Implement payment logic here
-    console.log("Payment initiated for outstanding amount:", outstandingAmount);
+    navigation.navigate("PaymentPage");
   };
 
   return (
