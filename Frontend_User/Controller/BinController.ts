@@ -8,7 +8,9 @@ import {
   getDoc,
   updateDoc,
   query,
-  where
+  where,
+  orderBy,
+  limit,
 } from "firebase/firestore";
 import { db } from "../storage/firebase";
 
@@ -36,8 +38,6 @@ export const getBinTypes = async () => {
   }
 };
 
-
-
 export const findBinsByUserEmail = async (email: string) => {
   try {
     // Reference the 'bins' collection in Firestore
@@ -56,26 +56,32 @@ export const findBinsByUserEmail = async (email: string) => {
     }
 
     // Extract and return bin data
-    const bins = querySnapshot.docs.map(doc => ({
+    const bins = querySnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
 
     return bins;
-
   } catch (error) {
     console.error("Error finding bins by user email:", error);
     throw new Error("Unable to find bins for the user.");
   }
 };
 
-export const createBinRequest = async (binType, binTypeId, userId, capacity) => {
+export const createBinRequest = async (
+  binType,
+  binTypeId,
+  userId,
+  capacity
+) => {
   try {
+    const binID = await generateBinID();
 
     const userRef = doc(db, "users", userId);
     const binRef = doc(db, "binTypes", binTypeId);
     // Create a new bin request object
     const newBinRequest = {
+      binID: binID,
       binType: binType,
       binTypeId: binRef,
       userId: userRef,
@@ -94,4 +100,25 @@ export const createBinRequest = async (binType, binTypeId, userId, capacity) => 
   } catch (error) {
     console.error("Error creating bin request: ", error);
   }
+};
+
+const generateBinID = async () => {
+  const binQuery = query(
+    collection(db, "binRequests"),
+    orderBy("binID", "desc"), // Order by paymentID in descending order
+    limit(1) // Limit to the latest document
+  );
+
+  const querySnapshot = await getDocs(binQuery);
+  let nextID = 1; // Default to 1 if no payments exist
+
+  if (!querySnapshot.empty) {
+    const lastDoc = querySnapshot.docs[0];
+    const lastBinID = lastDoc.data().binID;
+    const lastNumber = parseInt(lastBinID.replace("P", ""), 10); // Extract number from lastPaymentID
+    nextID = lastNumber + 1; // Increment
+  }
+
+  // Format the payment ID with leading zeros
+  return `P${String(nextID).padStart(4, "0")}`;
 };
