@@ -16,9 +16,9 @@ import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import { signInCollector } from '../controller/collectorController';
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -40,7 +40,6 @@ export default function LoginScreen() {
     const response = await signInCollector(email, password);
 
     if (response.success) {
-      // Save user details to AsyncStorage
       try {
         await AsyncStorage.setItem('collector', JSON.stringify(response.collector));
       } catch (error) {
@@ -55,7 +54,7 @@ export default function LoginScreen() {
       navigation.navigate('MainTabs');
     } else {
       Toast.show({
-        type: 'error', // Change this to a valid toast type like 'error'
+        type: 'error',
         text1: 'Login Failed',
         text2: 'Incorrect Password or email',
       });
@@ -66,11 +65,11 @@ export default function LoginScreen() {
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={100} // Adjust this offset based on your layout
+      keyboardVerticalOffset={100}
     >
       <ScrollView
         contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled" // Allow taps while keyboard is open
+        keyboardShouldPersistTaps="handled"
       >
         <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
           <Image source={require('../assets/loge.jpg')} style={styles.image} />
@@ -85,7 +84,7 @@ export default function LoginScreen() {
             <TextInput
               style={styles.input}
               placeholder="Username"
-              placeholderTextColor="#a0a0a0"
+              placeholderTextColor="#A0A0A0"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
@@ -101,22 +100,22 @@ export default function LoginScreen() {
             <TextInput
               style={styles.input}
               placeholder="Password"
-              placeholderTextColor="#a0a0a0"
+              placeholderTextColor="#A0A0A0"
               secureTextEntry={!showPassword}
               value={password}
               onChangeText={setPassword}
             />
+            <TouchableOpacity
+              onPress={() => setShowPassword(!showPassword)}
+              style={styles.eyeIcon}
+            >
+              <Ionicons
+                name={showPassword ? 'eye-outline' : 'eye-off-outline'}
+                size={24}
+                color="#007AFF"
+              />
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity
-            onPress={() => setShowPassword(!showPassword)}
-            style={styles.eyeIcon}
-          >
-            <Ionicons
-              name={showPassword ? 'eye-outline' : 'eye-off-outline'}
-              size={24}
-              color="#4CAF50"
-            />
-          </TouchableOpacity>
 
           <TouchableOpacity style={styles.button} onPress={handleLogin}>
             <Text style={styles.buttonText}>Login</Text>
@@ -138,28 +137,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 20,
   },
-  eyeIcon: {
-    padding: 4,
-  },
   content: {
     alignItems: 'center',
+    width: '100%',
   },
   image: {
-    width: width * 0.8,
-    height: width * 0.6,
+    width: width * 0.6,
+    height: width * 0.4,
     resizeMode: 'contain',
-    marginBottom: 10,
+    marginBottom: 20,
   },
   header: {
-    fontSize: 30,
+    fontSize: 32,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 30,
     color: '#007AFF',
-    textShadowColor: 'rgba(0, 0, 0, 0.2)',
-    backgroundColor: 'rgba(255,255,255,0.8)',
-    textShadowRadius: 3,
-    borderRadius: 10,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -169,6 +162,8 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     marginBottom: 15,
     paddingHorizontal: 15,
+    backgroundColor: '#F8F8F8',
+    width: '100%',
   },
   icon: {
     marginRight: 10,
@@ -178,6 +173,9 @@ const styles = StyleSheet.create({
     height: 50,
     fontSize: 16,
     color: '#333333',
+  },
+  eyeIcon: {
+    padding: 4,
   },
   button: {
     backgroundColor: '#007AFF',
