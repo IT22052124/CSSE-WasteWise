@@ -139,7 +139,6 @@ export default function BinDataScreen({ route }) {
 
               <InfoItem label="Owner Phone" value={binData.user.phone} />
               <InfoItem label="Recyclable" value={binData.type.recyclable} />
-              <InfoItem label="Charging per Kg" value={amount.chargingPerKg} />
             </View>
           </View>
         ) : (

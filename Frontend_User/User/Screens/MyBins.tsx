@@ -63,7 +63,7 @@ export default function YourBinsScreen() {
         setLoading(true);
         const binData = await findBinsByUserEmail(email);
         setBins(binData);
-        console.log(binData);
+        console.log("bro--------",binData);
         setLoading(false);
       } catch (error) {
         console.error("Failed to fetch bins: ", error);
@@ -76,7 +76,7 @@ export default function YourBinsScreen() {
 
       const intervalId = setInterval(() => {
         fetchBins(userEmail); // Fetch bins every 10 seconds
-      }, 1000000); // 10000 ms = 10 seconds
+      }, 100000000); // 10000 ms = 10 seconds
 
       // Clear the interval on component unmount or userEmail change
       return () => clearInterval(intervalId);
@@ -115,7 +115,7 @@ export default function YourBinsScreen() {
                     {item.binType} Bin : {item.binID}
                   </Text>
                   <Text style={styles.wasteTypeText}>
-                    Waste Type: {item.type.wasteType}
+                    Waste Type: {item.type.binType}
                   </Text>
                   <View style={styles.wasteLevelContainer}>
                     <Text style={styles.wasteLevelText}>Waste Level:</Text>
