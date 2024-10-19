@@ -108,6 +108,7 @@ export const updateTruck = async (id, updatedTruckData) => {
     const truckRef = doc(db, "trucks", id);
     await updateDoc(truckRef, {
       ...updatedTruckData,
+      locations: updatedTruckData.locations || [], // Handle locations being null or an array
       updatedAt: serverTimestamp(),
     });
     console.log("Truck updated with ID: ", id);
@@ -129,17 +130,48 @@ export const deleteTruck = async (id) => {
   }
 };
 
-// Get a truck by ID
 export const getTruckById = async (id) => {
   try {
     const truckRef = doc(db, "trucks", id);
     const truckDoc = await getDoc(truckRef);
 
     if (truckDoc.exists()) {
-      const truckData = {
+      let truckData = {
         id: truckDoc.id,
         ...truckDoc.data(),
       };
+
+      // Fetch locations if they exist
+      if (truckData.locations && truckData.locations.length > 0) {
+        truckData.locations = await Promise.all(
+          truckData.locations.map(async (locationId) => {
+            const locationRef = doc(db, "locations", locationId);
+            const locationDoc = await getDoc(locationRef);
+            return locationDoc.exists()
+              ? { id: locationDoc.id, ...locationDoc.data() }
+              : null;
+          })
+        );
+      }
+
+      // Fetch employee details from 'collectors' collection
+      if (truckData.employees && truckData.employees.length > 0) {
+        truckData.employees = await Promise.all(
+          truckData.employees.map(async (employeeId) => {
+            // Check if the employeeId is valid
+            if (!employeeId || typeof employeeId !== "string") {
+              return null;
+            }
+
+            const employeeRef = doc(db, "collectors", employeeId);
+            const employeeDoc = await getDoc(employeeRef);
+            return employeeDoc.exists()
+              ? { id: employeeDoc.id, ...employeeDoc.data() }
+              : null;
+          })
+        );
+      }
+
       console.log("Truck retrieved successfully:", truckData);
       return truckData;
     } else {
@@ -156,9 +188,10 @@ export const updateTruckEmployees = async (truckId, employees) => {
   try {
     const truckRef = doc(db, "trucks", truckId);
 
-    // Update the truck's employees field with the new employee list
+    const employeeList = Array.isArray(employees) ? employees : [employees];
+
     await updateDoc(truckRef, {
-      employees, // assuming employees is an array of employee IDs or details
+      employees: employeeList,
       updatedAt: serverTimestamp(),
     });
 
@@ -166,5 +199,15 @@ export const updateTruckEmployees = async (truckId, employees) => {
   } catch (e) {
     console.error("Error updating truck employees: ", e);
     throw e;
+  }
+};
+
+export const getTruckCount = async () => {
+  try {
+    const trucks = await getAllTrucks(); // Reuse the existing function to get all trucks
+    return trucks.length; // Return the count of trucks
+  } catch (error) {
+    console.error("Error retrieving truck count:", error);
+    throw new Error("Failed to fetch truck count");
   }
 };

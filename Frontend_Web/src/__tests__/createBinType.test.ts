@@ -1,32 +1,33 @@
 import { createBinType } from "../controllers/BinTypeController"; // Adjust the path as needed
 import * as firestore from "firebase/firestore";
 
-import { db } from "../storage/firebase"; // This import can stay if you need the db instance
-
 // Mock Firebase Firestore methods
 jest.mock("firebase/firestore", () => ({
   initializeApp: jest.fn(),
   getFirestore: jest.fn(),
-  addDoc: jest.fn(),
-  collection: jest.fn(),
+  addDoc: jest.fn() as jest.Mock, // Type the mock explicitly
+  collection: jest.fn() as jest.Mock, // Type the mock explicitly
   serverTimestamp: jest.fn(() => "mockTimestamp"),
 }));
 
 describe("createBinType", () => {
   beforeEach(() => {
     jest.clearAllMocks(); // Clear mocks before each test
+    (firestore.collection as jest.Mock).mockReturnValue("mockCollectionRef"); // Mock collection reference with correct type assertion
   });
 
   test("should create a bin type successfully", async () => {
-    // Mocking the addDoc function to resolve successfully
-    firestore.addDoc.mockResolvedValueOnce({ id: "mockBinTypeID" });
+    // Mock the addDoc function to resolve successfully
+    (firestore.addDoc as jest.Mock).mockResolvedValueOnce({
+      id: "mockBinTypeID",
+    });
 
     const formData = { name: "Plastic", color: "Blue" }; // Sample form data
     const result = await createBinType(formData);
 
     // Assertions
     expect(firestore.addDoc).toHaveBeenCalledWith(
-      firestore.collection(expect.anything(), "binTypes"),
+      "mockCollectionRef", // Ensure the first argument is the collection reference
       expect.objectContaining({
         ...formData,
         createdAt: "mockTimestamp", // Check that createdAt is included
@@ -37,7 +38,9 @@ describe("createBinType", () => {
 
   test("should throw an error when bin type creation fails", async () => {
     // Simulate an error in addDoc
-    firestore.addDoc.mockRejectedValueOnce(new Error("Firestore error"));
+    (firestore.addDoc as jest.Mock).mockRejectedValueOnce(
+      new Error("Firestore error")
+    );
 
     // Expect the function to throw an error
     await expect(

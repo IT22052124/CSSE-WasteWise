@@ -231,7 +231,16 @@ export const AddTruck = () => {
               className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
             />
             {errors.numberPlate && (
-              <Typography variant="small" color="red">
+              <Typography
+                variant="small"
+                color={
+                  sidenavColor !== "dark"
+                    ? sidenavColor !== "white"
+                      ? sidenavColor
+                      : "gray"
+                    : "gray"
+                }
+              >
                 {errors.numberPlate}
               </Typography>
             )}
@@ -254,7 +263,16 @@ export const AddTruck = () => {
               className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
             />
             {errors.capacity && (
-              <Typography variant="small" color="red">
+              <Typography
+                variant="small"
+                color={
+                  sidenavColor !== "dark"
+                    ? sidenavColor !== "white"
+                      ? sidenavColor
+                      : "gray"
+                    : "gray"
+                }
+              >
                 {errors.capacity}
               </Typography>
             )}
@@ -347,7 +365,16 @@ export const AddTruck = () => {
                   className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 />
                 {errors.Drivername && (
-                  <Typography variant="small" color="red">
+                  <Typography
+                    variant="small"
+                    color={
+                      sidenavColor !== "dark"
+                        ? sidenavColor !== "white"
+                          ? sidenavColor
+                          : "gray"
+                        : "gray"
+                    }
+                  >
                     {errors.Drivername}
                   </Typography>
                 )}
@@ -370,7 +397,16 @@ export const AddTruck = () => {
                   className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 />
                 {errors.DriverLicense && (
-                  <Typography variant="small" color="red">
+                  <Typography
+                    variant="small"
+                    color={
+                      sidenavColor !== "dark"
+                        ? sidenavColor !== "white"
+                          ? sidenavColor
+                          : "gray"
+                        : "gray"
+                    }
+                  >
                     {errors.DriverLicense}
                   </Typography>
                 )}
@@ -393,7 +429,16 @@ export const AddTruck = () => {
                   className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 />
                 {errors.DriverPhone && (
-                  <Typography variant="small" color="red">
+                  <Typography
+                    variant="small"
+                    color={
+                      sidenavColor !== "dark"
+                        ? sidenavColor !== "white"
+                          ? sidenavColor
+                          : "gray"
+                        : "gray"
+                    }
+                  >
                     {errors.DriverPhone}
                   </Typography>
                 )}
@@ -403,7 +448,13 @@ export const AddTruck = () => {
 
           <Button
             className="mt-6"
-            color="blue"
+            color={
+              sidenavColor !== "dark"
+                ? sidenavColor !== "white"
+                  ? sidenavColor
+                  : "gray"
+                : "gray"
+            }
             fullWidth
             type="submit"
             disabled={!isFormValid()}
