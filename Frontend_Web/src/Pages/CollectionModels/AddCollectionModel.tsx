@@ -1,10 +1,13 @@
 import { Button, Switch, Typography } from "@material-tailwind/react";
 import { useEffect, useState } from "react";
-import { addCollectionModel } from "@/controllers/CollectionModelController"; // Import the controller function
+import {
+  addCollectionModel,
+  getCollectionModels,
+} from "@/controllers/CollectionModelController"; // Import the controller function
 import { useMaterialTailwindController } from "@/context";
 import { useNavigate } from "react-router-dom";
-import { getWasteTypes } from "@/controllers/WasteTypeController";
-
+import { getBinTypes } from "@/controllers/BinTypeController";
+import Toast from "@/components/Toast/Toast";
 export const AddCollectionModel = () => {
   const [controller] = useMaterialTailwindController();
   const navigate = useNavigate();
@@ -13,68 +16,141 @@ export const AddCollectionModel = () => {
     modelName: "",
     collectionFrequency: "Weekly",
     chargingMethod: "",
-    customFrequency: "",
-    wasteTypes: [],
+    binTypes: [],
     flatRatePrice: 0,
   });
 
+  const [errors, setErrors] = useState({
+    modelName: "",
+    collectionFrequency: "",
+    chargingMethod: "",
+    binTypes: "",
+    flatRatePrice: "",
+  });
+
+  const checkCollectionModelsName = async (modeltype: string) => {
+    if (modeltype) {
+      const exists = await getCollectionModels();
+      const isExist = exists.some(
+        (model) => model.modelName.toLowerCase() === modeltype.toLowerCase()
+      );
+
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        modelName: isExist ? "This Model type name is already taken." : "",
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        modelName: "",
+      }));
+    }
+  };
+
   useEffect(() => {
-    const fetchWasteTypes = async () => {
+    const fetchbinTypes = async () => {
       try {
-        const data = await getWasteTypes();
-        setWasteTypes(data.map((wasteType) => wasteType.wasteType));
+        const data = await getBinTypes();
+        setBinTypes(data);
       } catch (error) {
         console.error("Error fetching waste types:", error);
       }
     };
-    fetchWasteTypes();
+    fetchbinTypes();
   });
 
-  const [wasteTypes, setWasteTypes] = useState<string[]>([]);
-  const [selectedWasteTypes, setSelectedWasteTypes] = useState<string[]>([]);
+  const [binTypes, setBinTypes] = useState<string[]>([]);
+  const [selectedBinTypes, setSelectedBinTypes] = useState<string[]>([]);
   const [all, setAll] = useState(false);
 
   // Handle input changes
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+
+    if (name === "modelName") {
+      checkCollectionModelsName(value);
+    }
+    validateFields(name, value);
+  };
+
+  const validateFields = (name: string, value: string) => {
+    if (name === "flatRatePrice" && parseFloat(value) <= 0) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: "Price must be greater than 0.",
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: value
+          ? ""
+          : `${name.charAt(0).toUpperCase() + name.slice(1)} is required.`,
+      }));
+    }
+  };
+
+  const isFormValid = () => {
+    // Check if all required fields are filled
+    const areRequiredFieldsFilled =
+      formData.modelName &&
+      formData.collectionFrequency &&
+      formData.chargingMethod &&
+      formData.binTypes.length > 0;
+
+    const isFlatRatePriceValid =
+      formData.chargingMethod === "Flat-rate pricing"
+        ? formData.flatRatePrice > 0
+        : true;
+
+    const noErrors = Object.values(errors).every((error) => !error);
+
+    return areRequiredFieldsFilled && isFlatRatePriceValid && noErrors;
   };
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target;
 
+    let updatedBinTypes = selectedBinTypes;
+
     if (checked) {
-      setSelectedWasteTypes((prev) => {
-        const updated = [...prev, value];
-        setFormData({
-          ...formData,
-          wasteTypes: updated,
-        });
-        return updated;
-      });
+      updatedBinTypes = [...updatedBinTypes, value];
     } else {
-      setSelectedWasteTypes((prev) => {
-        const updated = prev.filter((type) => type !== value);
-        setFormData({
-          ...formData,
-          wasteTypes: updated,
-        });
-        return updated;
-      });
+      updatedBinTypes = updatedBinTypes.filter((type) => type !== value);
+    }
+
+    setSelectedBinTypes(updatedBinTypes);
+    setFormData({
+      ...formData,
+      binTypes: updatedBinTypes,
+    });
+
+    // Check if no bin types are selected
+    if (updatedBinTypes.length === 0) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        binTypes: "Please select at least one bin type.",
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        binTypes: "",
+      }));
     }
   };
 
   useEffect(() => {
-    if (selectedWasteTypes.length === wasteTypes.length) {
+    if (selectedBinTypes.length === binTypes.length) {
       setAll(true);
     } else {
       setAll(false);
     }
-  }, [selectedWasteTypes, wasteTypes]);
+  }, [selectedBinTypes, binTypes]);
 
   // Handle Select changes
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -83,31 +159,54 @@ export const AddCollectionModel = () => {
       ...formData,
       [name]: value,
     });
+    if (name === "collectionFrequency" || name === "chargingMethod") {
+      validateFields(name, value);
+    }
   };
 
   const handleCheckboxChangeAll = () => {
     const updatedAll = !all;
     setAll(updatedAll);
 
+    let updatedBinTypes;
     if (updatedAll) {
-      setSelectedWasteTypes(wasteTypes);
+      updatedBinTypes = binTypes.map((type) => type.binType);
     } else {
-      setSelectedWasteTypes([]);
+      updatedBinTypes = [];
     }
 
+    setSelectedBinTypes(updatedBinTypes);
     setFormData({
       ...formData,
-      wasteTypes: updatedAll ? wasteTypes : [],
+      binTypes: updatedBinTypes,
     });
+
+    // Check if no bin types are selected
+    if (updatedBinTypes.length === 0) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        binTypes: "Please select at least one bin type.",
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        binTypes: "",
+      }));
+    }
   };
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!isFormValid()) {
+      return;
+    }
+
     try {
       await addCollectionModel(formData);
       navigate("/dashboard/collectionmodels");
+      Toast("Collection model added successfully", "success");
     } catch (error) {
       console.error("Failed to add collection model", error);
     }
@@ -139,9 +238,22 @@ export const AddCollectionModel = () => {
               placeholder="e.g., Pay-As-You-Throw"
               className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
             />
+            {errors.modelName && (
+              <Typography
+                variant="small"
+                color={
+                  sidenavColor !== "dark"
+                    ? sidenavColor !== "white"
+                      ? sidenavColor
+                      : "gray"
+                    : "gray"
+                }
+              >
+                {errors.modelName}
+              </Typography>
+            )}
           </div>
 
-          {/* Collection Frequency */}
           <div className="space-y-2">
             <Typography
               variant="small"
@@ -162,9 +274,22 @@ export const AddCollectionModel = () => {
               <option value="Monthly">Monthly</option>
               <option value="Custom">Yearly</option>
             </select>
+            {errors.collectionFrequency && (
+              <Typography
+                variant="small"
+                color={
+                  sidenavColor !== "dark"
+                    ? sidenavColor !== "white"
+                      ? sidenavColor
+                      : "gray"
+                    : "gray"
+                }
+              >
+                {errors.collectionFrequency}
+              </Typography>
+            )}
           </div>
 
-          {/* Charging Method */}
           <div className="space-y-2">
             <Typography
               variant="small"
@@ -186,6 +311,20 @@ export const AddCollectionModel = () => {
                 Per collection request
               </option>
             </select>
+            {errors.chargingMethod && (
+              <Typography
+                variant="small"
+                color={
+                  sidenavColor !== "dark"
+                    ? sidenavColor !== "white"
+                      ? sidenavColor
+                      : "gray"
+                    : "gray"
+                }
+              >
+                {errors.chargingMethod}
+              </Typography>
+            )}
           </div>
           {formData.chargingMethod === "Flat-rate pricing" && (
             <div className="space-y-2">
@@ -204,6 +343,20 @@ export const AddCollectionModel = () => {
                 placeholder="Enter custom frequency"
                 className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
               />
+              {errors.flatRatePrice && (
+                <Typography
+                  variant="small"
+                  color={
+                    sidenavColor !== "dark"
+                      ? sidenavColor !== "white"
+                        ? sidenavColor
+                        : "gray"
+                      : "gray"
+                  }
+                >
+                  {errors.flatRatePrice}
+                </Typography>
+              )}
             </div>
           )}
 
@@ -226,27 +379,48 @@ export const AddCollectionModel = () => {
                   className: "text-sm font-normal text-blue-gray-500 m-3",
                 }}
               />
-              {wasteTypes.map((type, index) => (
+              {binTypes.map((type, index) => (
                 <Switch
                   key={index}
                   id={`WasteType-${index}`}
-                  label={type}
-                  checked={selectedWasteTypes.includes(type)}
+                  label={type.binType}
+                  checked={selectedBinTypes.includes(type.binType)}
                   onChange={handleCheckboxChange}
-                  value={type} // This ensures the value is passed correctly to the handler
+                  value={type.binType} // This ensures the value is passed correctly to the handler
                   labelProps={{
                     className: "text-sm font-normal text-blue-gray-500 m-3",
                   }}
                 />
               ))}
+              {errors.binTypes && (
+                <Typography
+                  variant="small"
+                  color={
+                    sidenavColor !== "dark"
+                      ? sidenavColor !== "white"
+                        ? sidenavColor
+                        : "gray"
+                      : "gray"
+                  }
+                >
+                  {errors.binTypes}
+                </Typography>
+              )}
             </div>
           </div>
 
           <Button
             className="mt-6"
-            color={sidenavColor !== "dark" ? sidenavColor : "gray"}
+            color={
+              sidenavColor !== "dark"
+                ? sidenavColor !== "white"
+                  ? sidenavColor
+                  : "gray"
+                : "gray"
+            }
             fullWidth
             type="submit"
+            disabled={!isFormValid()}
           >
             Save Collection Model
           </Button>

@@ -10,6 +10,7 @@ import {
   DocumentDuplicateIcon,
   CreditCardIcon,
   TrashIcon,
+  TruckIcon,
 } from "@heroicons/react/24/solid";
 import { Home, Profile, Tables, Notifications } from "@/Pages/dashboard";
 import { SignIn, SignUp } from "@/Pages/auth";
@@ -43,6 +44,11 @@ import { UpdateBinType } from "./Pages/BinType/UpdateBinType";
 
 import { CreateReportForm } from "./Pages/Report/AddReport";
 
+import { BinRequests } from "./Pages/Bins/BinReq";
+import { Trucks } from "./Pages/Truck/Trucks";
+import { AddTruck } from "./Pages/Truck/AddTruck";
+import { UpdateTruck } from "./Pages/Truck/UpdateTruck";
+
 const icon = {
   className: "w-5 h-5 text-inherit",
 };
@@ -58,6 +64,14 @@ export const routes = [
         element: <Home />,
         inSidebar: true,
         relatedPaths: ["/home"], // Add related paths
+      },
+      {
+        icon: <RectangleStackIcon {...icon} />,
+        name: "Bins",
+        path: "/bin",
+        element: <Bins />,
+        inSidebar:true,
+        relatedPaths: ["/bin"],
       },
       {
         icon: <DocumentDuplicateIcon {...icon} />,
@@ -144,6 +158,30 @@ export const routes = [
         relatedPaths: ["/locations", "/addlocation", "/updatelocation"],
       },
       {
+        icon: <TruckIcon {...icon} />,
+        name: "Truck",
+        path: "/trucks",
+        element: <Trucks />,
+        inSidebar: true,
+        relatedPaths: ["/trucks", "/addtruck", "/updatetruck"],
+      },
+      {
+        icon: <TruckIcon {...icon} />,
+        name: "Add Truck",
+        path: "/addtruck",
+        element: <AddTruck />,
+        inSidebar: false,
+        relatedPaths: ["/trucks", "/addtruck", "/updatetruck"],
+      },
+      {
+        icon: <TruckIcon {...icon} />,
+        name: "Update Truck",
+        path: "/updatetruck/:id",
+        element: <UpdateTruck />,
+        inSidebar: false,
+        relatedPaths: ["/trucks", "/addtruck", "/updatetruck"],
+      },
+      {
         icon: <CreditCardIcon {...icon} />,
         name: "Payments",
         path: "/payments",
@@ -170,6 +208,14 @@ export const routes = [
       },
       {
         icon: <TrashIcon {...icon} />,
+        name: "Bin request",
+        path: "/binreq",
+        element: <BinRequests />,
+        inSidebar: true,
+        relatedPaths: ["/binreq"],
+      },
+      {
+        icon: <TrashIcon {...icon} />,
         name: "Update Bin Type",
         path: "/updatebintypes/:id",
         element: <UpdateBinType />,
@@ -181,7 +227,7 @@ export const routes = [
         name: "profile",
         path: "/profile",
         element: <Profile />,
-        inSidebar: true,
+        inSidebar: false,
         relatedPaths: ["/profile"],
       },
       {
@@ -190,16 +236,9 @@ export const routes = [
         path: "/addbin",
         element: <AddBin />,
         inSidebar: false,
-        relatedPaths: ["/bin", "/addbin"],
+        relatedPaths: [ "/addbin"],
       },
-      {
-        icon: <RectangleStackIcon {...icon} />,
-        name: "Bin",
-        path: "/bin",
-        element: <Bins />,
-        inSidebar: false,
-        relatedPaths: ["/bin", "/addbin"],
-      },
+     
       {
         icon: <TableCellsIcon {...icon} />,
         name: "tables",
@@ -213,7 +252,7 @@ export const routes = [
         name: "Collectors",
         path: "/collectors",
         element: <Collectors />,
-        inSidebar: false,
+        inSidebar:true,
         relatedPaths: ["/collectors", "/addcollector"],
       },
       {

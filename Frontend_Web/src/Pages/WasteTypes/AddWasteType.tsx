@@ -1,71 +1,101 @@
 import { Button, Switch, Typography } from "@material-tailwind/react";
 import { useState } from "react";
-import { addWasteType } from "@/controllers/WasteTypeController"; // Import the controller function
+import {
+  addWasteType,
+  getWasteTypesWithBinInfo,
+} from "@/controllers/WasteTypeController"; // Import the controller function
 import { useMaterialTailwindController } from "@/context";
 import { useNavigate } from "react-router-dom";
+import Toast from "@/components/Toast/Toast";
 
 export const AddWasteType = () => {
   const [controller] = useMaterialTailwindController();
   const navigate = useNavigate();
   const { sidenavColor } = controller;
+
   const [formData, setFormData] = useState({
     wasteType: "",
     description: "",
     guidelines: "",
     recyclable: false,
-    incentives: 0,
-    binType: "",
-    customBinColor: "",
-    price: 0,
   });
 
-  const [binColor, setBinColor] = useState<string>("");
-  const [open, setOpen] = useState(false);
+  const [errors, setErrors] = useState({
+    wasteType: "",
+    description: "",
+    guidelines: "",
+  });
 
-  // Handle input changes
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  const checkWasteTypeName = async (wasteType: string) => {
+    if (wasteType) {
+      const exists = await getWasteTypesWithBinInfo();
+      const isExist = exists.some(
+        (waste) => waste.wasteType.toLowerCase() === wasteType.toLowerCase()
+      );
 
-  const handleSwitchChangePayback = () => {
-    setOpen(!open);
-    if (!open) {
-      setFormData({
-        ...formData,
-        incentives: 0,
-      });
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        wasteType: isExist ? "This waste type name is already taken." : "",
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        wasteType: "",
+      }));
     }
   };
 
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+    if (name === "wasteType") {
+      checkWasteTypeName(value);
+    }
+
+    validateFields(name, value);
+  };
+
   const handleSwitchChange = () => {
-    setFormData({
-      ...formData,
-      recyclable: !formData.recyclable,
-    });
+    setFormData((prevData) => ({
+      ...prevData,
+      recyclable: !prevData.recyclable,
+    }));
   };
 
-  // Handle Select changes for bin color
-  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setBinColor(e.target.value);
-    setFormData({
-      ...formData,
-      binType:
-        e.target.value === "custom" ? formData.customBinColor : e.target.value,
-    });
+  const validateFields = (name: string, value: string) => {
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: value
+        ? ""
+        : `${name.charAt(0).toUpperCase() + name.slice(1)} is required.`,
+    }));
   };
 
-  // Handle form submission
+  const isFormValid = () => {
+    return (
+      formData.wasteType &&
+      formData.description &&
+      formData.guidelines &&
+      Object.values(errors).every((error) => !error)
+    );
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!isFormValid()) {
+      return;
+    }
 
     try {
       await addWasteType(formData);
       navigate("/dashboard/wastetypes");
+      Toast("Waste type added successfully", "success");
     } catch (error) {
       console.error("Failed to add waste type", error);
     }
@@ -96,6 +126,20 @@ export const AddWasteType = () => {
               placeholder="e.g., Organic Waste"
               className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
             />
+            {errors.wasteType && (
+              <Typography
+                variant="small"
+                color={
+                  sidenavColor !== "dark"
+                    ? sidenavColor !== "white"
+                      ? sidenavColor
+                      : "gray"
+                    : "gray"
+                }
+              >
+                {errors.wasteType}
+              </Typography>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -114,6 +158,20 @@ export const AddWasteType = () => {
               placeholder="Describe the waste type..."
               className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
             ></textarea>
+            {errors.description && (
+              <Typography
+                variant="small"
+                color={
+                  sidenavColor !== "dark"
+                    ? sidenavColor !== "white"
+                      ? sidenavColor
+                      : "gray"
+                    : "gray"
+                }
+              >
+                {errors.description}
+              </Typography>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -132,25 +190,22 @@ export const AddWasteType = () => {
               placeholder="Enter disposal guidelines..."
               className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
             ></textarea>
+            {errors.guidelines && (
+              <Typography
+                variant="small"
+                color={
+                  sidenavColor !== "dark"
+                    ? sidenavColor !== "white"
+                      ? sidenavColor
+                      : "gray"
+                    : "gray"
+                }
+              >
+                {errors.guidelines}
+              </Typography>
+            )}
           </div>
 
-          <div className="space-y-2">
-            <Typography
-              variant="small"
-              className="font-normal text-blue-gray-600"
-            >
-               Price (LKR per 1 kg)
-            </Typography>
-            <input
-              type="number"
-              id="price"
-              name="price"
-              value={formData.price}
-              onChange={handleChange}
-              placeholder="Enter waste collection price..."
-              className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            />
-          </div>
           <div className="flex items-center space-x-2">
             <Switch
               id="recyclable"
@@ -162,78 +217,19 @@ export const AddWasteType = () => {
               }}
             />
           </div>
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="Payback/Incentives"
-              label="Payback/Incentives"
-              checked={open}
-              onChange={handleSwitchChangePayback}
-              labelProps={{
-                className: "text-sm font-normal text-blue-gray-500",
-              }}
-            />
-          </div>
-          {open && (
-            <div className="space-y-2">
-              <input
-                type="number"
-                id="incentives"
-                name="incentives"
-                value={formData.incentives}
-                onChange={handleChange}
-                placeholder="Enter payback or incentives..."
-                className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-              />
-            </div>
-          )}
-
-          <div className="space-y-2">
-            <Typography
-              variant="small"
-              className="font-normal text-blue-gray-600"
-            >
-              Waste Bin Type/Color
-            </Typography>
-            <select
-              id="binColor"
-              name="binColor"
-              onChange={handleSelectChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            >
-              <option value="">Select bin color</option>
-              <option value="green">Green</option>
-              <option value="blue">Blue</option>
-              <option value="red">Red</option>
-              <option value="yellow">Yellow</option>
-              <option value="custom">Custom</option>
-            </select>
-          </div>
-
-          {binColor === "custom" && (
-            <div className="space-y-2">
-              <Typography
-                variant="small"
-                className="font-normal text-blue-gray-600"
-              >
-                Custom Bin Color
-              </Typography>
-              <input
-                type="text"
-                id="customBinColor"
-                name="customBinColor"
-                value={formData.customBinColor}
-                onChange={handleChange}
-                placeholder="Enter custom color"
-                className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-              />
-            </div>
-          )}
 
           <Button
             className="mt-6"
-            color={sidenavColor !== "dark" ? sidenavColor : "gray"}
+            color={
+              sidenavColor !== "dark"
+                ? sidenavColor !== "white"
+                  ? sidenavColor
+                  : "gray"
+                : "gray"
+            }
             fullWidth
             type="submit"
+            disabled={!isFormValid()}
           >
             Save Waste Type
           </Button>

@@ -9,7 +9,7 @@ import QRScannerScreen from "./Collector/QRScannerScreen";
 import BinDataScreen from "./Collector/BinDataScreen";
 import ProfileScreen from "./Collector/ProfileScreen";
 import Toast from "react-native-toast-message";
-
+import CollectedHistoryScreen from "./Collector/history"
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -24,6 +24,8 @@ function BottomTabNavigator() {
             iconName = focused ? "home" : "home-outline";
           } else if (route.name === "QRScanner") {
             iconName = focused ? "qr-code" : "qr-code-outline";
+           } else if (route.name === "History") {
+              iconName = focused ? "time" : "time-outline"
           } else if (route.name === "Profile") {
             iconName = focused ? "person" : "person-outline";
           }
@@ -40,6 +42,11 @@ function BottomTabNavigator() {
       <Tab.Screen
         name="QRScanner"
         component={QRScannerScreen}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
+        name="History"
+        component={CollectedHistoryScreen}
         options={{ headerShown: false }}
       />
       <Tab.Screen

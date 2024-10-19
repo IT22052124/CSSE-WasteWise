@@ -7,21 +7,32 @@ import {
   updateDoc,
   query,
   orderBy,
-  setDoc
+  deleteDoc,
+  getDoc,
+  where
 
 } from "firebase/firestore";
 import { db } from "@/storage/firebase";
 
-// Function to add a new bin
+
+
+// Function to add a new bin to Firestore
 export const addBin = async (binData) => {
   try {
+    // Get userRef and wasteTypeRef as actual document references
+    const userRef = doc(db, "users", binData.userRef); // Reference to the user document
+    const wasteTypeRef = doc(db, "binTypes", binData.wasteTypeRef); // Reference to the waste type document
+
+    // Create a bin document in Firestore
     const docRef = await addDoc(collection(db, "bins"), {
       ...binData,
+      userRef, // Store the user document reference
+      wasteTypeRef, // Store the waste type document reference
       wasteLevel: 0, // Set initial waste level to 0
-      createdAt: serverTimestamp(),
+      createdAt: serverTimestamp(), // Add timestamp
     });
 
-    // Navigate to the bins list page
+    console.log("Bin successfully added:", docRef.id);
     return docRef;
   } catch (e) {
     console.error("Error adding bin:", e);
@@ -102,7 +113,7 @@ export const getLastBinID = async () => {
 
   // Function to simulate waste level updates for all bins at a set interval
  // Function to simulate waste level updates for all bins at a set interval
-export const autoUpdateWasteLevels = async (intervalInMs = 1200000) => { // 10 seconds
+export const autoUpdateWasteLevels = async (intervalInMs = 10000000) => { // 10 seconds
   try {
     setInterval(async () => {
       // Get all bins
@@ -121,5 +132,80 @@ export const autoUpdateWasteLevels = async (intervalInMs = 1200000) => { // 10 s
     }, intervalInMs); // Runs every 10 seconds
   } catch (error) {
     console.error("Error during auto waste level update:", error);
+  }
+};
+export const getBinRequests = async () => {
+  try {
+    const binRequestsCollection = collection(db, "binRequests");
+    const q = query(binRequestsCollection, where("status", "==", "Pending"));
+    const binRequestsSnapshot = await getDocs(q);
+    const binRequests = binRequestsSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    return binRequests;
+  } catch (error) {
+    console.error("Error fetching pending bin requests:", error);
+    throw error;
+  }
+};
+
+
+// Function to update the bin request status based on RequestID
+export const updateBinRequestStatusByRequestID = async (requestID: string) => {
+  try {
+    // Reference to the binRequests collection
+    const binRequestsCollection = collection(db, "binRequests");
+    
+    // Create a query to find the bin request by RequestID
+    const q = query(binRequestsCollection, where("ReqID", "==", requestID));
+    const binRequestsSnapshot = await getDocs(q);
+
+    if (!binRequestsSnapshot.empty) {
+      // Assuming there should only be one request with a unique RequestID
+      const binRequestDoc = binRequestsSnapshot.docs[0]; // Get the first matching document
+
+      // Get the reference to the specific bin request document
+      const binRequestRef = doc(db, "binRequests", binRequestDoc.id);
+
+      // Update the status field to "success"
+      await updateDoc(binRequestRef, {
+        status: "success",
+      });
+
+      console.log(`Bin request with RequestID ${requestID} status updated to success`);
+    } else {
+      console.log(`No bin requests found with RequestID: ${requestID}`);
+    }
+  } catch (error) {
+    console.error("Error updating bin request status:", error);
+    throw error;
+  }
+};
+
+
+
+export const getDocData = async (docRef) => {
+  try {
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return docSnap.data();
+    } else {
+      throw new Error("No such document!");
+    }
+  } catch (error) {
+    console.error("Error fetching document:", error);
+    throw error;
+  }
+};
+
+export const deleteBin = async (id: string) => {
+  try {
+    console.log("Attempting to delete bin with ID:", id);
+    const binTypeRef = doc(db, "bins", id); // "bins" is your Firestore collection name
+    await deleteDoc(binTypeRef); // Delete the document
+    console.log(`Bin with ID: ${id} successfully deleted.`);
+  } catch (error) {
+    console.error("Error deleting bin:", error);
   }
 };

@@ -46,7 +46,7 @@ export default function SignInPage() {
           response.user.username || "User"
         }! Sign in successful.`,
       });
-      navigation.navigate("MyBins");
+      navigation.navigate("MainTabs");
     } else {
       Toast.show({
         type: "error",

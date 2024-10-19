@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react'
 import {
   View,
   Text,
@@ -10,59 +10,57 @@ import {
   SafeAreaView,
   StatusBar,
   ActivityIndicator,
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { getPaymentsByUserID } from "../../Controller/paymentController";
-import { getUserDetails } from "../../Controller/UserController";
-import { useFocusEffect } from "@react-navigation/native";
+} from 'react-native'
+import { Ionicons } from '@expo/vector-icons'
+import { getPaymentsByUserID } from '../../Controller/paymentController'
+import { getUserDetails } from '../../Controller/UserController'
+import { useFocusEffect } from '@react-navigation/native'
 
 const PaymentHistoryPage = () => {
-  const [payments, setPayments] = useState([]);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedSlip, setSelectedSlip] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [userID, setUserID] = useState(null);
+  const [payments, setPayments] = useState([])
+  const [modalVisible, setModalVisible] = useState(false)
+  const [selectedSlip, setSelectedSlip] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [userID, setUserID] = useState(null)
 
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        const userData = await getUserDetails();
-        setUserID(userData.id); // Set the userID after fetching the user details
+        const userData = await getUserDetails()
+        setUserID(userData.id)
       } catch (error) {
-        console.error("Failed to fetch user details: ", error);
+        console.error("Failed to fetch user details: ", error)
       }
-    };
-
-    fetchUserDetails(); // Trigger the user detail fetch
-  }, []);
-
-  // Fetch payments only when the userID is set
-  const fetchPayments = async () => {
-    if (!userID) return; // Don't fetch payments until the userID is available
-
-    setLoading(true);
-    try {
-      const paymentsData = await getPaymentsByUserID(userID); // Fetch payments using the userID
-      console.log("Fetched payments data:", paymentsData);
-      setPayments(paymentsData);
-    } catch (error) {
-      console.error("Error fetching payments:", error);
-    } finally {
-      setLoading(false); // Stop loading when the data is fetched
     }
-  };
 
-  // Use useFocusEffect to fetch payments when the screen is focused
+    fetchUserDetails()
+  }, [])
+
+  const fetchPayments = async () => {
+    if (!userID) return
+
+    setLoading(true)
+    try {
+      const paymentsData = await getPaymentsByUserID(userID)
+      console.log("Fetched payments data:", paymentsData)
+      setPayments(paymentsData)
+    } catch (error) {
+      console.error("Error fetching payments:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   useFocusEffect(
     React.useCallback(() => {
-      fetchPayments(); // Trigger payment fetch when userID is available
-    }, [userID]) // Dependency on userID so it refetches if userID changes
-  );
+      fetchPayments()
+    }, [userID])
+  )
 
   const renderPaymentItem = ({ item }) => (
     <View style={styles.paymentItem}>
       <View style={styles.paymentDetails}>
-        <Text style={styles.amount}>₹{item.amount}</Text>
+        <Text style={styles.amount}>LKR {item.amount.toFixed(2)}</Text>
         <Text style={styles.date}>
           {item.date.toDate().toLocaleDateString()}
         </Text>
@@ -81,8 +79,8 @@ const PaymentHistoryPage = () => {
           <TouchableOpacity
             style={styles.viewSlipButton}
             onPress={() => {
-              setSelectedSlip(item.slipUrl);
-              setModalVisible(true);
+              setSelectedSlip(item.slipUrl)
+              setModalVisible(true)
             }}
           >
             <Ionicons name="eye-outline" size={24} color="#4CAF50" />
@@ -90,20 +88,20 @@ const PaymentHistoryPage = () => {
         )}
       </View>
     </View>
-  );
+  )
 
   const getStatusColor = (status) => {
     switch (status) {
       case "Pending":
-        return "#FFA500";
+        return "#FFA500"
       case "Success":
-        return "#4CAF50";
+        return "#4CAF50"
       case "Rejected":
-        return "#FF0000";
+        return "#FF0000"
       default:
-        return "#000000";
+        return "#000000"
     }
-  };
+  }
 
   if (loading) {
     return (
@@ -114,12 +112,12 @@ const PaymentHistoryPage = () => {
           style={{ marginTop: 50 }}
         />
       </SafeAreaView>
-    );
+    )
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F5F5F5" />
+      <StatusBar barStyle="light-content" backgroundColor="#4CAF50" />
       <View style={styles.header}>
         <Text style={styles.title}>Payment History</Text>
       </View>
@@ -152,38 +150,36 @@ const PaymentHistoryPage = () => {
         </View>
       </Modal>
     </SafeAreaView>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: '#F5F5F5',
   },
   header: {
-    backgroundColor: "#4CAF50",
-    padding: 20,
-    paddingTop: 60,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
+    backgroundColor: '#4CAF50',
+    padding: 16,
+    paddingTop: 40,
   },
   title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#FFFFFF",
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
   },
   listContainer: {
     padding: 20,
   },
   paymentItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -194,25 +190,25 @@ const styles = StyleSheet.create({
   },
   amount: {
     fontSize: 20,
-    fontWeight: "bold",
-    color: "#000",
+    fontWeight: 'bold',
+    color: '#000',
     marginBottom: 5,
   },
   date: {
     fontSize: 14,
-    color: "#666",
+    color: '#666',
     marginBottom: 2,
   },
   method: {
     fontSize: 14,
-    color: "#666",
+    color: '#666',
   },
   statusContainer: {
-    alignItems: "flex-end",
+    alignItems: 'flex-end',
   },
   status: {
     fontSize: 14,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 5,
   },
   viewSlipButton: {
@@ -220,16 +216,16 @@ const styles = StyleSheet.create({
   },
   centeredView: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalView: {
-    backgroundColor: "white",
+    backgroundColor: 'white',
     borderRadius: 20,
     padding: 20,
-    alignItems: "center",
-    shadowColor: "#000",
+    alignItems: 'center',
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -237,21 +233,21 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-    width: "90%",
-    height: "70%",
+    width: '90%',
+    height: '70%',
   },
   closeButton: {
-    position: "absolute",
+    position: 'absolute',
     right: 10,
     top: 10,
     zIndex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     borderRadius: 15,
   },
   slipImage: {
-    width: "100%",
-    height: "100%",
+    width: '100%',
+    height: '100%',
   },
-});
+})
 
-export default PaymentHistoryPage;
+export default PaymentHistoryPage

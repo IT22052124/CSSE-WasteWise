@@ -8,7 +8,9 @@ import {
   getDoc,
   updateDoc,
   query,
-  where
+  where,
+  orderBy,
+  limit,
 } from "firebase/firestore";
 import { db } from "../storage/firebase";
 
@@ -36,8 +38,6 @@ export const getBinTypes = async () => {
   }
 };
 
-
-
 export const findBinsByUserEmail = async (email: string) => {
   try {
     // Reference the 'bins' collection in Firestore
@@ -56,26 +56,32 @@ export const findBinsByUserEmail = async (email: string) => {
     }
 
     // Extract and return bin data
-    const bins = querySnapshot.docs.map(doc => ({
+    const bins = querySnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
 
     return bins;
-
   } catch (error) {
     console.error("Error finding bins by user email:", error);
     throw new Error("Unable to find bins for the user.");
   }
 };
 
-export const createBinRequest = async (binType, binTypeId, userId, capacity) => {
+export const createBinRequest = async (
+  binType,
+  binTypeId,
+  userId,
+  capacity
+) => {
   try {
+    const ReqID = await generateBinID();
 
     const userRef = doc(db, "users", userId);
     const binRef = doc(db, "binTypes", binTypeId);
     // Create a new bin request object
     const newBinRequest = {
+      ReqID: ReqID,
       binType: binType,
       binTypeId: binRef,
       userId: userRef,
@@ -94,4 +100,24 @@ export const createBinRequest = async (binType, binTypeId, userId, capacity) => 
   } catch (error) {
     console.error("Error creating bin request: ", error);
   }
+};
+
+const generateBinID = async () => {
+  const binQuery = query(
+    collection(db, "binRequests"),
+    orderBy("ReqID", "desc"),
+    limit(1)
+  );
+
+  const querySnapshot = await getDocs(binQuery);
+  let nextID = 1;
+
+  if (!querySnapshot.empty) {
+    const lastDoc = querySnapshot.docs[0];
+    const lastReqID = lastDoc.data().ReqID;
+    const lastNumber = parseInt(lastReqID.replace("R", ""), 10);
+    nextID = lastNumber + 1; // Increment
+  }
+
+  return `R${String(nextID).padStart(4, "0")}`;
 };

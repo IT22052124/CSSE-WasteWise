@@ -19,9 +19,12 @@ import Toast from "react-native-toast-message";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../../storage/firebase";
 import { getUserDetails } from "../../Controller/UserController";
+import { useNavigation } from "@react-navigation/native";
 
-const PaymentPage = () => {
-  const [paymentAmount, setPaymentAmount] = useState("");
+const PaymentPage = ({ route }) => {
+  const { amount } = route.params;
+  const navigation = useNavigation();
+  const [paymentAmount, setPaymentAmount] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState("");
   const [cardHolder, setCardHolder] = useState("");
   const [cardNumber, setCardNumber] = useState("");
@@ -107,6 +110,14 @@ const PaymentPage = () => {
         return;
       }
 
+      if (!acceptTerms) {
+        Toast.show({
+          type: "error",
+          text1: "Please accept the terms and conditions.",
+        });
+        return;
+      }
+
       setIsLoading(true);
 
       try {
@@ -131,6 +142,7 @@ const PaymentPage = () => {
       });
       setIsLoading(false);
       resetFields();
+      navigation.navigate("MainTabs", { screen: "Bills" });
     } else if (paymentMethod === "bank") {
       if (!bankSlip) {
         Toast.show({
@@ -154,10 +166,8 @@ const PaymentPage = () => {
       try {
         await uploadBytes(storageRef, blob); // Upload the file
         const downloadURL = await getDownloadURL(storageRef); // Get the download URL
-        setSlipURL(downloadURL); // Set slipURL state
-
-        if (slipURL) {
-          // Ensure downloadURL is available before proceeding
+        setSlipURL(downloadURL);
+        if (downloadURL) {
           const paymentData = await createPayment(
             paymentAmount,
             userID,
@@ -188,6 +198,7 @@ const PaymentPage = () => {
 
       setIsLoading(false);
       resetFields();
+      navigation.navigate("MainTabs", { screen: "Bills" });
     } else {
       Toast.show({
         type: "error",
@@ -197,7 +208,7 @@ const PaymentPage = () => {
   };
 
   const resetFields = () => {
-    setPaymentAmount("");
+    setPaymentAmount(null);
     setPaymentMethod("");
     setCardHolder("");
     setCardNumber("");
@@ -296,10 +307,10 @@ const PaymentPage = () => {
         <View style={styles.bankForm}>
           <Text style={styles.formLabel}>Bank Account Details</Text>
           <Text style={styles.bankInfo}>Please transfer the amount to:</Text>
-          <Text style={styles.bankInfo}>Account Name: Your Company Name</Text>
-          <Text style={styles.bankInfo}>Account Number: 1234567890</Text>
-          <Text style={styles.bankInfo}>Bank: Example Bank</Text>
-          <Text style={styles.bankInfo}>IFSC Code: EXMP0001234</Text>
+          <Text style={styles.bankInfo}>Account Name: WasteWise Pvt Ltd</Text>
+          <Text style={styles.bankInfo}>Account Number: 9876543210</Text>
+          <Text style={styles.bankInfo}>Bank: People's Bank</Text>
+          <Text style={styles.bankInfo}>IFSC Code: PB00009876</Text>
           {!bankSlip && (
             <TouchableOpacity style={styles.uploadButton} onPress={pickImage}>
               <Text style={styles.uploadButtonText}>
@@ -326,6 +337,15 @@ const PaymentPage = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Payment</Text>
+      </View>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
@@ -337,10 +357,9 @@ const PaymentPage = () => {
             scrollViewRef.current.scrollToEnd({ animated: true })
           }
         >
-          <Text style={styles.title}>Payment</Text>
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Outstanding Amount</Text>
-            <Text style={styles.amount}>₹{outstandingAmount.toFixed(2)}</Text>
+            <Text style={styles.amount}>LKR {amount.toFixed(2)}</Text>
           </View>
           <View style={styles.inputContainer}>
             <Ionicons
@@ -351,8 +370,8 @@ const PaymentPage = () => {
             />
             <TextInput
               style={styles.input}
-              value={paymentAmount}
-              onChangeText={setPaymentAmount}
+              value={paymentAmount ? String(paymentAmount) : ""} // Convert the number back to a string for the input field
+              onChangeText={(text) => setPaymentAmount(Number(text))} // Convert the input to a number
               placeholder="Enter the Amount to Pay"
               placeholderTextColor="#888"
               keyboardType="numeric"
@@ -427,6 +446,21 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F5F5F5",
+  },
+  header: {
+    backgroundColor: "#4CAF50",
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+    paddingTop: 40,
+  },
+  backButton: {
+    marginRight: 16,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#FFFFFF",
   },
   scrollContent: {
     padding: 20,
