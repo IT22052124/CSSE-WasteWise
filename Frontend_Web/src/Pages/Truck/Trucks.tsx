@@ -33,9 +33,7 @@ export const Trucks = () => {
   const [trucks, setTrucks] = useState<any[]>([]);
   const [collectors, setCollectors] = useState<any[]>([]);
   const [selectedTruckId, setSelectedTruckId] = useState<string | null>(null);
-  const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(
-    null
-  );
+  const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
   const [controller] = useMaterialTailwindController();
   const { sidenavColor } = controller;
@@ -91,19 +89,34 @@ export const Trucks = () => {
 
   const openModal = (truckId) => {
     setSelectedTruckId(truckId);
+    const selectedTruck = trucks.find((truck) => truck.id === truckId);
+    setSelectedEmployeeIds(
+      selectedTruck.employees.map((employee) => employee.id)
+    );
+    console.log("selected employees", selectedEmployeeIds);
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setSelectedEmployeeId(null);
+    setSelectedEmployeeIds([]);
   };
 
   const handleAssignEmployee = async () => {
-    if (!selectedTruckId || !selectedEmployeeId) return;
+    if (!selectedTruckId || !selectedEmployeeIds) return;
+    console.log("selected length ", selectedEmployeeIds.length);
+    if (selectedEmployeeIds.length > 2) {
+      closeModal();
+      Swal.fire(
+        "Error",
+        "You can only assign 2 or 1 employees.",
+        "error"
+      ).then(() => openModal(selectedTruckId));
+      return;
+    }
 
     try {
-      await updateTruckEmployees(selectedTruckId, selectedEmployeeId);
+      await updateTruckEmployees(selectedTruckId, selectedEmployeeIds);
       const updatedTrucks = await getAllTrucks();
       setTrucks(updatedTrucks);
       closeModal();
@@ -112,6 +125,14 @@ export const Trucks = () => {
       console.error("Error assigning employee:", error);
       Swal.fire("Error", "Failed to assign employee.", "error");
     }
+  };
+
+  const toggleEmployeeSelection = (employeeId) => {
+    setSelectedEmployeeIds((prevSelected) =>
+      prevSelected.includes(employeeId)
+        ? prevSelected.filter((id) => id !== employeeId)
+        : [...prevSelected, employeeId]
+    );
   };
 
   return (
@@ -320,7 +341,6 @@ export const Trucks = () => {
                                       {index < employees.length - 1 && (
                                         <br />
                                       )}{" "}
-                                      
                                     </Typography>
                                   ))}
                               </td>
@@ -346,6 +366,18 @@ export const Trucks = () => {
                                 </IconButton>
                               </MenuHandler>
                               <MenuList className="w-max border-0 text-center ">
+                                <MenuItem
+                                  className="flex items-center"
+                                  onClick={() => openModal(id)}
+                                >
+                                  <Typography
+                                    variant="small"
+                                    color="blue-gray"
+                                    className="mb-1 font-normal "
+                                  >
+                                    <strong>Assaign</strong>
+                                  </Typography>
+                                </MenuItem>
                                 <MenuItem
                                   className="flex items-center"
                                   onClick={() =>
@@ -392,8 +424,10 @@ export const Trucks = () => {
             {collectors?.map((employee) => (
               <Button
                 key={employee.id}
-                color={selectedEmployeeId === employee.id ? "green" : "blue"}
-                onClick={() => setSelectedEmployeeId(employee.id)}
+                color={
+                  selectedEmployeeIds.includes(employee.id) ? "green" : "blue"
+                }
+                onClick={() => toggleEmployeeSelection(employee.id)}
               >
                 {employee.name}
               </Button>

@@ -82,7 +82,7 @@ export const getPaymentsByUserID = async (userID, method = null) => {
 };
 
 // Function to generate the next Payment ID
-const generatePaymentID = async () => {
+export const generatePaymentID = async () => {
   const paymentQuery = query(
     collection(db, "payments"),
     orderBy("paymentID", "desc"), // Order by paymentID in descending order
@@ -102,7 +102,6 @@ const generatePaymentID = async () => {
   // Format the payment ID with leading zeros
   return `P${String(nextID).padStart(4, "0")}`;
 };
-
 
 export const getWasteCollectionsByUserID = async (userID) => {
   try {
@@ -171,8 +170,8 @@ export const getWasteCollectionsByUserID = async (userID) => {
 
     // Step 7: Sort results by month, with the current month first
     result.sort((a, b) => {
-      const [yearA, monthA] = a.month.split(' ');
-      const [yearB, monthB] = b.month.split(' ');
+      const [yearA, monthA] = a.month.split(" ");
+      const [yearB, monthB] = b.month.split(" ");
 
       // Convert month names to numeric values for sorting
       const monthIndex = {

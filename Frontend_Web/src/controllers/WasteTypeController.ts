@@ -8,7 +8,22 @@ import {
   doc,
   getDoc,
 } from "firebase/firestore";
-import { db } from "@/storage/firebase";
+import { db } from "../storage/firebase";
+
+interface WasteType {
+  id: string;
+  wasteType: string;
+  description: string;
+}
+
+interface BinType {
+  id: string;
+  wasteTypes: string[]; // Assuming it's an array of waste type strings
+  binType: string;
+  chargingPerKg: number;
+  incentivesPerKg: number;
+  selectedColor: string;
+}
 
 export const addWasteType = async (wasteTypeData) => {
   try {
@@ -23,23 +38,31 @@ export const addWasteType = async (wasteTypeData) => {
   }
 };
 
-export const getWasteTypesWithBinInfo = async () => {
+export const getWasteTypesWithBinInfo = async (): Promise<
+  (WasteType & {
+    binType?: string;
+    chargingPerKg?: number;
+    incentivesPerKg?: number;
+    selectedColor?: string;
+    Bin?: boolean;
+  })[]
+> => {
   try {
     // Fetch waste types
     const wasteTypeCollection = collection(db, "wasteTypes");
     const wasteTypeSnapshot = await getDocs(wasteTypeCollection);
-    const wasteTypes = wasteTypeSnapshot.docs.map((doc) => ({
+    const wasteTypes: WasteType[] = wasteTypeSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
-    }));
+    })) as WasteType[];
 
     // Fetch bin types
     const binTypeCollection = collection(db, "binTypes");
     const binTypeSnapshot = await getDocs(binTypeCollection);
-    const binTypes = binTypeSnapshot.docs.map((doc) => ({
+    const binTypes: BinType[] = binTypeSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
-    }));
+    })) as BinType[];
 
     // Map waste types and merge matching bin type data
     const wasteTypesWithBinInfo = wasteTypes.map((wasteType) => {
@@ -91,18 +114,12 @@ export const deleteWasteType = async (id) => {
 };
 
 export const getWasteTypeById = async (id: string) => {
-  try {
-    const wasteTypeRef = doc(db, "wasteTypes", id);
-    const wasteTypeDoc = await getDoc(wasteTypeRef);
+  const wasteTypeRef = doc(db, "wasteTypes", id);
+  const wasteTypeDoc = await getDoc(wasteTypeRef);
 
-    if (wasteTypeDoc.exists()) {
-      const wasteTypeData = { id: wasteTypeDoc.id, ...wasteTypeDoc.data() };
-      return wasteTypeData;
-    } else {
-      throw new Error("Waste type not found");
-    }
-  } catch (error) {
-    console.error("Error retrieving waste type:", error);
-    throw new Error("Failed to fetch waste type by ID");
+  if (wasteTypeDoc.exists()) {
+    return { id: wasteTypeDoc.id, ...wasteTypeDoc.data() };
+  } else {
+    throw new Error("Waste type not found");
   }
 };

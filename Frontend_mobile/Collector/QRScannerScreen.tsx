@@ -3,8 +3,15 @@ import { Text, View, StyleSheet, Button, Alert, TouchableOpacity } from 'react-n
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { LogBox } from 'react-native';
 import { RootStackParamList } from '../App'; 
 import { findBinByID } from "../controller/BinController"; 
+import Toast from 'react-native-toast-message';
+
+// Ignore specific warning messages
+LogBox.ignoreLogs([
+  'Non-serializable values were found in the navigation state.',
+]);
 
 type QRScannerScreenNavigationProp = StackNavigationProp<RootStackParamList, 'MainTabs'>;
 
@@ -26,7 +33,12 @@ export default function QRScannerScreen() {
     try {
       console.log('Scanned data:', data); // Log the scanned data
       const binData = await findBinByID(data);
-      console.log(binData);
+      Toast.show({
+        type: 'success',
+        text1: 'Scan is Scanned',
+        visibilityTime: 3000, // Show for 3 seconds
+
+      });
       navigation.navigate('BinData', { binData });
     } catch (error) {
       Alert.alert('Error', 'Failed to fetch bin data. Please try again.');

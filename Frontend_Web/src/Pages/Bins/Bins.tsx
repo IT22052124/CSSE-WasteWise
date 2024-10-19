@@ -10,6 +10,7 @@ import { EllipsisVerticalIcon, TrashIcon } from "@heroicons/react/24/outline"; /
 import { getBins, autoUpdateWasteLevels, deleteBin } from "@/controllers/BinsController";
 import { useEffect, useState } from "react";
 import { useMaterialTailwindController } from "@/context";
+import { toast } from 'react-toastify'; // Import toast
 
 export const Bins = () => {
   const [bins, setBins] = useState<any[]>([]);
@@ -39,6 +40,8 @@ export const Bins = () => {
   const handleDelete = async (id: string) => {
     try {
       await deleteBin(id);
+      toast.success("Bin deleted successfully!");
+
       setBins((prevBins) => prevBins.filter((bin) => bin.binID !== id)); // Update the state after deleting
     } catch (error) {
       console.error("Error deleting bin:", error);

@@ -14,9 +14,10 @@ import {
 } from "@heroicons/react/24/solid";
 import { Home, Profile, Tables, Notifications } from "@/Pages/dashboard";
 import { SignIn, SignUp } from "@/Pages/auth";
+
 import { Bins } from "./Pages/Bins/Bins";
 import { AddBin } from "./Pages/Bins/AddBin";
-
+import {BinRequestsHistory}  from "./Pages/Bins/binreqHistory";
 //Waste Types Elements
 import { WasteTypes } from "./Pages/WasteTypes/WasteTypes";
 import { AddWasteType } from "./Pages/WasteTypes/AddWasteType";
@@ -167,6 +168,14 @@ export const routes = [
       },
       {
         icon: <TruckIcon {...icon} />,
+        name: "Bin Creations",
+        path: "/bincreationhistory",
+        element: <BinRequestsHistory />,
+        inSidebar: true,
+        relatedPaths: ["/bincreation"],
+      },
+      {
+        icon: <TruckIcon {...icon} />,
         name: "Add Truck",
         path: "/addtruck",
         element: <AddTruck />,
@@ -222,14 +231,7 @@ export const routes = [
         inSidebar: false,
         relatedPaths: ["/bintypes", "/addbintypes", "/updatebintypes"],
       },
-      {
-        icon: <UserCircleIcon {...icon} />,
-        name: "profile",
-        path: "/profile",
-        element: <Profile />,
-        inSidebar: false,
-        relatedPaths: ["/profile"],
-      },
+      
       {
         icon: <RectangleStackIcon {...icon} />,
         name: "Add bin",
@@ -239,14 +241,7 @@ export const routes = [
         relatedPaths: [ "/addbin"],
       },
      
-      {
-        icon: <TableCellsIcon {...icon} />,
-        name: "tables",
-        path: "/tables",
-        element: <Tables />,
-        inSidebar: true,
-        relatedPaths: ["/tables"],
-      },
+      
       {
         icon: <RectangleStackIcon {...icon} />,
         name: "Collectors",
@@ -263,6 +258,10 @@ export const routes = [
         inSidebar: false,
         relatedPaths: ["/collector", "/addcollector"],
       },
+      
+    ],
+  },
+  
       {
         icon: <DocumentDuplicateIcon {...icon} />,
         name: "Report",

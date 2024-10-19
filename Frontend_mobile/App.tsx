@@ -73,6 +73,8 @@ export default function App() {
           options={{ headerShown: true }}
         />
       </Stack.Navigator>
+      <Toast ref={(ref) => Toast.setRef(ref)} />
+
     </NavigationContainer>
   );
 }
