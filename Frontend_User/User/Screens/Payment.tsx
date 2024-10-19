@@ -142,6 +142,7 @@ const PaymentPage = ({ route }) => {
       });
       setIsLoading(false);
       resetFields();
+      navigation.navigate("MainTabs", { screen: "Bills" });
     } else if (paymentMethod === "bank") {
       if (!bankSlip) {
         Toast.show({
@@ -197,6 +198,7 @@ const PaymentPage = ({ route }) => {
 
       setIsLoading(false);
       resetFields();
+      navigation.navigate("MainTabs", { screen: "Bills" });
     } else {
       Toast.show({
         type: "error",
