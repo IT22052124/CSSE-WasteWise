@@ -16,7 +16,7 @@ import {
 } from "../controller/wasteCollectionController"; // Assuming you have this function to handle the submission
 import moment from "moment"; // To handle date formatting
 import { getCollectorDetails } from "../controller/collectorController";
-import { resetBinWasteLevel } from "../controller/BinController"; // Import your reset function
+import { resetBinWasteLevel } from "../controller/BinController";
 
 export default function BinDataScreen({ route }) {
   const [user, setUser] = useState(null);
@@ -27,12 +27,14 @@ export default function BinDataScreen({ route }) {
     incentivesPerKg: 0,
   });
 
+  const [weight, setWeight] = useState(0);
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
         const userData = await getCollectorDetails();
         setUser(userData);
-        console.log("hello-------", binData);
+        const randomWasteLevel = generateRandomWeight();
+        setWeight(randomWasteLevel);
       } catch (error) {
         console.error("Failed to fetch user details: ", error);
       }
@@ -40,9 +42,16 @@ export default function BinDataScreen({ route }) {
 
     fetchUserDetails();
   }, []);
+  // Function to generate a random weight between 1 and 25 kg
+  const generateRandomWeight = () => {
+    return Math.floor(Math.random() * (25 - 11 + 1)) + 11; // Generates a random number from 11 to 25
+  };
+
+  // Example usage
+  const randomWeight = generateRandomWeight();
+  console.log(randomWeight); // This will log a random number between 1 and 25
 
   const fetchBinTypeDetails = async () => {
-
     try {
       // Fetch details from Firebase
       const details = await getBinTypeDetailsByID(binData.wasteTypeRef);
@@ -68,12 +77,10 @@ export default function BinDataScreen({ route }) {
     try {
       const lastCollectionID = await getLastWasteCollectionID();
       if (lastCollectionID) {
-        // Increment the last collection ID (e.g., "C004" becomes "C005")
-        const numericPart = parseInt(lastCollectionID.substring(1)); // Get the numeric part of the ID
+        const numericPart = parseInt(lastCollectionID.substring(1));
         const nextNumericPart = numericPart + 1;
-        return `P${nextNumericPart.toString().padStart(3, "0")}`; // Format with leading zeros if necessary
+        return `P${nextNumericPart.toString().padStart(3, "0")}`;
       } else {
-        // If no collections exist, start with "C001"
         return "P001";
       }
     } catch (error) {
@@ -82,15 +89,11 @@ export default function BinDataScreen({ route }) {
     }
   };
 
-  // Handle the "Collect Waste" button press
   const handleCollectWaste = async () => {
     try {
-      // Generate the next collectionID
       const newCollectionID = await generateNextCollectionID();
-      console.log();
-      // Prepare data for submission
       const collectionDetails = {
-        collectionID: newCollectionID, // Use the generated collectionID
+        collectionID: newCollectionID,
         binID: binData.binID,
         userRef: binData.user.id,
         BinRef: binData.id,
@@ -99,19 +102,14 @@ export default function BinDataScreen({ route }) {
         WasteType: binData.type,
         collectorID: user.collectorID,
         collectorname: user.name,
-        wasteLevel: binData.wasteLevel, // Assuming this is static, but you can update as needed
+        wasteWeight: weight, // Assuming this is static, but you can update as needed
         collectionDate: moment().format("YYYY-MM-DD HH:mm:ss"), // Current date and time
         Payback: amount.incentivesPerKg,
         PerKg: amount.chargingPerKg,
       };
 
-      // Call the function to submit the collection details
       await addWasteCollection(collectionDetails);
-
-      // Reset the waste level of the bin to 0
       await resetBinWasteLevel(binData.id);
-
-      // Navigate back to the dashboard or the desired screen
       navigation.navigate("Home");
     } catch (error) {
       console.error("Failed to collect waste", error);
@@ -132,16 +130,16 @@ export default function BinDataScreen({ route }) {
             </View>
             <View style={styles.infoGrid}>
               <InfoItem label="BIN ID" value={binData.binID} />
+              <InfoItem label="Bin Size" value={binData.capacity} />
               <InfoItem label="Owner" value={binData.user.username} />
-              <InfoItem label="Owner Phone" value={binData.user.phone} />
+
+              <InfoItem label="Watse type" value={binData.type.binType} />
               <InfoItem label="Location" value={binData.user.address} />
-              <InfoItem label="Waste level" value={binData.wasteLevel} />
-              <InfoItem label="Waste type" value={binData.type.binType} />
+              <InfoItem label="Weight (KG)" value={weight} />
+
+              <InfoItem label="Owner Phone" value={binData.user.phone} />
               <InfoItem label="Recyclable" value={binData.type.recyclable} />
-              <InfoItem
-                label="Charging per Kg"
-                value={amount.chargingPerKg}
-              />
+              <InfoItem label="Charging per Kg" value={amount.chargingPerKg} />
             </View>
           </View>
         ) : (
@@ -162,7 +160,9 @@ export default function BinDataScreen({ route }) {
 const InfoItem = ({ label, value }) => (
   <View style={styles.infoItem}>
     <Text style={styles.infoLabel}>{label}</Text>
-    <Text style={styles.infoValue}>{value}</Text>
+    <Text style={styles.infoValue}>
+      {typeof value === "boolean" ? (value ? "Yes" : "No") : value}
+    </Text>
   </View>
 );
 
@@ -253,6 +253,7 @@ const styles = StyleSheet.create({
     width: 250,
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: 30,
   },
   collectButtonText: {
     color: "white",
