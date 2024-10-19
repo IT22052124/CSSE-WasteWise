@@ -21,9 +21,10 @@ import { storage } from "../../storage/firebase";
 import { getUserDetails } from "../../Controller/UserController";
 import { useNavigation } from "@react-navigation/native";
 
-const PaymentPage = () => {
+const PaymentPage = ({ route }) => {
+  const { amount } = route.params;
   const navigation = useNavigation();
-  const [paymentAmount, setPaymentAmount] = useState("");
+  const [paymentAmount, setPaymentAmount] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState("");
   const [cardHolder, setCardHolder] = useState("");
   const [cardNumber, setCardNumber] = useState("");
@@ -205,7 +206,7 @@ const PaymentPage = () => {
   };
 
   const resetFields = () => {
-    setPaymentAmount("");
+    setPaymentAmount(null);
     setPaymentMethod("");
     setCardHolder("");
     setCardNumber("");
@@ -304,10 +305,10 @@ const PaymentPage = () => {
         <View style={styles.bankForm}>
           <Text style={styles.formLabel}>Bank Account Details</Text>
           <Text style={styles.bankInfo}>Please transfer the amount to:</Text>
-          <Text style={styles.bankInfo}>Account Name: Your Company Name</Text>
-          <Text style={styles.bankInfo}>Account Number: 1234567890</Text>
-          <Text style={styles.bankInfo}>Bank: Example Bank</Text>
-          <Text style={styles.bankInfo}>IFSC Code: EXMP0001234</Text>
+          <Text style={styles.bankInfo}>Account Name: WasteWise Pvt Ltd</Text>
+          <Text style={styles.bankInfo}>Account Number: 9876543210</Text>
+          <Text style={styles.bankInfo}>Bank: People's Bank</Text>
+          <Text style={styles.bankInfo}>IFSC Code: PB00009876</Text>
           {!bankSlip && (
             <TouchableOpacity style={styles.uploadButton} onPress={pickImage}>
               <Text style={styles.uploadButtonText}>
@@ -356,7 +357,7 @@ const PaymentPage = () => {
         >
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Outstanding Amount</Text>
-            <Text style={styles.amount}>₹{outstandingAmount.toFixed(2)}</Text>
+            <Text style={styles.amount}>LKR {amount.toFixed(2)}</Text>
           </View>
           <View style={styles.inputContainer}>
             <Ionicons
@@ -367,8 +368,8 @@ const PaymentPage = () => {
             />
             <TextInput
               style={styles.input}
-              value={paymentAmount}
-              onChangeText={setPaymentAmount}
+              value={paymentAmount ? String(paymentAmount) : ""} // Convert the number back to a string for the input field
+              onChangeText={(text) => setPaymentAmount(Number(text))} // Convert the input to a number
               placeholder="Enter the Amount to Pay"
               placeholderTextColor="#888"
               keyboardType="numeric"

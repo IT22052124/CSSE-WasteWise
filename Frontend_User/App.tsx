@@ -36,6 +36,8 @@ function BottomTabNavigator({ route }) {
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
+        tabBarActiveTintColor: "#4CAF50",
+        tabBarInactiveTintColor: "#808080",
       })}
     >
       <Stack.Screen

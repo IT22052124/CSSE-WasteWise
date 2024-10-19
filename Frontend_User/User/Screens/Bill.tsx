@@ -11,7 +11,10 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import { getWasteCollectionsByUserID } from "./../../Controller/paymentController";
+import {
+  getWasteCollectionsByUserID,
+  getTotalPaymentByUserID,
+} from "./../../Controller/paymentController";
 import { getUserDetails } from "../../Controller/UserController";
 
 type Bill = {
@@ -26,8 +29,10 @@ export default function BillHistory() {
   const navigation = useNavigation();
   const [bills, setBills] = useState<Bill[]>([]);
   const [loading, setLoading] = useState(true);
-  const [outstandingAmount, setOutstandingAmount] = useState(0); // Initialize outstanding amount
+  const [outstandingAmount, setOutstandingAmount] = useState(0);
   const [userID, setUserID] = useState(null);
+  const [totalPayment, setTotalPayment] = useState(0);
+  const [finalToPaid, setFinalToPaid] = useState(0);
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -63,11 +68,31 @@ export default function BillHistory() {
     }
   };
 
+  const fetchPayments = async () => {
+    try {
+      const userData = await getUserDetails();
+      if (userData) {
+        const data = await getTotalPaymentByUserID(userData.id);
+
+        setTotalPayment(data);
+      }
+    } catch (error) {
+      console.error("Error fetching bills:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useFocusEffect(
     React.useCallback(() => {
       fetchBills();
+      fetchPayments();
     }, [userID])
   );
+
+  useEffect(() => {
+    setFinalToPaid(outstandingAmount - totalPayment);
+  }, [outstandingAmount, totalPayment]);
 
   const renderItem = ({ item }: { item: Bill }) => (
     <View style={styles.billItem}>
@@ -89,7 +114,7 @@ export default function BillHistory() {
         <View style={styles.amountRow}>
           <Text style={styles.amountLabel}>Net Amount:</Text>
           <Text style={styles.amount}>
-          LKR {item.totalAmountToBePaid.toFixed(2)}
+            LKR {item.totalAmountToBePaid.toFixed(2)}
           </Text>
         </View>
       </View>
@@ -97,7 +122,7 @@ export default function BillHistory() {
   );
 
   const handlePayment = () => {
-    navigation.navigate("PaymentPage");
+    navigation.navigate("PaymentPage", { amount: finalToPaid });
   };
 
   if (loading) {
@@ -109,7 +134,7 @@ export default function BillHistory() {
           style={{ marginTop: 50 }}
         />
       </SafeAreaView>
-    )
+    );
   }
 
   return (
@@ -120,14 +145,14 @@ export default function BillHistory() {
         <View style={styles.outstandingContainer}>
           <Text style={styles.outstandingLabel}>Outstanding</Text>
           <Text style={styles.outstandingAmount}>
-            LKR {outstandingAmount.toFixed(2)}
+            LKR {finalToPaid.toFixed(2)}
           </Text>
         </View>
       </View>
       <FlatList
         data={bills}
         renderItem={renderItem}
-        keyExtractor={(item) => item.month} // Use month as key, adjust if needed
+        keyExtractor={(item) => item.month}
         contentContainerStyle={styles.listContent}
       />
       <TouchableOpacity style={styles.payButton} onPress={handlePayment}>
@@ -215,7 +240,7 @@ const styles = StyleSheet.create({
   },
   amount: {
     fontSize: 16,
-    color: "#4CAF50",
+    color: "#333333",
     fontWeight: "600",
   },
   payButton: {
