@@ -41,6 +41,8 @@ import { AddBinType } from "./Pages/BinType/AddBinType";
 import { BinTypes } from "./Pages/BinType/BinTypes";
 import { UpdateBinType } from "./Pages/BinType/UpdateBinType";
 
+import { CreateReportForm } from "./Pages/Report/AddReport";
+
 const icon = {
   className: "w-5 h-5 text-inherit",
 };
@@ -221,6 +223,14 @@ export const routes = [
         element: <AddCollector />,
         inSidebar: false,
         relatedPaths: ["/collector", "/addcollector"],
+      },
+      {
+        icon: <DocumentDuplicateIcon {...icon} />,
+        name: "Report",
+        path: "/report",
+        element: <CreateReportForm />,
+        inSidebar: true,
+        relatedPaths: ["/report"],
       },
       {
         icon: <InformationCircleIcon {...icon} />,
