@@ -240,20 +240,6 @@ export const AddBin = () => {
             />
           </div>
 
-          {/* Per Kg Cost */}
-          <div className="space-y-2">
-            <Typography variant="small" className="font-normal text-blue-gray-600">
-              Cost Per Kg
-            </Typography>
-            <input
-              type="text"
-              name="perKg"
-              value={formData.perKg}
-              onChange={handleChange}
-              placeholder="Enter cost per kg"
-              className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm"
-            />
-          </div>
 
           <Button
             type="submit"
@@ -265,9 +251,17 @@ export const AddBin = () => {
         </form>
 
         {/* QR Code */}
-        <div ref={qrCodeRef} className="mt-8 p-4 bg-white shadow-md rounded-lg">
-          <QRCodeCanvas value={`${formData.binID}`} />
-        </div>
+        
+        <div
+  ref={qrCodeRef}
+  className="mt-8 p-4 bg-white shadow-md rounded-lg flex flex-col justify-center items-center" // Changed flex direction to column
+>
+  <Typography variant="h6" className="text-center mb-4">
+    Bin ID: {formData.binID}
+  </Typography>
+  <QRCodeCanvas value={`${formData.binID}`} />
+</div>
+        
         <Button onClick={downloadQRCode} className="mt-4 w-full">
           Download QR Code
         </Button>
