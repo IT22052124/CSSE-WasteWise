@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { getWasteCollectionsByUserID } from "./../../Controller/paymentController";
 import { getUserDetails } from "../../Controller/UserController";
 
@@ -29,30 +29,44 @@ export default function BillHistory() {
   const [userID, setUserID] = useState(null);
 
   useEffect(() => {
-    const fetchBills = async () => {
+    const fetchUserDetails = async () => {
       try {
         const userData = await getUserDetails();
         setUserID(userData.id);
-        if (userID) {
-          const fetchedBills = await getWasteCollectionsByUserID(userID);
-          setBills(fetchedBills);
-
-          // Calculate outstanding amount from fetched bills
-          const totalOutstanding = fetchedBills.reduce(
-            (total, bill) => total + bill.totalAmountToBePaid,
-            0
-          );
-          setOutstandingAmount(totalOutstanding);
-        }
       } catch (error) {
-        console.error("Error fetching bills:", error);
-      } finally {
-        setLoading(false);
+        console.error("Failed to fetch user details: ", error);
       }
     };
 
-    fetchBills();
+    fetchUserDetails();
   }, []);
+
+  const fetchBills = async () => {
+    try {
+      const userData = await getUserDetails();
+      if (userData) {
+        const fetchedBills = await getWasteCollectionsByUserID(userData.id);
+        setBills(fetchedBills);
+
+        // Calculate outstanding amount from fetched bills
+        const totalOutstanding = fetchedBills.reduce(
+          (total, bill) => total + bill.totalAmountToBePaid,
+          0
+        );
+        setOutstandingAmount(totalOutstanding);
+      }
+    } catch (error) {
+      console.error("Error fetching bills:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchBills();
+    }, [userID])
+  );
 
   const renderItem = ({ item }: { item: Bill }) => (
     <View style={styles.billItem}>

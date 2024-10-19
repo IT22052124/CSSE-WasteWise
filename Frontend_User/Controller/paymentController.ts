@@ -107,7 +107,7 @@ export const getWasteCollectionsByUserID = async (userID) => {
   try {
     // Step 1: Prepare the document reference for the userID
     const userRef = doc(db, "users", userID); // Reference to the user's document
-
+console.log(userID)
     // Step 2: Construct the query to fetch waste collections for the user
     const wasteCollectionQuery = query(
       collection(db, "wasteCollection"), // Query the wasteCollections collection
