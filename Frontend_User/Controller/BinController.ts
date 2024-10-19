@@ -75,13 +75,13 @@ export const createBinRequest = async (
   capacity
 ) => {
   try {
-    const binID = await generateBinID();
+    const ReqID = await generateBinID();
 
     const userRef = doc(db, "users", userId);
     const binRef = doc(db, "binTypes", binTypeId);
     // Create a new bin request object
     const newBinRequest = {
-      binID: binID,
+      ReqID: ReqID,
       binType: binType,
       binTypeId: binRef,
       userId: userRef,
@@ -105,20 +105,19 @@ export const createBinRequest = async (
 const generateBinID = async () => {
   const binQuery = query(
     collection(db, "binRequests"),
-    orderBy("binID", "desc"), // Order by paymentID in descending order
-    limit(1) // Limit to the latest document
+    orderBy("ReqID", "desc"),
+    limit(1)
   );
 
   const querySnapshot = await getDocs(binQuery);
-  let nextID = 1; // Default to 1 if no payments exist
+  let nextID = 1;
 
   if (!querySnapshot.empty) {
     const lastDoc = querySnapshot.docs[0];
-    const lastBinID = lastDoc.data().binID;
-    const lastNumber = parseInt(lastBinID.replace("P", ""), 10); // Extract number from lastPaymentID
+    const lastReqID = lastDoc.data().ReqID;
+    const lastNumber = parseInt(lastReqID.replace("R", ""), 10);
     nextID = lastNumber + 1; // Increment
   }
 
-  // Format the payment ID with leading zeros
-  return `P${String(nextID).padStart(4, "0")}`;
+  return `R${String(nextID).padStart(4, "0")}`;
 };

@@ -18,11 +18,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export const createUser = async (userData) => {
   const { username, email, phone, address, password } = userData;
 
-  const salt = await bcrypt.genSalt(10);
+  //const salt = await bcrypt.genSalt(10);
 
-  const hashedPassword = await bcrypt.hash(password, salt);
+  //const hashedPassword = await bcrypt.hash(password, salt);
 
-  console.log(hashedPassword);
+  //console.log(hashedPassword);
 
   try {
     await addDoc(collection(db, "users"), {
@@ -30,7 +30,7 @@ export const createUser = async (userData) => {
       email: email,
       phone: phone,
       address: address,
-      password: hashedPassword,
+      password: password,
     });
   } catch (error) {
     console.error("Error creating user:", error);
@@ -103,11 +103,11 @@ export const signInUser = async (email, password) => {
     const userDoc = querySnapshot.docs[0];
     const userData = userDoc.data();
     const userId = userDoc.id;
-    const hashedPassword = userData.password;
+    //const hashedPassword = userData.password;
 
-    const isMatch = await bcrypt.compare(password, hashedPassword);
+    //const isMatch = await bcrypt.compare(password, hashedPassword);
 
-    if (!isMatch) {
+    if (password != userData.password) {
       return { success: false, message: "Incorrect password" };
     }
 

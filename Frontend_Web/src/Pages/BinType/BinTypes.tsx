@@ -9,6 +9,7 @@ import {
   MenuHandler,
   MenuList,
   MenuItem,
+  Button,
 } from "@material-tailwind/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import { deleteBinType, getBinTypes } from "@/controllers/BinTypeController"; // Update the import path according to your structure
@@ -72,7 +73,7 @@ export const BinTypes = () => {
         <CardHeader
           variant="gradient"
           color={sidenavColor !== "dark" ? sidenavColor : "gray"}
-          className="mb-8 p-6"
+          className="mb-8 p-6 flex justify-between items-center"
         >
           <Typography
             variant="h6"
@@ -80,6 +81,13 @@ export const BinTypes = () => {
           >
             Bin Types
           </Typography>
+          <Button
+            variant="contained"
+            color={sidenavColor === "white" ? "black" : "white"}
+            onClick={() => navigate(`/dashboard/addbintypes`)}
+          >
+            Add New Type
+          </Button>
         </CardHeader>
         <CardBody className=" px-0 pt-0 pb-2">
           <table className="w-full min-w-[640px] table-auto">
