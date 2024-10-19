@@ -109,6 +109,14 @@ const PaymentPage = () => {
         return;
       }
 
+      if (!acceptTerms) {
+        Toast.show({
+          type: "error",
+          text1: "Please accept the terms and conditions.",
+        });
+        return;
+      }
+
       setIsLoading(true);
 
       try {
@@ -156,10 +164,8 @@ const PaymentPage = () => {
       try {
         await uploadBytes(storageRef, blob); // Upload the file
         const downloadURL = await getDownloadURL(storageRef); // Get the download URL
-        setSlipURL(downloadURL); // Set slipURL state
-
-        if (slipURL) {
-          // Ensure downloadURL is available before proceeding
+        setSlipURL(downloadURL);
+        if (downloadURL) {
           const paymentData = await createPayment(
             paymentAmount,
             userID,
