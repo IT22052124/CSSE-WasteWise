@@ -77,14 +77,19 @@ export const CreateReportForm = () => {
   };
 
   const reportConfig = {
-    "Waste Collection Summary Reports": {
-      fields: [
-        { key: "location", label: "Location" },
-        { key: "wasteAmount", label: "Waste Amount (kg)" }
-      ],
-      summaryField: "wasteAmount",
-      summaryText: "Total Waste Collected"
-    },
+   "Waste Collection Summary Reports": {
+  fields: [
+    { key: "address", label: "Location" },
+    { key: "wasteWeight", label: "Waste Amount (kg)" },
+    { key: "userEmail", label: "User Email" },
+    { key: "collectorName", label: "Collector Name" }, // Added collector name
+    { key: "binType", label: "Bin Type" }, // Added bin type
+    { key: "wasteType", label: "Waste Type" } // Added waste type
+  ],
+  summaryField: "wasteWeight",
+  summaryText: "Total Waste Collected"
+},
+
     "Route Optimization Reports": {
       fields: [
         { key: "routeName", label: "Route Name" },
@@ -123,20 +128,45 @@ export const CreateReportForm = () => {
   
   
 
-  // Fetch specific data based on report type
   const fetchWasteCollectionData = async () => {
+    const fromDate = new Date(formData.fromDate);
+    const toDate = new Date(formData.toDate);
+  
     const q = query(
       collection(db, "wasteCollection"),
-      where("timestamp", ">=", formData.fromDate),
-      where("timestamp", "<=", formData.toDate)
+      
     );
+  
     const querySnapshot = await getDocs(q);
     let data = [];
+  
+    console.log("Query Snapshot Size:", querySnapshot.size); // Log the number of documents retrieved
+  
     querySnapshot.forEach((doc) => {
-      data.push(doc.data());
+      const wasteData = doc.data();
+      console.log("Document Data:", wasteData); // Log the entire document data
+  
+      if (wasteData) {
+        data.push({
+          address: wasteData.User?.address || "N/A", // Use optional chaining to access User.address
+          wasteWeight: wasteData.wasteWeight || 0,   // Use wasteWeight instead of wasteLevel
+          userEmail: wasteData.User?.email || "N/A",  // Access User.email
+          collectorName: wasteData.collectorname || "N/A", // Use correct case for collectorname
+          binType: wasteData.WasteType?.binType || "N/A", // Assuming BinTypeRef is the correct property
+          wasteType: wasteData.WasteType?.wasteTypes || "N/A" // Accessing WasteType.id for waste type
+        });
+      } else {
+        console.warn("No data found for document:", doc.id);
+      }
     });
+  
+    console.log("Retrieved Data:", data); // Log the retrieved data
     return data;
   };
+  
+  
+  
+  
 
   const fetchRouteOptimizationData = async () => {
     const q = query(
@@ -284,7 +314,7 @@ export const CreateReportForm = () => {
       doc.autoTable({
         head: [tableHeaders],
         body: tableData,
-        startY: 20, // Start after the title
+        startY, // Start after the title
         theme: 'grid',
         headStyles: { fillColor: [0, 0, 0] }, // Black header
         styles: { halign: 'center' }, // Center-align text
