@@ -7,7 +7,7 @@ import {
   updateDoc,
   query,
   orderBy,
-  setDoc,
+  deleteDoc,
   getDoc,
   where
 
@@ -197,4 +197,10 @@ export const getDocData = async (docRef) => {
     console.error("Error fetching document:", error);
     throw error;
   }
+};
+
+
+export const deleteBin = async (id) => {
+  const binTypeRef = doc(db, "bins", id); // "binTypes" is your Firestore collection name
+  await deleteDoc(binTypeRef); // Delete the document
 };

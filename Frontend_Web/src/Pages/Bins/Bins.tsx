@@ -6,10 +6,11 @@ import {
     Chip,
   } from "@material-tailwind/react";
   import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
-  import { getBins,autoUpdateWasteLevels} from "@/controllers/BinsController"; // Assuming you have a BinController to fetch bin data
+  import { getBins,autoUpdateWasteLevels,deleteBin} from "@/controllers/BinsController"; // Assuming you have a BinController to fetch bin data
   import { useEffect, useState } from "react";
   import { useMaterialTailwindController } from "@/context";
-  
+  import Swal from "sweetalert2";
+
   export const Bins = () => {
     const [bins, setBins] = useState<any[]>([]);
     const [controller, dispatch] = useMaterialTailwindController();
@@ -34,7 +35,34 @@ import {
       // Cleanup function to clear the interval on component unmount
       return () => clearInterval(intervalId);
     }, []); // Empty dependency array to run only on mount
-  
+    const handleDelete = async (id) => {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          try {
+            const fetch = async () => {
+              await deleteBin(id);
+              
+            };
+            fetch();
+          } catch (error) {
+            console.error("Error deleting bin type:", error);
+          }
+          Swal.fire({
+            title: "Deleted!",
+            text: "Your file has been deleted.",
+            icon: "success",
+          });
+        }
+      });
+    };
     return (
       <div className="mt-12 mb-8 flex flex-col gap-12 min-h-screen">
         <Card>

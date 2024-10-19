@@ -30,7 +30,7 @@ const generateRandomWeight = () => {
   return Math.floor(Math.random() * (25 - 11 + 1)) + 11; // Generates a random number from 11 to 25
 };
 
-
+///
 // Example usage
 const randomWeight = generateRandomWeight();
 console.log(randomWeight); // This will log a random number between 1 and 25
