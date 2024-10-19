@@ -14,9 +14,10 @@ import {
 } from "@heroicons/react/24/solid";
 import { Home, Profile, Tables, Notifications } from "@/Pages/dashboard";
 import { SignIn, SignUp } from "@/Pages/auth";
+
 import { Bins } from "./Pages/Bins/Bins";
 import { AddBin } from "./Pages/Bins/AddBin";
-
+import {BinRequestsHistory}  from "./Pages/Bins/binreqHistory";
 //Waste Types Elements
 import { WasteTypes } from "./Pages/WasteTypes/WasteTypes";
 import { AddWasteType } from "./Pages/WasteTypes/AddWasteType";
@@ -162,6 +163,14 @@ export const routes = [
         element: <Trucks />,
         inSidebar: true,
         relatedPaths: ["/trucks", "/addtruck", "/updatetruck"],
+      },
+      {
+        icon: <TruckIcon {...icon} />,
+        name: "Bin Creations",
+        path: "/bincreationhistory",
+        element: <BinRequestsHistory />,
+        inSidebar: true,
+        relatedPaths: ["/bincreation"],
       },
       {
         icon: <TruckIcon {...icon} />,

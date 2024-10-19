@@ -7,11 +7,11 @@ import {
     Button,
   } from "@material-tailwind/react";
   import { useEffect, useState } from "react";
-  import { getBinRequests, getDocData } from "@/controllers/BinsController";
+  import { getBinHistory, getDocData } from "@/controllers/BinsController";
   import { useMaterialTailwindController } from "@/context";
   import { useNavigate } from "react-router-dom";
   
-  export const BinRequests = () => {
+  export const BinRequestsHistory = () => {
     const [binRequests, setBinRequests] = useState<any[]>([]);
     const [controller] = useMaterialTailwindController();
     const { sidenavColor } = controller;
@@ -20,7 +20,7 @@ import {
     useEffect(() => {
       const fetchData = async () => {
         try {
-          const data = await getBinRequests();
+          const data = await getBinHistory();
           console.log(data)
   
           const resolvedRequests = await Promise.all(
@@ -46,10 +46,7 @@ import {
       fetchData();
     }, []);
   
-    const handleCreateBin = (binType: string, userEmail: string, capacity: string, ReqID:string) => {
-      // Navigate to the bin creation page with pre-filled waste type, user email, and capacity
-      navigate(`/dashboard/addbin?binType=${binType}&userEmail=${userEmail}&capacity=${capacity}&ReqID=${ReqID}`);
-    };
+    
     
   
     return (
@@ -58,19 +55,11 @@ import {
           <CardHeader
             variant="gradient"
             color={sidenavColor !== "dark" ? sidenavColor : "gray"}
-            className="mb-8 p-6 flex justify-between items-center"
+            className="mb-8 p-6"
           >
             <Typography variant="h6" color={sidenavColor !== "white" ? "white" : "grey"}>
-              Bin Requests
+              Bin Creation History
             </Typography>
-
-            <Button
-            variant="contained"
-            color={sidenavColor === "white" ? "black" : "white"}
-            onClick={() => navigate(`/dashboard/bincreationhistory`)}
-          >
-            Bin Creation history
-          </Button>
           </CardHeader>
           <CardBody className="px-0 pt-0 pb-2">
             <table className="w-full min-w-[640px] table-auto">
@@ -119,11 +108,7 @@ import {
                           {new Date(createdAt.seconds * 1000).toLocaleDateString()}
                         </Typography>
                       </td>
-                      <td className={className}>
-                        <Button size="sm" onClick={() => handleCreateBin(binType, userEmail,capacity,ReqID)}>
-                          Create Bin
-                        </Button>
-                      </td>
+                      
                     </tr>
                   );
                 })}

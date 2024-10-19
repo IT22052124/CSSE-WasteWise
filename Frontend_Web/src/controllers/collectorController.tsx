@@ -6,6 +6,8 @@ import {
   query,
   orderBy,
   limit,
+  deleteDoc,
+  doc
 } from "firebase/firestore";
 import { db } from "@/storage/firebase";
 import bcrypt from "bcryptjs"; // Make sure to install bcryptjs package
@@ -73,5 +75,15 @@ export const getLastCollectorID = async () => {
   } catch (error) {
     console.error("Error retrieving last collectorID:", error);
     throw new Error("Failed to fetch last collectorID");
+  }
+};
+export const deleteCollector = async (id: string) => {
+  try {
+    console.log("Attempting to delete collector with ID:", id);
+    const collectorRef = doc(db, "collectors", id); // "collectors" is your Firestore collection name
+    await deleteDoc(collectorRef); // Delete the document
+    console.log(`Collector with ID: ${id} successfully deleted.`);
+  } catch (error) {
+    console.error("Error deleting collector:", error);
   }
 };

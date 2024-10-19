@@ -6,6 +6,7 @@ import { getUserByEmail } from "@/controllers/UserController";
 import { useNavigate, useLocation } from "react-router-dom";
 import { QRCodeCanvas } from "qrcode.react";
 import html2canvas from "html2canvas";
+import { toast } from 'react-toastify'; // Import toast
 
 export const AddBin = () => {
   const [formData, setFormData] = useState({
@@ -154,6 +155,7 @@ export const AddBin = () => {
       if (formData.requestID) {
         await updateBinRequestStatusByRequestID(formData.requestID);
       }
+      toast.success("New Bin Created successfully!");
 
       navigate("/dashboard/bin");
     } catch (error) {
