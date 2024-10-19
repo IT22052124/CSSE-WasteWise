@@ -60,7 +60,7 @@ const PaymentHistoryPage = () => {
   const renderPaymentItem = ({ item }) => (
     <View style={styles.paymentItem}>
       <View style={styles.paymentDetails}>
-        <Text style={styles.amount}>₹{item.amount}</Text>
+        <Text style={styles.amount}>LKR {item.amount.toFixed(2)}</Text>
         <Text style={styles.date}>
           {item.date.toDate().toLocaleDateString()}
         </Text>
