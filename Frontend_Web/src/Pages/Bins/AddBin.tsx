@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Button, Typography } from "@material-tailwind/react";
-import { addBin, getLastBinID } from "@/controllers/BinsController";
+import { addBin, getLastBinID, updateBinRequestStatusByRequestID } from "@/controllers/BinsController"; // Update the import if necessary
 import { getBinTypeByBinType } from "@/controllers/BinTypeController";
 import { getUserByEmail } from "@/controllers/UserController";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -13,14 +13,14 @@ export const AddBin = () => {
     type: {},
     user: {},
     perKg: "",
+    capacity: "",
     wasteLevel: 0,
-    customBinColor: "",
     userRef: "",
     wasteTypeRef: "",
   });
 
   const [userEmail, setUserEmail] = useState<string>("");
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false); // To handle form submission state
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const qrCodeRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -46,11 +46,13 @@ export const AddBin = () => {
     fetchNewBinID();
   }, []);
 
-  // Prefill bin type and user email from query parameters
+  // Prefill bin type, user email, capacity, and requestID from query parameters
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const prefilledBinType = params.get("binType");
     const prefilledUserEmail = params.get("userEmail");
+    const prefilledCapacity = params.get("capacity");
+    const requestID = params.get("ReqID"); // Get requestID from query parameters
 
     if (prefilledBinType) {
       const fetchWasteType = async () => {
@@ -73,6 +75,21 @@ export const AddBin = () => {
 
     if (prefilledUserEmail) {
       setUserEmail(prefilledUserEmail);
+    }
+
+    if (prefilledCapacity) {
+      setFormData((prevState) => ({
+        ...prevState,
+        capacity: prefilledCapacity,
+      }));
+    }
+
+    // Store requestID in the state if needed
+    if (requestID) {
+      setFormData((prevState) => ({
+        ...prevState,
+        requestID, // Add this to formData if necessary
+      }));
     }
   }, [location.search]);
 
@@ -112,7 +129,6 @@ export const AddBin = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Ensure userRef and wasteTypeRef are set before submitting
     if (!formData.userRef) {
       console.error("User reference is missing.");
       return;
@@ -123,7 +139,7 @@ export const AddBin = () => {
       return;
     }
 
-    setIsSubmitting(true); // Disable submit button during submission
+    setIsSubmitting(true);
 
     const binData = {
       ...formData,
@@ -133,11 +149,17 @@ export const AddBin = () => {
 
     try {
       await addBin(binData);
+
+      // Update the status of the bin request using the requestID
+      if (formData.requestID) {
+        await updateBinRequestStatusByRequestID(formData.requestID);
+      }
+
       navigate("/dashboard/bin");
     } catch (error) {
       console.error("Failed to add bin", error);
     } finally {
-      setIsSubmitting(false); // Re-enable submit button after submission
+      setIsSubmitting(false);
     }
   };
 
@@ -204,6 +226,20 @@ export const AddBin = () => {
             />
           </div>
 
+          {/* Capacity (Prefilled and disabled) */}
+          <div className="space-y-2">
+            <Typography variant="small" className="font-normal text-blue-gray-600">
+              Capacity
+            </Typography>
+            <input
+              type="text"
+              name="capacity"
+              value={formData.capacity}
+              disabled
+              className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm"
+            />
+          </div>
+
           {/* Per Kg Cost */}
           <div className="space-y-2">
             <Typography variant="small" className="font-normal text-blue-gray-600">
@@ -232,10 +268,12 @@ export const AddBin = () => {
         <div ref={qrCodeRef} className="mt-8 p-4 bg-white shadow-md rounded-lg">
           <QRCodeCanvas value={`${formData.binID}`} />
         </div>
-        <Button onClick={downloadQRCode} className="mt-4 bg-blue-500 hover:bg-blue-600">
+        <Button onClick={downloadQRCode} className="mt-4 w-full">
           Download QR Code
         </Button>
       </div>
     </div>
   );
 };
+
+export default AddBin;

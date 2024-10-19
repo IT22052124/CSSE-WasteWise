@@ -10,12 +10,13 @@ export default function BinDataScreen({ route }) {
   const [user, setUser] = useState(null);
   const { binData } = route.params;
   const navigation = useNavigation();
-
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
         const userData = await getCollectorDetails();
         setUser(userData);
+        console.log("hello-------",binData)
+
       } catch (error) {
         console.error("Failed to fetch user details: ", error);
       }
@@ -53,14 +54,17 @@ export default function BinDataScreen({ route }) {
       const collectionDetails = {
         collectionID: newCollectionID, // Use the generated collectionID
         binID: binData.binID,
+        userRef:binData.user.id,
+        BinRef:binData.id,
+        BinTypeRef:binData.type.id,
         User:binData.user,
         WasteType:binData.type,
         collectorID: user.collectorID,
         collectorname: user.name,
         wasteLevel: binData.wasteLevel, // Assuming this is static, but you can update as needed
         collectionDate: moment().format('YYYY-MM-DD HH:mm:ss'), // Current date and time
-Payback: binData.type.incentives,
-        PerKg: binData.type.price
+        Payback: binData.type.incentivesPerKg,
+        PerKg: binData.type.chargingPerKg
         ,
       };
 
@@ -100,9 +104,9 @@ Payback: binData.type.incentives,
               <InfoItem label="Owner Phone" value={binData.user.phone} />
               <InfoItem label="Location" value={binData.user.address} />
               <InfoItem label="Waste level" value={binData.wasteLevel} />
-              <InfoItem label="Waste type" value={binData.type.wasteType} />
-              <InfoItem label="Recyclable" value="yes" />
-              <InfoItem label="Cost per Kg" value={binData.perKg} />
+              <InfoItem label="Waste type" value={binData.type.binType} />
+              <InfoItem label="Recyclable" value={binData.type.recyclable} />
+              <InfoItem label="Cost per Kg" value={binData.type.chargingPerKg} />
             </View>
           </View>
         ) : (

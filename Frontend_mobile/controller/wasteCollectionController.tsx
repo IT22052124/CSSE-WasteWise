@@ -14,8 +14,18 @@ import {
   // Function to log a waste collection
   export const addWasteCollection = async (collectionData) => {
     try {
+      console.log(collectionData);
+      // Create references for user, bin type, and bin
+      const userRef = doc(db, "users", collectionData.userRef); // Reference to the user's document
+      const binTypeRef = doc(db, "binTypes", collectionData.BinTypeRef); // Reference to the bin type document
+      const binRef = doc(db, "bins", collectionData.BinRef); // Reference to the bin's document
+  
+      // Add waste collection data, including the references
       const docRef = await addDoc(collection(db, "wasteCollection"), {
         ...collectionData,
+        userRef, // Reference to the user
+        binTypeRef, // Reference to the bin type
+        binRef, // Reference to the bin
         collectedAt: serverTimestamp(), // Timestamp when the waste was collected
       });
   
