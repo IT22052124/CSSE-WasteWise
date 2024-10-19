@@ -126,3 +126,30 @@ export const getCollectorDetails = async () => {
   }
 };
 
+// Function to get all records for a collector using collectorID
+export const getCollectorRecords = async (collectorID) => {
+  try {
+    console.log(collectorID);
+
+    if (!collectorID) {
+      throw new Error("Collector ID must be provided");
+    }
+
+    // Query Firestore for all records with matching collectorID
+    const recordsRef = collection(db, "wasteCollection"); // Assuming the collection name is 'wasteCollection'
+    const q = query(recordsRef, where("collectorID", "==", collectorID));
+
+    // Fetch the records
+    const querySnapshot = await getDocs(q);
+
+    const records = [];
+    querySnapshot.forEach((doc) => {
+      records.push({ id: doc.id, ...doc.data() });
+    });
+
+    return records; // Return the fetched records
+  } catch (error) {
+    console.error("Error fetching collector records:", error);
+    throw new Error("Failed to fetch collector records");
+  }
+};
