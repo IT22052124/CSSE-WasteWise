@@ -128,14 +128,14 @@ export const getWasteCollectionsByUserID = async (userID) => {
 
     // Step 5: Process the retrieved waste collections
     querySnapshot.docs.forEach((doc) => {
-      const { PerKg, Payback, wasteLevel, collectedAt } = doc.data();
+      const { PerKg, Payback, wasteWeight, collectedAt } = doc.data();
       const date = collectedAt.toDate(); // Convert Firestore timestamp to JS Date object
 
       // Format the date as 'Month Year' (e.g., 'October 2024')
       const month = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long' }).format(date);
 
-      const amount = PerKg * wasteLevel;
-      const payBackAmount = Payback * wasteLevel;
+      const amount = PerKg * wasteWeight;
+      const payBackAmount = Payback * wasteWeight;
 
       // Accumulate data by month
       if (!wasteData[month]) {
@@ -149,7 +149,7 @@ export const getWasteCollectionsByUserID = async (userID) => {
 
       wasteData[month].totalAmount += amount;
       wasteData[month].totalPayBackAmount += payBackAmount;
-      wasteData[month].totalWaste += wasteLevel;
+      wasteData[month].totalWaste += wasteWeight;
       wasteData[month].totalAmountToBePaid =
         wasteData[month].totalAmount - wasteData[month].totalPayBackAmount;
     });
