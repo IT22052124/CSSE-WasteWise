@@ -110,6 +110,21 @@ const PaymentPage = ({ route }) => {
         return;
       }
 
+      if (cardNumber.length !== 16 || isNaN(cardNumber)) {
+        Toast.show({
+          type: "error",
+          text1: "Card number must be 16 digits.",
+        });
+        return;
+      }
+
+      if (cvv.length !== 3 || isNaN(cvv)) {
+        Toast.show({
+          type: "error",
+          text1: "CVV must be 3 digits.",
+        });
+        return;
+      }
       if (!acceptTerms) {
         Toast.show({
           type: "error",

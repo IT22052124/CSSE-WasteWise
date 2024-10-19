@@ -9,7 +9,7 @@ import {
   updateDoc,
   query,where
 } from "firebase/firestore";
-import { db } from "@/storage/firebase";
+import { db } from "../storage/firebase";
 
 export const getAllWasteTypes = async () => {
   try {

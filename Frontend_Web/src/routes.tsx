@@ -229,14 +229,7 @@ export const routes = [
         inSidebar: false,
         relatedPaths: ["/bintypes", "/addbintypes", "/updatebintypes"],
       },
-      {
-        icon: <UserCircleIcon {...icon} />,
-        name: "profile",
-        path: "/profile",
-        element: <Profile />,
-        inSidebar: false,
-        relatedPaths: ["/profile"],
-      },
+      
       {
         icon: <RectangleStackIcon {...icon} />,
         name: "Add bin",
@@ -246,14 +239,7 @@ export const routes = [
         relatedPaths: [ "/addbin"],
       },
      
-      {
-        icon: <TableCellsIcon {...icon} />,
-        name: "tables",
-        path: "/tables",
-        element: <Tables />,
-        inSidebar: true,
-        relatedPaths: ["/tables"],
-      },
+      
       {
         icon: <RectangleStackIcon {...icon} />,
         name: "Collectors",
@@ -270,37 +256,9 @@ export const routes = [
         inSidebar: false,
         relatedPaths: ["/collector", "/addcollector"],
       },
-      {
-        icon: <InformationCircleIcon {...icon} />,
-        name: "notifications",
-        path: "/notifications",
-        element: <Notifications />,
-        inSidebar: true,
-        relatedPaths: ["/notifications"],
-      },
+      
     ],
   },
-  {
-    title: "auth pages",
-    layout: "auth",
-    pages: [
-      {
-        icon: <ServerStackIcon {...icon} />,
-        name: "sign in",
-        path: "/sign-in",
-        element: <SignIn />,
-        inSidebar: true,
-        relatedPaths: ["/sign-in"],
-      },
-      {
-        icon: <RectangleStackIcon {...icon} />,
-        name: "sign up",
-        path: "/sign-up",
-        element: <SignUp />,
-        inSidebar: true,
-        relatedPaths: ["/sign-up"],
-      },
-    ],
-  },
+  
 ];
 export default routes;
