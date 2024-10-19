@@ -7,7 +7,8 @@ import {
   doc,
   getDoc,
   updateDoc,
-  query,where
+  query,
+  where,
 } from "firebase/firestore";
 import { db } from "../storage/firebase";
 
@@ -113,16 +114,14 @@ export const updateBinType = async (id, updatedData) => {
   }
 };
 
-
-
-
-
-
 // Function to get bin type by binType
 export const getBinTypeByBinType = async (binType) => {
   try {
     const binTypesCollection = collection(db, "binTypes"); // Get reference to 'binTypes' collection
-    const binTypeQuery = query(binTypesCollection, where("binType", "==", binType)); // Create query for binType
+    const binTypeQuery = query(
+      binTypesCollection,
+      where("binType", "==", binType)
+    ); // Create query for binType
 
     const binTypeSnapshot = await getDocs(binTypeQuery); // Execute the query
 

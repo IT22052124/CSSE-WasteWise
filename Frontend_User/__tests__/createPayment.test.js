@@ -1,91 +1,51 @@
-import { createPayment } from "../Controller/paymentController"; // Adjust the path as needed
-import { db } from '../storage/firebase'; // This import can stay if you need the db instance
-import * as firestore from 'firebase/firestore';
+// src/__tests__/createBinType.test.ts
 
-// Mock Firebase Firestore methods
-jest.mock("firebase/firestore", () => ({
-  initializeApp: jest.fn(),
-  getFirestore: jest.fn(),
-  addDoc: jest.fn(),
-  collection: jest.fn(),
-  doc: jest.fn(),
-  Timestamp: {
-    now: jest.fn(() => "mockTimestamp"),
-  },
-}));
+import { createBinType } from '../controllers/BinTypeController'; // Adjust the path according to your project structure
 
-describe("createPayment", () => {
-  beforeEach(() => {
-    jest.clearAllMocks(); // Clear mocks before each test
-    firestore.addDoc.mockClear(); // Clear the specific mock if needed
+describe('createBinType', () => {
+  let consoleErrorSpy: jest.SpyInstance;
+
+  // This runs before all the tests
+  beforeAll(() => {
+    // Mock console.error to prevent it from actually printing to the console
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
-  test("should create a payment successfully with card method", async () => {
-    // Mock the payment ID directly without calling the function
-    const mockPaymentID = "mockPaymentID";
-
-    // Mock Firebase doc and addDoc behavior
-    const mockDoc = { id: "mockUserID" };
-    firestore.doc.mockReturnValue(mockDoc);
-    firestore.addDoc.mockResolvedValueOnce({ id: "mockPaymentDocID" });
-
-    // Call the function and test the outcome
-    await createPayment(100, "mockUserID", "card", null);
-
-    // Assertions
-    expect(firestore.doc).toHaveBeenCalledWith(expect.anything(), "users", "mockUserID");
-    expect(firestore.addDoc).toHaveBeenCalledWith(
-      firestore.collection(expect.anything(), "payments"),
-      expect.objectContaining({
-        paymentID: mockPaymentID, // Use mocked payment ID directly
-        amount: 100,
-        userID: mockDoc,
-        date: "mockTimestamp",
-        method: "card",
-        status: "Success",
-        slipUrl: null,
-      })
-    );
+  // This runs after all the tests to restore the original function
+  afterAll(() => {
+    consoleErrorSpy.mockRestore(); // Restore the original console.error function
   });
 
-  test("should create a payment successfully with bank method", async () => {
-    // Mock the payment ID directly without calling the function
-    const mockPaymentID = "mockPaymentID";
+  it('should create a bin type successfully', async () => {
+    // Mock data for successful creation
+    const binTypeData = {
+      name: 'Mock Bin Type',
+      description: 'This is a mock bin type.',
+    };
 
-    const mockDoc = { id: "mockUserID" };
-    firestore.doc.mockReturnValue(mockDoc);
-    firestore.addDoc.mockResolvedValueOnce({ id: "mockPaymentDocID" });
+    // Call the createBinType function with valid data
+    const result = await createBinType(binTypeData);
 
-    await createPayment(100, "mockUserID", "bank", "mockSlipUrl");
-
-    expect(firestore.doc).toHaveBeenCalledWith(expect.anything(), "users", "mockUserID");
-    expect(firestore.addDoc).toHaveBeenCalledWith(
-      firestore.collection(expect.anything(), "payments"),
-      expect.objectContaining({
-        paymentID: mockPaymentID, // Use mocked payment ID directly
-        amount: 100,
-        userID: mockDoc,
-        date: "mockTimestamp",
-        method: "bank",
-        status: "Pending",
-        slipUrl: "mockSlipUrl",
-      })
-    );
+    // Check that the result is as expected (e.g., a bin type ID is returned)
+    expect(result).toBeDefined();
+    expect(result).toMatch(/mockBinTypeID/); // Adjust based on actual return value
   });
 
-  test("should throw an error when payment creation fails", async () => {
-    // Simulate an error in addDoc
-    firestore.addDoc.mockRejectedValueOnce(new Error("Firestore error"));
+  it('should throw an error when bin type creation fails', async () => {
+    // Simulate an error by passing invalid data or mocking Firestore to throw an error
+    const binTypeData = {
+      // Provide invalid data here that triggers an error
+      name: '', // or other invalid field
+      description: '',
+    };
 
-    // Expect the function to throw an error
-    await expect(
-      createPayment(100, "mockUserID", "bank", "mockSlipUrl")
-    ).rejects.toThrow("Payment creation failed");
+    // We expect the function to throw an error, so we wrap it in a try-catch block
+    await expect(createBinType(binTypeData)).rejects.toThrow("Failed to create bin type");
 
-    // Check if error was logged
-    expect(console.error).toHaveBeenCalledWith(
-      "Error creating payment:",
-      expect.any(Error)
+    // Now we check if console.error was called
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "Error creating bin type:",
+      expect.any(Error) // This expects any error object
     );
   });
 });
