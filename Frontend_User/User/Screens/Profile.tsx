@@ -11,8 +11,10 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { getUserDetails } from "../../Controller/UserController";
+import { useNavigation } from "@react-navigation/native";
 
 const UserDetailsPage = () => {
+  const navigation = useNavigation();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -29,7 +31,7 @@ const UserDetailsPage = () => {
   }, []);
 
   const handleLogout = () => {
-    console.log("User logged out");
+    navigation.navigate("SignInPage");
   };
 
   if (!user) {
@@ -49,7 +51,7 @@ const UserDetailsPage = () => {
         <View style={styles.header}>
           <Image
             source={{
-              uri: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/placeholder-Ue5Ue5Ue5Ue5Ue5Ue5Ue5Ue5Ue5Ue5Ue5.png",
+              uri: "https://cdn-icons-png.flaticon.com/512/18/18148.png",
             }}
             style={styles.avatar}
           />
