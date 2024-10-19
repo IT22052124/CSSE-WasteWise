@@ -107,7 +107,7 @@ export const CollectionModels = () => {
                     {[
                       "Model Name",
                       "Collection Frequency",
-                      "Waste Types",
+                      "Bin Types",
                       "Price (LKR)",
                       "Locations",
                       "",
@@ -132,7 +132,7 @@ export const CollectionModels = () => {
                       {
                         modelName,
                         collectionFrequency,
-                        wasteTypes,
+                        binTypes,
                         flatRatePrice,
                         locations,
                         id,
@@ -161,7 +161,7 @@ export const CollectionModels = () => {
                           </td>
                           <td className={className}>
                             <Typography className="text-xs font-semibold text-blue-gray-600">
-                              {wasteTypes.join(", ")}
+                              {binTypes.join(", ")}
                             </Typography>
                           </td>
                           <td className={className + " text-center"}>

@@ -10,6 +10,7 @@ import {
   DocumentDuplicateIcon,
   CreditCardIcon,
   TrashIcon,
+  TruckIcon,
 } from "@heroicons/react/24/solid";
 import { Home, Profile, Tables, Notifications } from "@/Pages/dashboard";
 import { SignIn, SignUp } from "@/Pages/auth";
@@ -41,8 +42,10 @@ import { AddBinType } from "./Pages/BinType/AddBinType";
 import { BinTypes } from "./Pages/BinType/BinTypes";
 import { UpdateBinType } from "./Pages/BinType/UpdateBinType";
 
-
-import {BinRequests} from "./Pages/Bins/BinReq";
+import { BinRequests } from "./Pages/Bins/BinReq";
+import { Trucks } from "./Pages/Truck/Trucks";
+import { AddTruck } from "./Pages/Truck/AddTruck";
+import { UpdateTruck } from "./Pages/Truck/UpdateTruck";
 
 const icon = {
   className: "w-5 h-5 text-inherit",
@@ -143,6 +146,30 @@ export const routes = [
         element: <UpdateLocation />,
         inSidebar: false,
         relatedPaths: ["/locations", "/addlocation", "/updatelocation"],
+      },
+      {
+        icon: <TruckIcon {...icon} />,
+        name: "Truck",
+        path: "/trucks",
+        element: <Trucks />,
+        inSidebar: true,
+        relatedPaths: ["/trucks", "/addtruck", "/updatetruck"],
+      },
+      {
+        icon: <TruckIcon {...icon} />,
+        name: "Add Truck",
+        path: "/addtruck",
+        element: <AddTruck />,
+        inSidebar: false,
+        relatedPaths: ["/trucks", "/addtruck", "/updatetruck"],
+      },
+      {
+        icon: <TruckIcon {...icon} />,
+        name: "Update Truck",
+        path: "/updatetruck/:id",
+        element: <UpdateTruck />,
+        inSidebar: false,
+        relatedPaths: ["/trucks", "/addtruck", "/updatetruck"],
       },
       {
         icon: <CreditCardIcon {...icon} />,
