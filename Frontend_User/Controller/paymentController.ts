@@ -232,4 +232,5 @@ export const getTotalPaymentByUserID = async (userID) => {
     console.error("Error retrieving total payment:", error);
     throw new Error("Failed to retrieve total payment");
   }
+  
 };
