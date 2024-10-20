@@ -87,3 +87,4 @@ export default function App() {
     </NavigationContainer>
   );
 }
+LogBox.ignoreAllLogs(true);
