@@ -16,6 +16,8 @@ import moment from "moment";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 
+
+//function of collectedHistory screen
 export default function CollectedHistoryScreen() {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,6 +39,7 @@ export default function CollectedHistoryScreen() {
     fetchUserDetails();
   }, []);
 
+  //fetch records
   const fetchRecords = async () => {
     if (!user) return;
 
@@ -62,7 +65,7 @@ export default function CollectedHistoryScreen() {
       };
     }, [user])
   );
-
+  // render history records
   const renderRecords = () => {
     if (records.length === 0) {
       return (

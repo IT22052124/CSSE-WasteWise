@@ -58,6 +58,7 @@ export default function LoginScreen() {
       });
       navigation.navigate('MainTabs'); //navigate to maintabs after login
     } else {
+       //toast appears when user login fails
       Toast.show({
         type: 'error',
         text1: 'Login Failed',

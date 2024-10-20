@@ -13,11 +13,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { getCollectorDetails } from "../controller/collectorController";
 import { useNavigation } from "@react-navigation/native";
 
+//user details page
 const UserDetailsPage = () => {
   const [user, setUser] = useState(null);
   const navigation = useNavigation();
 
-
+//functions to get collector details
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
@@ -36,7 +37,7 @@ const UserDetailsPage = () => {
     // navigate to login screen
     navigation.navigate('Login');
   };
-
+ //info card for user details
   const InfoCard = ({ icon, label, value, bgColor }) => (
     <View style={styles.infoCard}>
       <View style={[styles.iconContainer, { backgroundColor: bgColor }]}>

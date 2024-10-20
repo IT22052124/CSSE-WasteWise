@@ -5,6 +5,7 @@ import { getTrucksForCollector, getLocationsByIds } from '../controller/TruckCon
 import { getCollectorDetails } from "../controller/collectorController";
 import moment from 'moment'; // For formatting the current date
 
+//Truck interface
 type Truck = {
   id: string;
   truckId: string;
@@ -28,7 +29,8 @@ export default function HomeScreen() {
   const [trucks, setTrucks] = useState<Truck[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [currentDate, setCurrentDate] = useState<string>(moment().format('MMMM Do YYYY, dddd')); // Get today's date
-
+  
+  //get collector details
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
@@ -43,6 +45,8 @@ export default function HomeScreen() {
     fetchUserDetails();
   }, []);
 
+
+  //Get trucks assigned details
   useEffect(() => {
     const fetchTrucks = async () => {
       try {
@@ -64,6 +68,7 @@ export default function HomeScreen() {
     }
   }, [collectorId]);
 
+  // render the details of truck assigned
   const renderItem = ({ item }: { item: Truck }) => {
     return (
       <Animated.View style={styles.truckItem}>
@@ -155,6 +160,8 @@ export default function HomeScreen() {
   );
 }
 
+
+//styles for the screen
 const styles = StyleSheet.create({
   container: {
     flex: 1,
