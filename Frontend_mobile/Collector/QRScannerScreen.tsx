@@ -33,16 +33,30 @@ export default function QRScannerScreen() {
     try {
       console.log('Scanned data:', data); // Log the scanned data
       const binData = await findBinByID(data);
+      
+      if (!binData) {
+        // Handle case where binData is null or undefined
+        Toast.show({
+          type: 'error',
+          text1: 'No Bin Found',
+          text2: 'The scanned bin ID does not match any records.',
+          visibilityTime: 3000, // Show for 3 seconds
+        });
+        setScanned(false); // Allow scanning again
+        return; // Exit the function
+      }
+
       Toast.show({
         type: 'success',
-        text1: 'Scan is Scanned',
+        text1: 'Scan Successful',
+        text2: 'Bin data retrieved successfully.',
         visibilityTime: 3000, // Show for 3 seconds
-
       });
       navigation.navigate('BinData', { binData });
     } catch (error) {
       Alert.alert('Error', 'Failed to fetch bin data. Please try again.');
       console.error(error);
+      setScanned(false); // Allow scanning again
     }
   };
 
@@ -71,7 +85,7 @@ export default function QRScannerScreen() {
       />
       {scanned && (
         <TouchableOpacity style={styles.scanAgainButton} onPress={() => setScanned(false)}>
-          <Text style={styles.scanAgainText}>Tap to Scan </Text>
+          <Text style={styles.scanAgainText}>Tap to Scan Again</Text>
         </TouchableOpacity>
       )}
     </View>
@@ -99,7 +113,7 @@ const styles = StyleSheet.create({
     left: 20,
     right: 20,
     padding: 20,
-    backgroundColor: '#2ecc71', // Blue background for scan again button
+    backgroundColor: '#2ecc71', // Green background for scan again button
     borderRadius: 10,
     alignItems: 'center',
     elevation: 5, // Shadow effect

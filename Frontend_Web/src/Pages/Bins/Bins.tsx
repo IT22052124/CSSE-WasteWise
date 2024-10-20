@@ -31,7 +31,7 @@ export const Bins = () => {
     fetchData(); // Initial fetch
 
     // Set up interval for fetching data every 10 seconds
-    const intervalId = setInterval(fetchData, 10000000); // 10000 ms = 10 seconds
+    const intervalId = setInterval(fetchData, 10000); // 10000 ms = 10 seconds
 
     // Cleanup function to clear the interval on component unmount
     return () => clearInterval(intervalId);
