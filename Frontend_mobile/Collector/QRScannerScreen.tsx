@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     left: 20,
     right: 20,
     padding: 20,
-    backgroundColor: '#2ecc71', // Green background for scan again button
+    backgroundColor: '#3498DB', // Green background for scan again button
     borderRadius: 10,
     alignItems: 'center',
     elevation: 5, // Shadow effect
