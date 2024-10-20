@@ -1,14 +1,20 @@
 import { useState, useRef  } from "react";
 import { Typography, Button } from "@material-tailwind/react"; 
-import { collection, query, where, getDocs, getDoc } from "firebase/firestore";
-import { db } from "@/storage/firebase"; // Your Firebase config
 import { jsPDF } from "jspdf";
 import * as XLSX from "xlsx";
 import Papa from "papaparse";
-import { isWithinInterval, format } from 'date-fns'; // Importing necessary functions
+import {
+  fetchWasteCollectionData,
+  fetchRouteOptimizationData,
+  fetchWasteTrendsData,
+  fetchRecyclableWasteData,
+  fetchAccountPaymentData,
+} from "@/controllers/reportController"; // Importing the report controller functions
 import "jspdf-autotable"; // Importing jsPDF AutoTable plugin
 import { BarChart, Bar, LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend } from "recharts"; // For chart rendering
 import html2canvas from "html2canvas"; // For capturing charts as images
+
+
 
 export const CreateReportForm = () => {
   const chartContainerRef = useRef(null); // Create a ref
@@ -46,28 +52,36 @@ export const CreateReportForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Check for valid date inputs
+    const fromDate = new Date(formData.fromDate);
+    const toDate = new Date(formData.toDate);
+
+    if (fromDate > toDate) {
+      alert("From Date cannot be greater than To Date.");
+      return;
+    }
+
     let fetchedData = [];
     switch (formData.reportType) {
       case "Waste Collection Summary Reports":
-        fetchedData = await fetchWasteCollectionData();
+        fetchedData = await fetchWasteCollectionData(fromDate, toDate);
         break;
       case "Route Optimization Reports":
-        fetchedData = await fetchRouteOptimizationData();
+        fetchedData = await fetchRouteOptimizationData(fromDate, toDate);
         break;
       case "Waste Generation Trends":
-        fetchedData = await fetchWasteTrendsData();
+        fetchedData = await fetchWasteTrendsData(fromDate, toDate);
         break;
       case "Recyclable Waste Collection Reports":
-        fetchedData = await fetchRecyclableWasteData();
+        fetchedData = await fetchRecyclableWasteData(fromDate, toDate);
         break;
       case "Account and Payment Reports":
-        fetchedData = await fetchAccountPaymentData();
+        fetchedData = await fetchAccountPaymentData(fromDate, toDate);
         break;
       default:
         console.error("Invalid report type");
         return;
     }
-    
     setReportData(fetchedData); // Store the data in state for rendering
     // Prepare chart data for rendering if the view is Chart or Graph
     if (formData.reportView === "Chart" || formData.reportView === "Graph") {
@@ -79,14 +93,12 @@ export const CreateReportForm = () => {
   const reportConfig = {
    "Waste Collection Summary Reports": {
   fields: [
-    { key: "address", label: "Location" },
-    { key: "wasteWeight", label: "Waste Amount (kg)" },
-    { key: "userEmail", label: "User Email" },
+    { key: "totalWasteCollected", label: "Waste Amount (kg)" },
     { key: "collectorName", label: "Collector Name" }, // Added collector name
-    { key: "binType", label: "Bin Type" }, // Added bin type
-    { key: "wasteType", label: "Waste Type" } // Added waste type
+    { key: "collectorID", label: "Collector ID" }, // Added collector ID
+    { key: "binTypes", label: "Waste Type" }, // Added collector name
   ],
-  summaryField: "wasteWeight",
+  summaryField: "totalWasteCollected",
   summaryText: "Total Waste Collected"
 },
 
@@ -100,10 +112,10 @@ export const CreateReportForm = () => {
     },
     "Waste Generation Trends": {
       fields: [
-        { key: "date", label: "Date" },
-        { key: "wasteGenerated", label: "Waste Generated (kg)" }
+        { key: "binType", label: "Bin Type" },
+        { key: "totalWasteLevel", label: "Waste Generated (kg)" }
       ],
-      summaryField: "wasteGenerated",
+      summaryField: "totalWasteLevel",
       summaryText: "Total Waste Generated"
     },
     "Recyclable Waste Collection Reports": {
@@ -116,147 +128,16 @@ export const CreateReportForm = () => {
     },
     "Account and Payment Reports": {
       fields: [
-        { key: "paymentID", label: "Payment ID" },
-        { key: "amount", label: "Amount" },
-        { key: "status", label: "Status" },
+        { key: "username", label: "User ID" },
+        { key: "totalAmount", label: "Amount" },
         { key: "userEmail", label: "User Email" }
       ],
-      summaryField: "amount",
+      summaryField: "totalAmount",
       summaryText: "Total Amount Earned"
     }
   };
   
   
-  const fetchWasteCollectionData = async () => {
-    const fromDate = new Date(formData.fromDate);
-    const toDate = new Date(formData.toDate);
-  
-    const q = query(
-      collection(db, "wasteCollection"),
-      where("collectedAt", ">=", fromDate),
-      where("collectedAt", "<=", toDate)
-    );
-  
-    const querySnapshot = await getDocs(q);
-    let collectorData = {};
-  
-    console.log("Query Snapshot Size:", querySnapshot.size); // Log the number of documents retrieved
-  
-    querySnapshot.forEach((doc) => {
-      const wasteData = doc.data();
-      console.log("Document Data:", wasteData); // Log the entire document data
-  
-      if (wasteData && wasteData.collectorname && wasteData.wasteWeight) {
-        const collectorName = wasteData.collectorname;
-        const wasteWeight = wasteData.wasteWeight;
-  
-        // Aggregate waste weight by collector
-        if (collectorData[collectorName]) {
-          collectorData[collectorName] += wasteWeight;
-        } else {
-          collectorData[collectorName] = wasteWeight;
-        }
-      } else {
-        console.warn("No valid data for document:", doc.id);
-      }
-    });
-  
-    const result = Object.entries(collectorData).map(([collectorName, totalWaste]) => ({
-      collectorName,
-      totalWasteCollected: totalWaste,
-    }));
-  
-    console.log("Retrieved Collector Data:", result); // Log the aggregated data
-    return result;
-  };
-  
-  
-  
-  
-
-  const fetchRouteOptimizationData = async () => {
-    const q = query(
-      collection(db, "routeCollection"),
-      where("timestamp", ">=", formData.fromDate),
-      where("timestamp", "<=", formData.toDate)
-    );
-    const querySnapshot = await getDocs(q);
-    let data = [];
-    querySnapshot.forEach((doc) => {
-      data.push(doc.data());
-    });
-    return data;
-  };
-
-  const fetchWasteTrendsData = async () => {
-    const q = query(
-      collection(db, "wasteTrends"),
-      where("timestamp", ">=", formData.fromDate),
-      where("timestamp", "<=", formData.toDate)
-    );
-    const querySnapshot = await getDocs(q);
-    let data = [];
-    querySnapshot.forEach((doc) => {
-      data.push(doc.data());
-    });
-    return data;
-  };
-
-  const fetchRecyclableWasteData = async () => {
-    const q = query(
-      collection(db, "recyclableWaste"),
-      where("timestamp", ">=", formData.fromDate),
-      where("timestamp", "<=", formData.toDate)
-    );
-    const querySnapshot = await getDocs(q);
-    let data = [];
-    querySnapshot.forEach((doc) => {
-      data.push(doc.data());
-    });
-    return data;
-    
-  };
-
-  
-
-  const fetchAccountPaymentData = async () => {
-    // Convert user input dates (YYYY-MM-DD) to JavaScript Date objects
-    const fromDate = new Date(formData.fromDate);
-    const toDate = new Date(formData.toDate);
-  
-    const q = query(
-      collection(db, "payments"),
-      where("status", "==", "Success") // Filter by status "Success"
-    );
-    const querySnapshot = await getDocs(q);
-    let data = [];
-  
-    // Loop through each payment document
-    for (const docSnapshot of querySnapshot.docs) {
-      const paymentData = docSnapshot.data();
-  
-      // Convert Firestore timestamp to a JavaScript Date object
-      const paymentDate = paymentData.date.toDate(); // Convert Firestore timestamp to Date
-  
-      // Check if paymentDate is within the specified range
-      if (isWithinInterval(paymentDate, { start: fromDate, end: toDate })) {
-        // Fetch the referred user's email
-        const userRef = paymentData.userID; // Firestore document reference for user
-        const userDoc = await getDoc(userRef); // Get user document
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          paymentData.userEmail = userData.email; // Add user email to payment data
-        } else {
-          paymentData.userEmail = "User not found"; // Handle missing user
-        }
-  
-        data.push(paymentData);
-      }
-    }
-  
-    console.log(data); // Display filtered data with user email
-    return data;
-  };
   
   
 
@@ -379,29 +260,66 @@ doc.addImage(imgData, "PNG", 10, startY + 20, 180, 160);
     document.body.removeChild(link);
   };
 
-  // Render a table view using Recharts
-  const ChartView = ({ data }) => (
+// Function to get the X-axis data key based on the report type
+const getXAxisDataKey = (reportType) => {
+  const fields = reportConfig[formData.reportType]?.fields || [];
+
+  console.log(`Fields for ${formData.reportType}:`, fields);
+
+  // Ensure we have fields to work with
+  if (fields.length === 0) {
+    console.warn(`No fields found for report type: ${formData.reportType}`);
+    return "defaultKey"; // Replace with a valid key from your data
+  }
+
+  // Logic to determine the dataKey based on report type
+  switch (reportType) {
+    case "Waste Collection Summary Reports":
+      return fields.find(field => field.key === "collectorID")?.key || fields[0].key;
+    case "Account and Payment Reports":
+      return fields.find(field => field.key === "userEmail")?.key || fields[0].key;
+    case "Waste Generation Trends":
+      return fields.find(field => field.key === "binType")?.key || fields[0].key; // Adjust for waste trends
+    default:
+      return fields[0].key; // Fallback to the first field if none matched
+  }
+};
+
+// Render a table view using Recharts
+const ChartView = ({ data, reportType }) => {
+  const xAxisDataKey = getXAxisDataKey(formData.reportType);
+  console.log(`ChartView X-Axis DataKey: ${xAxisDataKey}`);
+  console.log(`ChartView DataKey: ${reportConfig[formData.reportType]?.summaryField}`);
+
+  return (
     <BarChart width={500} height={300} data={data}>
       <CartesianGrid strokeDasharray="3 3" />
-      <XAxis dataKey="paymentID" />
+      <XAxis dataKey={xAxisDataKey} />
       <YAxis />
       <Tooltip />
       <Legend />
-      <Bar dataKey="amount" fill="#8884d8" />
+      <Bar dataKey={reportConfig[formData.reportType]?.summaryField} fill="#8884d8" />
     </BarChart>
   );
+};
 
-  // Render a graph view using Recharts
-  const GraphView = ({ data }) => (
+// Render a graph view using Recharts
+const GraphView = ({ data, reportType }) => {
+  const xAxisDataKey = getXAxisDataKey(formData.reportType);
+  console.log(`GraphView X-Axis DataKey: ${xAxisDataKey}`);
+
+  return (
     <LineChart width={500} height={300} data={data}>
       <CartesianGrid strokeDasharray="3 3" />
-      <XAxis dataKey="paymentID" />
+      <XAxis dataKey={xAxisDataKey} />
       <YAxis />
       <Tooltip />
       <Legend />
-      <Line type="monotone" dataKey="amount" stroke="#8884d8" />
+      <Line type="monotone" dataKey={reportConfig[formData.reportType]?.summaryField} stroke="#8884d8" />
     </LineChart>
   );
+};
+
 
    return (
     <div className="w-full max-w-2xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
