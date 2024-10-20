@@ -159,7 +159,7 @@ export const BinTypes = () => {
                       </td>
                       <td className={className + " text-center"}>
                         <Typography className="text-xs font-semibold text-blue-gray-600">
-                          {chargingPerKg}
+                          {parseFloat(chargingPerKg).toFixed(2)}
                         </Typography>
                       </td>
                       <td className={`${className} text-center align-middle`}>
