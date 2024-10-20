@@ -149,7 +149,8 @@ export const AddBin = () => {
     };
 
     try {
-      await addBin(binData);
+      // add new bin 
+      await addBin(binData); 
 
       // Update the status of the bin request using the requestID
       if (formData.requestID) {
@@ -255,14 +256,15 @@ export const AddBin = () => {
         {/* QR Code */}
         
         <div
-  ref={qrCodeRef}
-  className="mt-8 p-4 bg-white shadow-md rounded-lg flex flex-col justify-center items-center" // Changed flex direction to column
->
-  <Typography variant="h6" className="text-center mb-4">
-    Bin ID: {formData.binID}
-  </Typography>
-  <QRCodeCanvas value={`${formData.binID}`} />
-</div>
+        ref={qrCodeRef}
+        className="mt-8 p-4 bg-white shadow-md rounded-lg flex flex-col justify-center items-center" // Changed flex direction to column
+        >
+
+       <Typography variant="h6" className="text-center mb-4">
+        Bin ID: {formData.binID}
+       </Typography>
+       <QRCodeCanvas value={`${formData.binID}`} />
+       </div>
         
         <Button onClick={downloadQRCode} className="mt-4 w-full">
           Download QR Code
@@ -272,4 +274,4 @@ export const AddBin = () => {
   );
 };
 
-export default AddBin;
+export default AddBin; //export addbin module

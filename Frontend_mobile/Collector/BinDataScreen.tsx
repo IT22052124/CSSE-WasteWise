@@ -19,6 +19,7 @@ import { getCollectorDetails } from "../controller/collectorController";
 import { resetBinWasteLevel } from "../controller/BinController";
 import { LogBox } from 'react-native';
 
+//funcion for Bin Data screen
 export default function BinDataScreen({ route }) {
   const [user, setUser] = useState(null);
   const { binData } = route.params;
@@ -93,7 +94,7 @@ LogBox.ignoreLogs([
       throw new Error("Failed to generate collectionID");
     }
   };
-
+//store the values to send for the collection
   const handleCollectWaste = async () => {
     try {
       const newCollectionID = await generateNextCollectionID();
@@ -113,8 +114,8 @@ LogBox.ignoreLogs([
         PerKg: amount.chargingPerKg,
       };
 
-      await addWasteCollection(collectionDetails);
-      await resetBinWasteLevel(binData.id);
+      await addWasteCollection(collectionDetails); //add waste collection
+      await resetBinWasteLevel(binData.id); //reset bin level once the bin is collected
       navigation.navigate("Home");
     } catch (error) {
       console.error("Failed to collect waste", error);
@@ -170,6 +171,7 @@ const InfoItem = ({ label, value }) => (
   </View>
 );
 
+//styles for the screen
 const styles = StyleSheet.create({
   container: {
     flex: 1,

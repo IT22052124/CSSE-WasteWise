@@ -15,6 +15,7 @@ LogBox.ignoreLogs([
 
 type QRScannerScreenNavigationProp = StackNavigationProp<RootStackParamList, 'MainTabs'>;
 
+//function 
 export default function QRScannerScreen() {
   const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
@@ -45,14 +46,14 @@ export default function QRScannerScreen() {
         setScanned(false); // Allow scanning again
         return; // Exit the function
       }
-
+      // Toast to show
       Toast.show({
         type: 'success',
         text1: 'Scan Successful',
         text2: 'Bin data retrieved successfully.',
         visibilityTime: 3000, // Show for 3 seconds
       });
-      navigation.navigate('BinData', { binData });
+      navigation.navigate('BinData', { binData }); // navigation to BinData Screen
     } catch (error) {
       Alert.alert('Error', 'Failed to fetch bin data. Please try again.');
       console.error(error);
@@ -63,7 +64,7 @@ export default function QRScannerScreen() {
   if (!permission) {
     return <View style={styles.container}><Text>Loading camera permissions...</Text></View>;
   }
-
+   //return when function permission is not granted
   if (!permission.granted) {
     return (
       <View style={styles.container}>
@@ -92,6 +93,7 @@ export default function QRScannerScreen() {
   );
 }
 
+//styles for the page
 const styles = StyleSheet.create({
   container: {
     flex: 1,

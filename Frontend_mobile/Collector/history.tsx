@@ -22,6 +22,8 @@ export default function CollectedHistoryScreen() {
   const [error, setError] = useState(null);
   const [user, setUser] = useState(null);
 
+
+  //function to get collector details
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {

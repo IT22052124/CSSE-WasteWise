@@ -31,8 +31,9 @@ const UserDetailsPage = () => {
     fetchUserDetails();
   }, []);
 
+//function to handle logout
   const handleLogout = () => {
-    // Implement logout logic here
+    // navigate to login screen
     navigation.navigate('Login');
   };
 
@@ -126,6 +127,7 @@ const UserDetailsPage = () => {
   );
 };
 
+// styles for the screen
 const styles = StyleSheet.create({
   container: {
     flex: 1,

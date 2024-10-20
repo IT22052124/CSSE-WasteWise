@@ -17,15 +17,17 @@ import Toast from 'react-native-toast-message';
 import { signInCollector } from '../controller/collectorController';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
 const { width, height } = Dimensions.get('window');
 
+
+//function for login screen 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
 
+  //intialization of navigation
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -36,6 +38,8 @@ export default function LoginScreen() {
     }).start();
   }, []);
 
+
+  //function to handle login
   const handleLogin = async () => {
     const response = await signInCollector(email, password);
 
@@ -45,13 +49,14 @@ export default function LoginScreen() {
       } catch (error) {
         console.error('Error saving user data: ', error);
       }
-
+      
+      //toast appears when user login sucess
       Toast.show({
         type: 'success',
         text1: 'Welcome!',
         text2: `Hello, ${response.collector.email || 'collector'}! Sign in successful.`,
       });
-      navigation.navigate('MainTabs');
+      navigation.navigate('MainTabs'); //navigate to maintabs after login
     } else {
       Toast.show({
         type: 'error',
@@ -127,6 +132,7 @@ export default function LoginScreen() {
   );
 }
 
+// styles for the screen
 const styles = StyleSheet.create({
   container: {
     flex: 1,
