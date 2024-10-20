@@ -43,6 +43,7 @@ export const createPayment = async (amount, userID, method, slipUrl) => {
   }
 };
 
+//get all payments done by a user
 export const getPaymentsByUserID = async (userID, method = null) => {
   try {
     // Step 1: Prepare the document reference for the userID
@@ -103,6 +104,7 @@ export const generatePaymentID = async () => {
   return `P${String(nextID).padStart(4, "0")}`;
 };
 
+//get all cost for waste collection by user
 export const getWasteCollectionsByUserID = async (userID) => {
   try {
     // Step 1: Prepare the document reference for the userID
@@ -212,6 +214,7 @@ export const getWasteCollectionsByUserID = async (userID) => {
   }
 };
 
+//get all payment done by a user
 export const getTotalPaymentByUserID = async (userID) => {
   try {
     // Step 1: Prepare the document reference for the userID
