@@ -8,6 +8,7 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { getCollectionModels } from "@/controllers/CollectionModelController";
 import Toast from "@/components/Toast/Toast";
+import { PulseLoader } from "react-spinners";
 
 const customIcon = L.icon({
   iconUrl: "https://leafletjs.com/examples/custom-icons/leaf-green.png",
@@ -354,7 +355,11 @@ export const AddLocation = () => {
             type="submit"
             disabled={loading || !isFormValid}
           >
-            Save Location
+            {loading ? (
+              <PulseLoader size={10} color="#ffffff" />
+            ) : (
+              "Save Location"
+            )}
           </Button>
         </form>
       </div>

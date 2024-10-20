@@ -8,10 +8,12 @@ import { useMaterialTailwindController } from "@/context";
 import { useNavigate } from "react-router-dom";
 import { getBinTypes } from "@/controllers/BinTypeController";
 import Toast from "@/components/Toast/Toast";
+import { PulseLoader } from "react-spinners";
 export const AddCollectionModel = () => {
   const [controller] = useMaterialTailwindController();
   const navigate = useNavigate();
   const { sidenavColor } = controller;
+  const [loading, setloading] = useState(false);
   const [formData, setFormData] = useState({
     modelName: "",
     collectionFrequency: "Weekly",
@@ -198,7 +200,7 @@ export const AddCollectionModel = () => {
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    setloading(true);
     if (!isFormValid()) {
       return;
     }
@@ -207,6 +209,7 @@ export const AddCollectionModel = () => {
       await addCollectionModel(formData);
       navigate("/dashboard/collectionmodels");
       Toast("Collection model added successfully", "success");
+      setloading(false);
     } catch (error) {
       console.error("Failed to add collection model", error);
     }
@@ -420,9 +423,15 @@ export const AddCollectionModel = () => {
             }
             fullWidth
             type="submit"
-            disabled={!isFormValid()}
+            disabled={loading || !isFormValid()}
           >
-            Save Collection Model
+            {loading ? (
+              <>
+                <PulseLoader size={10} color="#ffffff" />
+              </>
+            ) : (
+              "Save Collection Model"
+            )}
           </Button>
         </form>
       </div>

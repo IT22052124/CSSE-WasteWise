@@ -7,11 +7,13 @@ import {
 import { useMaterialTailwindController } from "@/context";
 import { useNavigate } from "react-router-dom";
 import Toast from "@/components/Toast/Toast";
+import { PulseLoader } from "react-spinners";
 
 export const AddWasteType = () => {
   const [controller] = useMaterialTailwindController();
   const navigate = useNavigate();
   const { sidenavColor } = controller;
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     wasteType: "",
@@ -87,6 +89,7 @@ export const AddWasteType = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
 
     if (!isFormValid()) {
       return;
@@ -96,6 +99,7 @@ export const AddWasteType = () => {
       await addWasteType(formData);
       navigate("/dashboard/wastetypes");
       Toast("Waste type added successfully", "success");
+      setloading(false);
     } catch (error) {
       console.error("Failed to add waste type", error);
     }
@@ -229,9 +233,15 @@ export const AddWasteType = () => {
             }
             fullWidth
             type="submit"
-            disabled={!isFormValid()}
+            disabled={loading || !isFormValid()}
           >
-            Save Waste Type
+            {loading ? (
+              <>
+                <PulseLoader size={10} color="#ffffff" />
+              </>
+            ) : (
+              "Save Waste Type"
+            )}
           </Button>
         </form>
       </div>
