@@ -29,6 +29,7 @@ export default function SignInPage() {
     updatePageViews();
   });
 
+  //handle sign in
   const handleSignIn = async () => {
     const response = await signInUser(email, password);
     if (response.success) {

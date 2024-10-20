@@ -37,6 +37,7 @@ const PaymentPage = ({ route }) => {
   const [userID, setUserID] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  //get user details
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
@@ -55,6 +56,7 @@ const PaymentPage = ({ route }) => {
   const outstandingAmount = 1050.0;
   const currentYear = new Date().getFullYear() % 100; // Get last two digits of current year
 
+  //handle the card expiry date change
   const handleExpiryDateChange = (text) => {
     let formatted = text.replace(/[^0-9]/g, "");
     if (formatted.length > 0) {
@@ -92,6 +94,7 @@ const PaymentPage = ({ route }) => {
     setBankSlip(null);
   };
 
+  //make payment
   const submitPayment = async () => {
     if (!paymentAmount || parseFloat(paymentAmount) <= 0) {
       Toast.show({

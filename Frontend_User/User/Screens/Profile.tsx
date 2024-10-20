@@ -17,6 +17,7 @@ const UserDetailsPage = () => {
   const navigation = useNavigation();
   const [user, setUser] = useState(null);
 
+  //get user details
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {

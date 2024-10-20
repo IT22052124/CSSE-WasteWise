@@ -23,6 +23,7 @@ const PaymentHistoryPage = () => {
   const [loading, setLoading] = useState(true)
   const [userID, setUserID] = useState(null)
 
+  //get user details
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
@@ -36,6 +37,7 @@ const PaymentHistoryPage = () => {
     fetchUserDetails()
   }, [])
 
+  //get all payments of user
   const fetchPayments = async () => {
     if (!userID) return
 

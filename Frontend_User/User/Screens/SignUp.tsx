@@ -31,6 +31,7 @@ export default function SignUpPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigation = useNavigation();
 
+  //validate sign up form
   const validateForm = () => {
     if (
       !username ||
@@ -98,6 +99,7 @@ export default function SignUpPage() {
     return true;
   };
 
+  //check if the user exists
   const checkExistingUser = async () => {
     try {
       const [existingUsernames, existingEmails] = await Promise.all([

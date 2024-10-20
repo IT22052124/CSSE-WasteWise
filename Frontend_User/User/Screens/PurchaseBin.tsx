@@ -41,6 +41,7 @@ const BinPurchasePage = () => {
   const [wasteTypes, setWasteTypes] = useState([]);
   const navigation = useNavigation();
 
+  //generate reference number for slip
   const generateRefNumber = (length: number): string => {
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let refNumber = "";
@@ -51,6 +52,7 @@ const BinPurchasePage = () => {
     return refNumber;
   };
 
+  //generate pdf for slip
   const generatePDF = async () => {
     try {
       const userDetails = await getUserDetails();

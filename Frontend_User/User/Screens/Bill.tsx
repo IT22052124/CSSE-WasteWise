@@ -34,6 +34,7 @@ export default function BillHistory() {
   const [totalPayment, setTotalPayment] = useState(0);
   const [finalToPaid, setFinalToPaid] = useState(0);
 
+  //get user details
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
@@ -47,6 +48,7 @@ export default function BillHistory() {
     fetchUserDetails();
   }, []);
 
+  //get bills of user
   const fetchBills = async () => {
     try {
       const userData = await getUserDetails();
@@ -68,6 +70,7 @@ export default function BillHistory() {
     }
   };
 
+  //get total payment of user
   const fetchPayments = async () => {
     try {
       const userData = await getUserDetails();
@@ -83,6 +86,7 @@ export default function BillHistory() {
     }
   };
 
+  //render on focus
   useFocusEffect(
     React.useCallback(() => {
       fetchBills();
