@@ -30,6 +30,7 @@ export const Payments = () => {
     null
   ); // State to hold the selected payment ID
 
+  //format the date
   const formattedDate = (timestamp) => {
     if (timestamp instanceof Timestamp) {
       return timestamp.toDate().toLocaleDateString("en-US", {
@@ -64,9 +65,7 @@ export const Payments = () => {
 
         setPayments((prevPayments) =>
           prevPayments.map((payment) =>
-            payment.id === selectedPaymentId
-              ? { ...payment, status }
-              : payment
+            payment.id === selectedPaymentId ? { ...payment, status } : payment
           )
         );
         Swal.fire({
@@ -98,36 +97,6 @@ export const Payments = () => {
 
     fetchData();
   }, [payments]);
-
-  const handleDelete = async (id) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        try {
-          const fetch = async () => {
-            await deleteWasteType(id);
-            const updatedWasteTypes = await getWasteTypes();
-            setWasteTypes(updatedWasteTypes);
-          };
-          fetch();
-        } catch (error) {
-          console.error("Error deleting waste type:", error);
-        }
-        Swal.fire({
-          title: "Deleted!",
-          text: "Your file has been deleted.",
-          icon: "success",
-        });
-      }
-    });
-  };
 
   return (
     <div className="mt-12 mb-8 flex flex-col gap-12 min-h-screen">

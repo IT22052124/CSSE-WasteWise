@@ -16,7 +16,6 @@ export const UpdateBinType = () => {
   const { sidenavColor } = controller;
   const [isLoading, setIsLoading] = useState(false);
 
-
   const [formData, setFormData] = useState({
     binType: "",
     recyclable: false,
@@ -34,6 +33,7 @@ export const UpdateBinType = () => {
   const [wasteTypes, setWasteTypes] = useState([]);
   const [waste, setWaste] = useState([]);
 
+  //get the bin details to update
   useEffect(() => {
     const fetchData = async () => {
       try {
