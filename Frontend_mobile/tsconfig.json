@@ -3,11 +3,6 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
-    "esModuleInterop": true, // Enable compatibility with CommonJS
-    "jsx": "react",          // Set JSX option for React
-    "target": "esnext",      // Optional: Set to the latest ECMAScript version
-    "module": "esnext",      // Optional: Set module system
-    "lib": ["es6", "dom"],   // Optional: Include standard libraries
-    "skipLibCheck": true      // Optional: Skip type checking of declaration files
+    "jsx": "react"
   }
 }
