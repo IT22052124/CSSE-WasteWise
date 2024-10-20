@@ -127,18 +127,18 @@ export const CreateReportForm = () => {
   };
   
   
-
   const fetchWasteCollectionData = async () => {
     const fromDate = new Date(formData.fromDate);
     const toDate = new Date(formData.toDate);
   
     const q = query(
       collection(db, "wasteCollection"),
-      
+      where("collectedAt", ">=", fromDate),
+      where("collectedAt", "<=", toDate)
     );
   
     const querySnapshot = await getDocs(q);
-    let data = [];
+    let collectorData = {};
   
     console.log("Query Snapshot Size:", querySnapshot.size); // Log the number of documents retrieved
   
@@ -146,22 +146,28 @@ export const CreateReportForm = () => {
       const wasteData = doc.data();
       console.log("Document Data:", wasteData); // Log the entire document data
   
-      if (wasteData) {
-        data.push({
-          address: wasteData.User?.address || "N/A", // Use optional chaining to access User.address
-          wasteWeight: wasteData.wasteWeight || 0,   // Use wasteWeight instead of wasteLevel
-          userEmail: wasteData.User?.email || "N/A",  // Access User.email
-          collectorName: wasteData.collectorname || "N/A", // Use correct case for collectorname
-          binType: wasteData.WasteType?.binType || "N/A", // Assuming BinTypeRef is the correct property
-          wasteType: wasteData.WasteType?.wasteTypes || "N/A" // Accessing WasteType.id for waste type
-        });
+      if (wasteData && wasteData.collectorname && wasteData.wasteWeight) {
+        const collectorName = wasteData.collectorname;
+        const wasteWeight = wasteData.wasteWeight;
+  
+        // Aggregate waste weight by collector
+        if (collectorData[collectorName]) {
+          collectorData[collectorName] += wasteWeight;
+        } else {
+          collectorData[collectorName] = wasteWeight;
+        }
       } else {
-        console.warn("No data found for document:", doc.id);
+        console.warn("No valid data for document:", doc.id);
       }
     });
   
-    console.log("Retrieved Data:", data); // Log the retrieved data
-    return data;
+    const result = Object.entries(collectorData).map(([collectorName, totalWaste]) => ({
+      collectorName,
+      totalWasteCollected: totalWaste,
+    }));
+  
+    console.log("Retrieved Collector Data:", result); // Log the aggregated data
+    return result;
   };
   
   
