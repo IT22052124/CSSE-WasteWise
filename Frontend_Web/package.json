@@ -17,12 +17,16 @@
     "apexcharts": "3.44.0",
     "axios": "^1.7.7",
     "bcryptjs": "^2.4.3",
+    "date-fns": "^4.1.0",
     "expo-camera": "^15.0.16",
     "firebase": "^10.14.1",
     "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.4",
     "leaflet": "^1.9.4",
     "leaflet-geosearch": "^4.0.0",
     "lodash": "^4.17.21",
+    "papaparse": "^5.4.1",
     "prop-types": "^15.8.1",
     "qrcode.react": "^4.0.1",
     "react": "^18.3.1",
@@ -33,7 +37,9 @@
     "react-router-dom": "^6.27.0",
     "react-spinners": "^0.14.1",
     "react-toastify": "^10.0.6",
-    "sweetalert2": "^11.14.3"
+    "recharts": "^2.13.0",
+    "sweetalert2": "^11.14.3",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.11.1",

@@ -43,6 +43,8 @@ import { AddBinType } from "./Pages/BinType/AddBinType";
 import { BinTypes } from "./Pages/BinType/BinTypes";
 import { UpdateBinType } from "./Pages/BinType/UpdateBinType";
 
+import { CreateReportForm } from "./Pages/Report/AddReport";
+
 import { BinRequests } from "./Pages/Bins/BinReq";
 import { Trucks } from "./Pages/Truck/Trucks";
 import { AddTruck } from "./Pages/Truck/AddTruck";
@@ -261,5 +263,45 @@ export const routes = [
     ],
   },
   
+      {
+        icon: <DocumentDuplicateIcon {...icon} />,
+        name: "Report",
+        path: "/report",
+        element: <CreateReportForm />,
+        inSidebar: true,
+        relatedPaths: ["/report"],
+      },
+      {
+        icon: <InformationCircleIcon {...icon} />,
+        name: "notifications",
+        path: "/notifications",
+        element: <Notifications />,
+        inSidebar: true,
+        relatedPaths: ["/notifications"],
+      },
+    ],
+  },
+  {
+    title: "auth pages",
+    layout: "auth",
+    pages: [
+      {
+        icon: <ServerStackIcon {...icon} />,
+        name: "sign in",
+        path: "/sign-in",
+        element: <SignIn />,
+        inSidebar: true,
+        relatedPaths: ["/sign-in"],
+      },
+      {
+        icon: <RectangleStackIcon {...icon} />,
+        name: "sign up",
+        path: "/sign-up",
+        element: <SignUp />,
+        inSidebar: true,
+        relatedPaths: ["/sign-up"],
+      },
+    ],
+  },
 ];
 export default routes;

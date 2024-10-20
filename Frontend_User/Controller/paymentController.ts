@@ -82,7 +82,7 @@ export const getPaymentsByUserID = async (userID, method = null) => {
 };
 
 // Function to generate the next Payment ID
-const generatePaymentID = async () => {
+export const generatePaymentID = async () => {
   const paymentQuery = query(
     collection(db, "payments"),
     orderBy("paymentID", "desc"), // Order by paymentID in descending order
@@ -140,6 +140,13 @@ export const getWasteCollectionsByUserID = async (userID) => {
 
       const amount = PerKg * wasteWeight;
       const payBackAmount = Payback * wasteWeight;
+
+      if (amount < 0 || payBackAmount < 0) {
+        console.error(
+          "Invalid calculation: Amount or Payback Amount is negative."
+        );
+        return; // Skip this iteration
+      }
 
       // Accumulate data by month
       if (!wasteData[month]) {
