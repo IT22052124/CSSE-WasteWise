@@ -29,10 +29,12 @@ export const WasteTypes = () => {
   const { sidenavColor } = controller;
   const [loading, setLoading] = useState(false);
 
+  // Fetch waste types
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
+        // Fetch waste types with bin info
         const data = await getWasteTypesWithBinInfo();
         setWasteTypes(data);
         setLoading(false);
@@ -44,6 +46,7 @@ export const WasteTypes = () => {
     fetchData();
   }, []);
 
+  // Delete a waste type
   const handleDelete = async (id) => {
     Swal.fire({
       title: "Are you sure?",

@@ -11,7 +11,8 @@ import {
 import { db } from "@/storage/firebase";
 import { updateCollectionModel } from "./CollectionModelController";
 
-export const addLocation = async (locationData) => {
+
+export const addLocation = async (locationData) => { // Add a new location
   try {
     // Add the new location
     const docRef = await addDoc(collection(db, "locations"), {
@@ -49,7 +50,7 @@ export const addLocation = async (locationData) => {
   }
 };
 
-export const getLocations = async () => {
+export const getLocations = async () => { // Fetch all locations
   try {
     const locationsCollection = collection(db, "locations");
     const locationsSnapshot = await getDocs(locationsCollection);
@@ -89,7 +90,7 @@ export const getLocations = async () => {
   }
 };
 
-export const getLocationById = async (id) => {
+export const getLocationById = async (id) => { // Fetch a location by ID
   try {
     const locationRef = doc(db, "locations", id);
     const locationDoc = await getDoc(locationRef);
@@ -111,7 +112,7 @@ export const getLocationById = async (id) => {
   }
 };
 
-export const updateLocation = async (id, updatedLocationData) => {
+export const updateLocation = async (id, updatedLocationData) => { // Update a location by ID
   try {
     const locationRef = doc(db, "locations", id);
     await updateDoc(locationRef, {

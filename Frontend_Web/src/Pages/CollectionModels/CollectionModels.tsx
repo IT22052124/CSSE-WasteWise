@@ -15,9 +15,9 @@ import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import {
   deleteCollectionModel,
   getCollectionModels,
-} from "@/controllers/CollectionModelController"; // Adjusted controller
+} from "@/controllers/CollectionModelController"; // Import the controller function
 import { useEffect, useState } from "react";
-import { useMaterialTailwindController } from "@/context";
+import { useMaterialTailwindController } from "@/context"; // import context
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import { Loader } from "@/components/Loader";
@@ -29,6 +29,7 @@ export const CollectionModels = () => {
   const { sidenavColor } = controller;
   const [loading, setLoading] = useState(false);
 
+  // Fetch collection models
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -44,6 +45,7 @@ export const CollectionModels = () => {
     fetchData();
   }, []);
 
+  // Delete a collection model
   const handleDelete = async (id) => {
     Swal.fire({
       title: "Are you sure?",

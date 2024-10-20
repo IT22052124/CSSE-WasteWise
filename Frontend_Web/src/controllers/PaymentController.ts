@@ -9,8 +9,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/storage/firebase";
 
-//get all payments
-export const getAllPayments = async () => {
+export const getAllPayments = async () => { // Fetch all payments
   try {
     const paymentsCollectionRef = collection(db, "payments");
 
@@ -64,21 +63,18 @@ export const getAllPayments = async () => {
   }
 };
 
-//update status of payemnt
-export const updatePaymentStatus = async (paymentId, newStatus) => {
+export const updatePaymentStatus = async (paymentId, newStatus) => { // Update payment status
   try {
     // Create a reference to the specific payment document
-    console.log(paymentId, newStatus);
+    console.log(paymentId, newStatus)
     const paymentDocRef = doc(db, "payments", paymentId);
-
+    
     // Update the payment status
     await updateDoc(paymentDocRef, {
       status: newStatus,
     });
 
-    console.log(
-      `Payment status updated to ${newStatus} for payment ID: ${paymentId}`
-    );
+    console.log(`Payment status updated to ${newStatus} for payment ID: ${paymentId}`);
   } catch (error) {
     console.error("Error updating payment status:", error);
     throw new Error("Failed to update payment status");

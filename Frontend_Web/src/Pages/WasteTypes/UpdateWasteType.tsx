@@ -110,6 +110,7 @@ export const UpdateWasteType = () => {
     }
 
     try {
+      // Update waste type
       await updateWasteType(id, formData);
       Toast("Waste type updated successfully", "success");
       navigate("/dashboard/wastetypes");

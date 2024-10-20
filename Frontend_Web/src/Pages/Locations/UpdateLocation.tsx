@@ -13,6 +13,7 @@ import L from "leaflet";
 import { getCollectionModels } from "@/controllers/CollectionModelController";
 import Toast from "@/components/Toast/Toast";
 
+// Cursor Icon
 const customIcon = L.icon({
   iconUrl: "https://leafletjs.com/examples/custom-icons/leaf-green.png",
   shadowUrl: "https://leafletjs.com/examples/custom-icons/leaf-shadow.png",
@@ -45,6 +46,7 @@ export const UpdateLocation = () => {
   const [isFormValid, setIsFormValid] = useState(false);
   const [locations, setLocations] = useState([]);
 
+  // Fetch collection models and location data
   useEffect(() => {
     const fetchCollectionModels = async () => {
       try {
@@ -57,6 +59,7 @@ export const UpdateLocation = () => {
       }
     };
 
+    // Fetch location data by ID
     const fetchLocationData = async () => {
       try {
         const locationData = await getLocationById(id); // Fetch location data by ID
@@ -75,6 +78,7 @@ export const UpdateLocation = () => {
     fetchLocationData();
   }, [id]); // Fetch data when component mounts or ID changes
 
+  // Validate form fields
   useEffect(() => {
     const isFormValid =
       formData.collectionModel && selectedPosition && !errors.locationName;
@@ -90,6 +94,7 @@ export const UpdateLocation = () => {
     validateField(e.target.name, e.target.value);
   };
 
+  // Validate field
   const validateField = (field, value) => {
     let error = "";
     if (field === "collectionModel" && !value) {
@@ -112,6 +117,7 @@ export const UpdateLocation = () => {
     }));
   };
 
+  // Fetch place name by coordinates
   const fetchPlaceName = async (lat, lng) => {
     try {
       setLoading(true);
@@ -157,6 +163,7 @@ export const UpdateLocation = () => {
     }
   };
 
+  // Fetch place name by place name
   const fetchLatLngByPlaceName = async (placeName) => {
     try {
       setLoading(true);
@@ -209,6 +216,7 @@ export const UpdateLocation = () => {
     }
   };
 
+  // Handle map click
   const onChangeLocationSearch = (e) => {
     setFormData({
       ...formData,
@@ -217,11 +225,14 @@ export const UpdateLocation = () => {
     fetchLatLngByPlaceName(e.target.value);
   };
 
+  // Handle map click
+
   const handleMapClick = (latlng) => {
     setSelectedPosition(latlng);
     fetchPlaceName(latlng.lat, latlng.lng);
   };
 
+  // Map click handler
   const MapClickHandler = () => {
     useMapEvents({
       click(e) {
@@ -232,13 +243,14 @@ export const UpdateLocation = () => {
       <Marker position={selectedPosition} icon={customIcon} />
     );
   };
+  // Convert string to PascalCase
   const toPascalCase = (str) => {
     return str
       .split(/[\s_-]+/)
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join("");
   };
-
+// Validate form fields
   const validateForm = () => {
     let valid = true;
     if (!formData.collectionModel) {
@@ -269,6 +281,8 @@ export const UpdateLocation = () => {
     }
     return valid;
   };
+
+  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {

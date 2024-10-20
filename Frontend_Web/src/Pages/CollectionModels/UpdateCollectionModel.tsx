@@ -4,8 +4,8 @@ import {
   updateCollectionModel,
   getCollectionModelById,
   getCollectionModels,
-} from "@/controllers/CollectionModelController";
-import { useMaterialTailwindController } from "@/context";
+} from "@/controllers/CollectionModelController"; // Import the controller function
+import { useMaterialTailwindController } from "@/context"; // import context
 import { useNavigate, useParams } from "react-router-dom";
 import { getBinTypes } from "@/controllers/BinTypeController";
 import Toast from "@/components/Toast/Toast";
@@ -102,6 +102,8 @@ export const UpdateCollectionModel = () => {
     validateFields(name, value);
   };
 
+  // Validate form fields
+
   const validateFields = (name: string, value: string) => {
     if (name === "flatRatePrice" && parseFloat(value) <= 0) {
       setErrors((prevErrors) => ({
@@ -117,7 +119,7 @@ export const UpdateCollectionModel = () => {
       }));
     }
   };
-
+// Check if the form is valid
   const isFormValid = () => {
     const areRequiredFieldsFilled =
       formData.modelName &&
@@ -135,6 +137,7 @@ export const UpdateCollectionModel = () => {
     return areRequiredFieldsFilled && isFlatRatePriceValid && noErrors;
   };
 
+  // Handle checkbox changes
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target;
 
@@ -151,7 +154,7 @@ export const UpdateCollectionModel = () => {
       ...formData,
       binTypes: updatedBinTypes,
     });
-
+// Validate bin types
     if (updatedBinTypes.length === 0) {
       setErrors((prevErrors) => ({
         ...prevErrors,
@@ -164,7 +167,7 @@ export const UpdateCollectionModel = () => {
       }));
     }
   };
-
+// Check if all bin types are selected
   useEffect(() => {
     if (selectedBinTypes.length === binTypes.length) {
       setAll(true);
@@ -173,6 +176,7 @@ export const UpdateCollectionModel = () => {
     }
   }, [selectedBinTypes, binTypes]);
 
+  // Handle select changes
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { value, name } = e.target;
     setFormData({
@@ -183,7 +187,7 @@ export const UpdateCollectionModel = () => {
       validateFields(name, value);
     }
   };
-
+// Handle form submission
   const handleCheckboxChangeAll = () => {
     const updatedAll = !all;
     setAll(updatedAll);
@@ -214,6 +218,7 @@ export const UpdateCollectionModel = () => {
     }
   };
 
+  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -222,6 +227,7 @@ export const UpdateCollectionModel = () => {
     }
 
     try {
+      // Call the update function with ID
       await updateCollectionModel(id, formData); // Call the update function with ID
       navigate("/dashboard/collectionmodels");
       Toast("Collection model updated successfully", "success");
