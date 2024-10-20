@@ -17,7 +17,7 @@ import { SignIn, SignUp } from "@/Pages/auth";
 
 import { Bins } from "./Pages/Bins/Bins";
 import { AddBin } from "./Pages/Bins/AddBin";
-import {BinRequestsHistory}  from "./Pages/Bins/binreqHistory";
+import { BinRequestsHistory } from "./Pages/Bins/binreqHistory";
 //Waste Types Elements
 import { WasteTypes } from "./Pages/WasteTypes/WasteTypes";
 import { AddWasteType } from "./Pages/WasteTypes/AddWasteType";
@@ -71,7 +71,7 @@ export const routes = [
         name: "Bins",
         path: "/bin",
         element: <Bins />,
-        inSidebar:true,
+        inSidebar: true,
         relatedPaths: ["/bin"],
       },
       {
@@ -231,23 +231,22 @@ export const routes = [
         inSidebar: false,
         relatedPaths: ["/bintypes", "/addbintypes", "/updatebintypes"],
       },
-      
+
       {
         icon: <RectangleStackIcon {...icon} />,
         name: "Add bin",
         path: "/addbin",
         element: <AddBin />,
         inSidebar: false,
-        relatedPaths: [ "/addbin"],
+        relatedPaths: ["/addbin"],
       },
-     
-      
+
       {
         icon: <RectangleStackIcon {...icon} />,
         name: "Collectors",
         path: "/collectors",
         element: <Collectors />,
-        inSidebar:true,
+        inSidebar: true,
         relatedPaths: ["/collectors", "/addcollector"],
       },
       {
@@ -258,11 +257,7 @@ export const routes = [
         inSidebar: false,
         relatedPaths: ["/collector", "/addcollector"],
       },
-      tf
-      
-    ],
-  },
-  
+
       {
         icon: <DocumentDuplicateIcon {...icon} />,
         name: "Report",
@@ -270,36 +265,6 @@ export const routes = [
         element: <CreateReportForm />,
         inSidebar: true,
         relatedPaths: ["/report"],
-      },
-      {
-        icon: <InformationCircleIcon {...icon} />,
-        name: "notifications",
-        path: "/notifications",
-        element: <Notifications />,
-        inSidebar: true,
-        relatedPaths: ["/notifications"],
-      },
-    ],
-  },
-  {
-    title: "auth pages",
-    layout: "auth",
-    pages: [
-      {
-        icon: <ServerStackIcon {...icon} />,
-        name: "sign in",
-        path: "/sign-in",
-        element: <SignIn />,
-        inSidebar: true,
-        relatedPaths: ["/sign-in"],
-      },
-      {
-        icon: <RectangleStackIcon {...icon} />,
-        name: "sign up",
-        path: "/sign-up",
-        element: <SignUp />,
-        inSidebar: true,
-        relatedPaths: ["/sign-up"],
       },
     ],
   },

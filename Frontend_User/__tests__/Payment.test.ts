@@ -2,8 +2,8 @@ import {
   generatePaymentID,
   getTotalPaymentByUserID,
   getWasteCollectionsByUserID,
-} from "../Controller/paymentController"; // Adjust the path as necessary
-import * as firestore from "firebase/firestore"; // Import the Firestore methods
+} from "../Controller/paymentController";
+import * as firestore from "firebase/firestore";
 
 // Mock Firebase Firestore methods
 jest.mock("firebase/firestore", () => {
@@ -41,7 +41,7 @@ describe("PaymentController", () => {
       expect.anything(),
       "payments"
     );
-    expect(firestore.getDocs).toHaveBeenCalled(); // Ensure getDocs was called
+    expect(firestore.getDocs).toHaveBeenCalled();
   });
 
   test("generatePaymentID should return the next payment ID if payments exist", async () => {
@@ -273,6 +273,6 @@ describe("PaymentController", () => {
       },
     ];
 
-    expect(result).toEqual(expectedResult); // This test should pass
+    expect(result).toEqual(expectedResult);
   });
 });
