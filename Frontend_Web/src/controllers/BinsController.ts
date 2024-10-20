@@ -113,7 +113,7 @@ export const getLastBinID = async () => {
 
  // Function to simulate waste level updates for all bins at a set interval
  //Function to simulate waste level updates for all bins at a set interval
-export const autoUpdateWasteLevels = async (intervalInMs = 10000000) => { // 10 seconds
+export const autoUpdateWasteLevels = async (intervalInMs = 10000) => { // 10 seconds
   try {
     setInterval(async () => {
       // Get all bins
