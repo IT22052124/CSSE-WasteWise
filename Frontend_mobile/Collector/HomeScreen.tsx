@@ -34,7 +34,7 @@ export default function HomeScreen() {
       try {
         const userData = await getCollectorDetails();
         setUser(userData.id);
-        setID(userData.collectorID)
+        setID(userData.collectorID);
         setCollectorName(userData.name); // Assuming you have collector's name in userData
       } catch (error) {
         console.error("Failed to fetch user details: ", error);
@@ -138,12 +138,19 @@ export default function HomeScreen() {
       <View style={styles.truckListHeader}>
         <Text style={styles.truckListTitle}>Truck Assignments</Text>
       </View>
-      <AnimatedFlatList
-        data={trucks}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContainer}
-      />
+      
+      {trucks.length === 0 ? ( // Check if there are no trucks
+        <View style={styles.noAssignmentContainer}>
+          <Text style={styles.noAssignmentText}>No assignment today</Text>
+        </View>
+      ) : (
+        <AnimatedFlatList
+          data={trucks}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.listContainer}
+        />
+      )}
     </SafeAreaView>
   );
 }
@@ -240,7 +247,7 @@ const styles = StyleSheet.create({
   truckInfo: {
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
+    borderColor: '#BDC3C7',
   },
   infoRow: {
     flexDirection: 'row',
@@ -248,9 +255,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   infoText: {
-    fontSize: 18,
-    color: '#34495E',
     marginLeft: 10,
+    fontSize: 16,
+    color: '#34495E',
   },
   locationsContainer: {
     padding: 20,
@@ -264,41 +271,46 @@ const styles = StyleSheet.create({
   locationItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 5,
   },
   locationText: {
+    marginLeft: 10,
     fontSize: 16,
-    color: '#34495E',
-    marginLeft: 8,
+    color: '#3498DB',
   },
   noLocationsText: {
-    fontSize: 16,
-    color: '#7F8C8D',
     fontStyle: 'italic',
+    color: '#BDC3C7',
   },
   actionsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
     padding: 20,
-    backgroundColor: '#F4F6F6',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   actionButton: {
+    backgroundColor: '#2ecc71',
+    padding: 10,
+    borderRadius: 5,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#2980B9',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 8,
   },
   actionButtonText: {
     color: '#FFFFFF',
-    marginLeft: 8,
-    fontSize: 16,
+    marginLeft: 5,
     fontWeight: 'bold',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  noAssignmentContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  noAssignmentText: {
+    fontSize: 18,
+    color: '#7F8C8D',
   },
 });

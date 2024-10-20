@@ -9,7 +9,16 @@ import QRScannerScreen from "./Collector/QRScannerScreen";
 import BinDataScreen from "./Collector/BinDataScreen";
 import ProfileScreen from "./Collector/ProfileScreen";
 import Toast from "react-native-toast-message";
+import { LogBox } from 'react-native';
 import CollectedHistoryScreen from "./Collector/history"
+
+  
+// Ignore specific warning messages
+LogBox.ignoreLogs([
+  'Non-serializable values were found in the navigation state.',
+]);
+
+
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
