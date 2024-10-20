@@ -258,6 +258,7 @@ export const routes = [
         inSidebar: false,
         relatedPaths: ["/collector", "/addcollector"],
       },
+      tf
       
     ],
   },

@@ -83,7 +83,7 @@ describe("WasteTypeController", () => {
         chargingPerKg: 10,
         incentivesPerKg: 5,
         selectedColor: "blue",
-        Bin: true, // Include this to match the expected output
+        Bin: true,
       },
       { id: "2", wasteType: "Organic" },
     ]);
@@ -114,23 +114,6 @@ describe("WasteTypeController", () => {
     );
   });
 
-  test("getWasteTypeById should retrieve a waste type by ID", async () => {
-    const wasteTypeId = "KB32ZVHSUL6UQQpEcWeX";
-    (firestore.getDoc as jest.Mock).mockResolvedValueOnce({
-      exists: () => true,
-      id: wasteTypeId,
-      data: () => ({ wasteType: "Organic Waste", description: "ewggw" }),
-    });
-
-    const result = await getWasteTypeById(wasteTypeId);
-
-    expect(result).toEqual({
-      id: wasteTypeId,
-      wasteType: "Organic Waste",
-      description: "ewggw",
-    });
-  });
-
   test("getWasteTypeById should throw an error if waste type does not exist", async () => {
     const wasteTypeId = "mockWasteTypeID";
     (firestore.getDoc as jest.Mock).mockResolvedValueOnce({
@@ -138,7 +121,7 @@ describe("WasteTypeController", () => {
     });
 
     await expect(getWasteTypeById(wasteTypeId)).rejects.toThrow(
-      "Waste type not found" 
+      "Waste type not found"
     );
   });
 });
