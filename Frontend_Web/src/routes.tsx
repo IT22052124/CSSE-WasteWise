@@ -171,7 +171,7 @@ export const routes = [
         name: "Bin Creations",
         path: "/bincreationhistory",
         element: <BinRequestsHistory />,
-        inSidebar: true,
+        inSidebar: false,
         relatedPaths: ["/bincreation"],
       },
       {

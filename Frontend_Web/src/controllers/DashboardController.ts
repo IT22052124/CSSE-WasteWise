@@ -1,5 +1,12 @@
-import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
-import { db } from "@/storage/firebase";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
+import { db } from "../storage/firebase";
 
 const getPaymentsForMonth = async (startDate, endDate) => {
   try {
@@ -73,42 +80,33 @@ export const getMonthlyPaymentTotals = async () => {
   };
 };
 
-export const getLast7DaysPageViews = async () => {
+export const getPageViewsForLast7Days = async () => {
   try {
+    const dates = [];
     const today = new Date();
-    const last7Days = Array.from({ length: 7 }, (_, i) => {
-      const date = new Date(today);
-      date.setDate(today.getDate() - i); // Go back i days
-      return date.toISOString().split("T")[0]; // Format date as YYYY-MM-DD
-    });
 
-    // Query to get documents for the last 7 days
-    const pageViewsQuery = query(
-      collection(db, "globalStats"),
-      where("date", "in", last7Days)
-    );
+    // Get the last 7 days, including today
+    for (let i = 0; i < 7; i++) {
+      const currentDate = new Date();
+      currentDate.setDate(today.getDate() - i);
+      const formattedDate = currentDate.toISOString().split("T")[0];
+      dates.push(formattedDate);
+    }
 
-    const pageViewsSnapshot = await getDocs(pageViewsQuery);
+    const pageViews = [];
 
-    const pageViewsCount = last7Days.map((date) => ({
-      date,
-      views: 0,
-    }));
+    // Fetch page views for each date
+    for (const date of dates) {
+      const dateRef = doc(db, "globalStats", date);
+      const dateDoc = await getDoc(dateRef);
+      const views = dateDoc.exists() ? dateDoc.data().views : 0;
+      pageViews.push({ date, views });
+    }
 
-    // Map the results to the corresponding dates
-    pageViewsSnapshot.forEach((doc) => {
-      const data = doc.data();
-      const date = doc.id; // Assuming the document ID is the date
-      const viewEntry = pageViewsCount.find((entry) => entry.date === date);
-      if (viewEntry) {
-        viewEntry.views = data.views || 0;
-      }
-    });
-
-    return pageViewsCount;
+    return pageViews; // Return an array of objects with date and views
   } catch (error) {
-    console.error("Error fetching last 7 days page views:", error);
-    throw new Error("Failed to fetch last 7 days page views");
+    console.error("Error fetching page views for the last 7 days:", error);
+    throw new Error("Failed to fetch page views for the last 7 days");
   }
 };
 
@@ -139,4 +137,30 @@ export const getPageViewsForTodayAndYesterday = async () => {
     console.error("Error fetching page views for today and yesterday:", error);
     throw new Error("Failed to fetch page views for today and yesterday");
   }
+};
+
+export const getLast9MonthsPaymentTotals = async () => {
+  const currentDate = new Date();
+  const monthlyTotals = [];
+
+  for (let i = 0; i < 9; i++) {
+    // Calculate the start and end dates of the current month in the loop
+    const startOfMonth = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() - i, // Move back by 'i' months
+      1
+    );
+    const endOfMonth = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() - i + 1,
+      0
+    ); // Last day of the month
+
+    // Get total payments for the month
+    const monthTotal = await getPaymentsForMonth(startOfMonth, endOfMonth);
+    monthlyTotals.push(monthTotal); // Add the total to the array
+  }
+
+  // Reverse the array to show the oldest month first
+  return monthlyTotals.reverse();
 };

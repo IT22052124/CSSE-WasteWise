@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { findBinsByUserEmail } from "../../Controller/BinController";
 import { getUserDetails } from "../../Controller/UserController";
 import { Trash2, AlertTriangle, Plus } from "lucide-react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 
 const { width } = Dimensions.get("window");
 
@@ -57,31 +57,33 @@ export default function YourBinsScreen() {
     fetchUserDetails();
   }, []);
 
-  useEffect(() => {
-    const fetchBins = async (email: string) => {
-      try {
-        setLoading(true);
-        const binData = await findBinsByUserEmail(email);
-        setBins(binData);
-        console.log("bro--------",binData);
-        setLoading(false);
-      } catch (error) {
-        console.error("Failed to fetch bins: ", error);
-        setLoading(false);
-      }
-    };
-
-    if (userEmail) {
-      fetchBins(userEmail); // Initial fetch
-
-      const intervalId = setInterval(() => {
-        fetchBins(userEmail); // Fetch bins every 10 seconds
-      }, 100000000); // 10000 ms = 10 seconds
-
-      // Clear the interval on component unmount or userEmail change
-      return () => clearInterval(intervalId);
+  const fetchBins = async (email) => {
+    try {
+      setLoading(true);
+      const binData = await findBinsByUserEmail(email);
+      setBins(binData);
+      console.log("bro--------", binData);
+      setLoading(false);
+    } catch (error) {
+      console.error("Failed to fetch bins: ", error);
+      setLoading(false);
     }
-  }, [userEmail]);
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      if (userEmail) {
+        fetchBins(userEmail); // Initial fetch
+
+        const intervalId = setInterval(() => {
+          fetchBins(userEmail); // Fetch bins every 10 seconds
+        }, 10000); // 10000 ms = 10 seconds
+
+        // Clear the interval on component unmount or userEmail change
+        return () => clearInterval(intervalId);
+      }
+    }, [userEmail])
+  );
 
   const navigateToBinScreen = () => {
     navigation.navigate("BinPurchasePage");

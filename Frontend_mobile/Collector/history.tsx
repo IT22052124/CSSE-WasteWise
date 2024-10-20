@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,9 +8,13 @@ import {
   SafeAreaView,
   StatusBar,
 } from "react-native";
-import { getCollectorRecords, getCollectorDetails } from "../controller/collectorController";
+import {
+  getCollectorRecords,
+  getCollectorDetails,
+} from "../controller/collectorController";
 import moment from "moment";
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function CollectedHistoryScreen() {
   const [records, setRecords] = useState([]);
@@ -31,24 +35,31 @@ export default function CollectedHistoryScreen() {
     fetchUserDetails();
   }, []);
 
-  useEffect(() => {
-    const fetchRecords = async () => {
-      if (!user) return;
+  const fetchRecords = async () => {
+    if (!user) return;
 
-      try {
-        const collectedRecords = await getCollectorRecords(user);
-        setRecords(collectedRecords);
-        console.log("Collected Records:", collectedRecords);
-      } catch (err) {
-        console.error("Failed to fetch collected records:", err);
-        setError("Failed to fetch collected records. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    };
+    try {
+      const collectedRecords = await getCollectorRecords(user);
+      setRecords(collectedRecords);
+      console.log("Collected Records:", collectedRecords);
+    } catch (err) {
+      console.error("Failed to fetch collected records:", err);
+      setError("Failed to fetch collected records. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchRecords();
-  }, [user]);
+  useFocusEffect(
+    useCallback(() => {
+      setLoading(true); // Start loading before fetch
+      fetchRecords();
+
+      return () => {
+        setRecords([]); // Optional: Clear records if needed when the screen loses focus
+      };
+    }, [user])
+  );
 
   const renderRecords = () => {
     if (records.length === 0) {
@@ -64,7 +75,9 @@ export default function CollectedHistoryScreen() {
       <View key={record.id} style={styles.recordItem}>
         <View style={styles.recordHeader}>
           <MaterialIcons name="local-shipping" size={24} color="#2ecc71" />
-          <Text style={styles.recordId}>Collection ID: {record.collectionID}</Text>
+          <Text style={styles.recordId}>
+            Collection ID: {record.collectionID}
+          </Text>
         </View>
         <View style={styles.recordBody}>
           <View style={styles.recordDetail}>
@@ -100,7 +113,11 @@ export default function CollectedHistoryScreen() {
           <Text style={styles.header}>Collected Waste History</Text>
 
           {loading ? (
-            <ActivityIndicator size="large" color="#2ecc71" style={styles.loader} />
+            <ActivityIndicator
+              size="large"
+              color="#2ecc71"
+              style={styles.loader}
+            />
           ) : error ? (
             <View style={styles.errorContainer}>
               <MaterialIcons name="error-outline" size={48} color="#e74c3c" />

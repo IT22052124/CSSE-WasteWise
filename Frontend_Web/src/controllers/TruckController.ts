@@ -10,10 +10,10 @@ import {
   query,
   orderBy,
 } from "firebase/firestore";
-import { db } from "@/storage/firebase";
+import { db } from "../storage/firebase";
 
 // Helper function to generate the next truck ID (Tru-001, Tru-002, etc.)
-const generateTruckId = async () => {
+export const generateTruckId = async () => {
   const q = query(collection(db, "trucks"), orderBy("truckId", "desc"));
   const truckSnapshot = await getDocs(q);
 

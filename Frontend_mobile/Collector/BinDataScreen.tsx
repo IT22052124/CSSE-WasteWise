@@ -17,6 +17,7 @@ import {
 import moment from "moment"; // To handle date formatting
 import { getCollectorDetails } from "../controller/collectorController";
 import { resetBinWasteLevel } from "../controller/BinController";
+import { LogBox } from 'react-native';
 
 export default function BinDataScreen({ route }) {
   const [user, setUser] = useState(null);
@@ -26,7 +27,11 @@ export default function BinDataScreen({ route }) {
     chargingPerKg: 0,
     incentivesPerKg: 0,
   });
-
+  
+// Ignore specific warning messages
+LogBox.ignoreLogs([
+  'Non-serializable values were found in the navigation state.',
+]);
   const [weight, setWeight] = useState(0);
   useEffect(() => {
     const fetchUserDetails = async () => {

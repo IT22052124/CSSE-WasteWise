@@ -13,6 +13,7 @@ import PaymentHistoryPage from "./User/Screens/PaymentHistory";
 import BillHistory from "./User/Screens/Bill";
 import MyBins from "./User/Screens/MyBins";
 import "react-native-reanimated";
+import { LogBox } from 'react-native';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -119,3 +120,4 @@ export default function App() {
     </NavigationContainer>
   );
 }
+LogBox.ignoreAllLogs(true);
