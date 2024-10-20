@@ -158,6 +158,8 @@ export default function SignUpPage() {
           text1: "Success",
           text2: "Sign up successful!",
         });
+
+        navigation.navigate("SignInPage");
       } catch (error) {
         console.error(error);
         Toast.show({
