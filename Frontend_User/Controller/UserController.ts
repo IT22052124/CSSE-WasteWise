@@ -15,6 +15,7 @@ import {
 import bcrypt from "bcryptjs";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+//create a new user
 export const createUser = async (userData) => {
   const { username, email, phone, address, password } = userData;
 
@@ -38,6 +39,7 @@ export const createUser = async (userData) => {
   }
 };
 
+//get a user by his id
 export const getUserById = async (userId) => {
   try {
     const userDoc = await db.collection("users").doc(userId).get();
@@ -53,6 +55,7 @@ export const getUserById = async (userId) => {
   }
 };
 
+//get all emails of users
 export const getEmails = async () => {
   try {
     const querySnapshot = await getDocs(collection(db, "users"));
@@ -72,6 +75,7 @@ export const getEmails = async () => {
   }
 };
 
+//get all user names of users
 export const getUsernames = async () => {
   try {
     const querySnapshot = await getDocs(collection(db, "users"));
@@ -91,6 +95,7 @@ export const getUsernames = async () => {
   }
 };
 
+//handle sign in
 export const signInUser = async (email, password) => {
   try {
     const q = query(collection(db, "users"), where("email", "==", email));
@@ -122,6 +127,7 @@ export const signInUser = async (email, password) => {
   }
 };
 
+//get the user from async storage
 export const getUserDetails = async () => {
   try {
     const userData = await AsyncStorage.getItem("user");

@@ -37,6 +37,7 @@ export const BinTypes = () => {
     fetchData();
   }, []);
 
+  //delete function to delete a bin type
   const handleDelete = async (id) => {
     Swal.fire({
       title: "Are you sure?",

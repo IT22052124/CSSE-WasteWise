@@ -12,6 +12,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../storage/firebase";
 
+//get all the waste types
 export const getAllWasteTypes = async () => {
   try {
     // Step 1: Reference the wasteTypes collection
@@ -36,6 +37,7 @@ export const getAllWasteTypes = async () => {
   }
 };
 
+//create a new bin type
 export const createBinType = async (formData) => {
   try {
     // Step 1: Reference the binTypes collection
@@ -57,6 +59,7 @@ export const createBinType = async (formData) => {
   }
 };
 
+//get all bin types
 export const getBinTypes = async () => {
   try {
     // Step 1: Reference the binTypes collection
@@ -81,11 +84,13 @@ export const getBinTypes = async () => {
   }
 };
 
+//delete a bin type
 export const deleteBinType = async (id) => {
   const binTypeRef = doc(db, "binTypes", id); // "binTypes" is your Firestore collection name
   await deleteDoc(binTypeRef); // Delete the document
 };
 
+//get a bin type by id
 export const getBinTypeById = async (id) => {
   try {
     const docRef = doc(db, "binTypes", id); // Reference to the specific bin type
@@ -103,6 +108,7 @@ export const getBinTypeById = async (id) => {
   }
 };
 
+//update a bin type
 export const updateBinType = async (id, updatedData) => {
   try {
     const docRef = doc(db, "binTypes", id); // Reference to the specific bin type

@@ -32,6 +32,7 @@ export const AddBinType = () => {
   const [waste, setWaste] = useState([]);
   const [errors, setErrors] = useState({});
 
+  //get all waste types
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -64,6 +65,7 @@ export const AddBinType = () => {
     });
   };
 
+  // validate the form data
   const validateForm = () => {
     const newErrors = {};
 

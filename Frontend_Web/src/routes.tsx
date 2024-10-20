@@ -72,7 +72,7 @@ export const routes = [
         path: "/bin",
         element: <Bins />,
         inSidebar: true,
-        relatedPaths: ["/bin"],
+        relatedPaths: ["/Binn"],
       },
       {
         icon: <DocumentDuplicateIcon {...icon} />,
