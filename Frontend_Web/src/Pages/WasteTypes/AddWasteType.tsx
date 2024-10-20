@@ -14,20 +14,20 @@ export const AddWasteType = () => {
   const navigate = useNavigate();
   const { sidenavColor } = controller;
   const [loading, setLoading] = useState(false);
-
+// Form data
   const [formData, setFormData] = useState({
     wasteType: "",
     description: "",
     guidelines: "",
     recyclable: false,
   });
-
+// Form errors
   const [errors, setErrors] = useState({
     wasteType: "",
     description: "",
     guidelines: "",
   });
-
+// Check if the waste type name already exists
   const checkWasteTypeName = async (wasteType: string) => {
     if (wasteType) {
       const exists = await getWasteTypesWithBinInfo();
@@ -46,7 +46,7 @@ export const AddWasteType = () => {
       }));
     }
   };
-
+// Handle form input changes
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -62,13 +62,14 @@ export const AddWasteType = () => {
     validateFields(name, value);
   };
 
+  //
   const handleSwitchChange = () => {
     setFormData((prevData) => ({
       ...prevData,
       recyclable: !prevData.recyclable,
     }));
   };
-
+// Validate form fields
   const validateFields = (name: string, value: string) => {
     setErrors((prevErrors) => ({
       ...prevErrors,
@@ -78,6 +79,7 @@ export const AddWasteType = () => {
     }));
   };
 
+  // Check if the form is valid
   const isFormValid = () => {
     return (
       formData.wasteType &&
@@ -87,6 +89,7 @@ export const AddWasteType = () => {
     );
   };
 
+  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -96,6 +99,7 @@ export const AddWasteType = () => {
     }
 
     try {
+      // Add waste type
       await addWasteType(formData);
       navigate("/dashboard/wastetypes");
       Toast("Waste type added successfully", "success");

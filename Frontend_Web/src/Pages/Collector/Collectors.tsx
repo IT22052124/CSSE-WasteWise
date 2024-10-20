@@ -78,7 +78,7 @@ import {
                     "Name",
                     "Email",
                     "Phone",
-                    "Assigned Bins",
+                    "Address",
                     "action",
                   ].map((el) => (
                     <th

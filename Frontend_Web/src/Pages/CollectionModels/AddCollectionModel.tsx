@@ -4,7 +4,7 @@ import {
   addCollectionModel,
   getCollectionModels,
 } from "@/controllers/CollectionModelController"; // Import the controller function
-import { useMaterialTailwindController } from "@/context";
+import { useMaterialTailwindController } from "@/context"; // import context
 import { useNavigate } from "react-router-dom";
 import { getBinTypes } from "@/controllers/BinTypeController";
 import Toast from "@/components/Toast/Toast";
@@ -30,6 +30,8 @@ export const AddCollectionModel = () => {
     flatRatePrice: "",
   });
 
+  // check if the model name already exists
+
   const checkCollectionModelsName = async (modeltype: string) => {
     if (modeltype) {
       const exists = await getCollectionModels();
@@ -49,6 +51,7 @@ export const AddCollectionModel = () => {
     }
   };
 
+// Fetch bin types
   useEffect(() => {
     const fetchbinTypes = async () => {
       try {
@@ -80,7 +83,7 @@ export const AddCollectionModel = () => {
     }
     validateFields(name, value);
   };
-
+// Validate fields
   const validateFields = (name: string, value: string) => {
     if (name === "flatRatePrice" && parseFloat(value) <= 0) {
       setErrors((prevErrors) => ({
@@ -96,7 +99,7 @@ export const AddCollectionModel = () => {
       }));
     }
   };
-
+// Check if the form is valid
   const isFormValid = () => {
     // Check if all required fields are filled
     const areRequiredFieldsFilled =
@@ -115,6 +118,7 @@ export const AddCollectionModel = () => {
     return areRequiredFieldsFilled && isFlatRatePriceValid && noErrors;
   };
 
+  // Handle checkbox changes
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target;
 
@@ -145,7 +149,7 @@ export const AddCollectionModel = () => {
       }));
     }
   };
-
+// Check if all bin types are selected
   useEffect(() => {
     if (selectedBinTypes.length === binTypes.length) {
       setAll(true);
@@ -165,11 +169,11 @@ export const AddCollectionModel = () => {
       validateFields(name, value);
     }
   };
-
+// Handle checkbox change for all
   const handleCheckboxChangeAll = () => {
     const updatedAll = !all;
     setAll(updatedAll);
-
+// Update the selected bin types
     let updatedBinTypes;
     if (updatedAll) {
       updatedBinTypes = binTypes.map((type) => type.binType);
@@ -204,11 +208,11 @@ export const AddCollectionModel = () => {
     if (!isFormValid()) {
       return;
     }
-
+// Add collection model
     try {
-      await addCollectionModel(formData);
+      await addCollectionModel(formData); // Call the controller function
       navigate("/dashboard/collectionmodels");
-      Toast("Collection model added successfully", "success");
+      Toast("Collection model added successfully", "success"); // Add a toast notification
       setloading(false);
     } catch (error) {
       console.error("Failed to add collection model", error);

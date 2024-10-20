@@ -10,6 +10,7 @@ import { getCollectionModels } from "@/controllers/CollectionModelController";
 import Toast from "@/components/Toast/Toast";
 import { PulseLoader } from "react-spinners";
 
+// Cursor Icon
 const customIcon = L.icon({
   iconUrl: "https://leafletjs.com/examples/custom-icons/leaf-green.png",
   shadowUrl: "https://leafletjs.com/examples/custom-icons/leaf-shadow.png",
@@ -41,6 +42,7 @@ export const AddLocation = () => {
   const [isFormValid, setIsFormValid] = useState(false);
   const [locations, setLocations] = useState([]);
 
+  // Fetch collection models and locations
   useEffect(() => {
     const fetchCollectionModels = async () => {
       try {
@@ -54,6 +56,8 @@ export const AddLocation = () => {
     };
     fetchCollectionModels();
   }, []);
+
+  // Validate form fields
 
   useEffect(() => {
     const isFormValid =
@@ -69,6 +73,7 @@ export const AddLocation = () => {
     validateField(e.target.name, e.target.value);
   };
 
+  // Validate field
   const validateField = (field, value) => {
     let error = "";
     if (field === "collectionModel" && !value) {
@@ -89,6 +94,7 @@ export const AddLocation = () => {
     }));
   };
 
+  // Fetch place name by coordinates
   const fetchPlaceName = async (lat, lng) => {
     try {
       setLoading(true);
@@ -134,6 +140,7 @@ export const AddLocation = () => {
     }
   };
 
+  // Fetch coordinates by place name
   const fetchLatLngByPlaceName = async (placeName) => {
     try {
       setLoading(true);
@@ -186,6 +193,8 @@ export const AddLocation = () => {
     }
   };
 
+  // Handle location search input change
+
   const onChangeLocationSearch = (e) => {
     setFormData({
       ...formData,
@@ -194,11 +203,13 @@ export const AddLocation = () => {
     fetchLatLngByPlaceName(e.target.value);
   };
 
+  // Handle map click
   const handleMapClick = (latlng) => {
     setSelectedPosition(latlng);
     fetchPlaceName(latlng.lat, latlng.lng);
   };
 
+  // Map click
   const MapClickHandler = () => {
     useMapEvents({
       click(e) {
@@ -210,6 +221,7 @@ export const AddLocation = () => {
     );
   };
 
+  // Convert string to PascalCase
   const toPascalCase = (str) => {
     return str
       .split(/[\s_-]+/)
@@ -217,6 +229,7 @@ export const AddLocation = () => {
       .join("");
   };
 
+  // Validate form
   const validateForm = () => {
     let valid = true;
     if (!formData.collectionModel) {
@@ -247,7 +260,7 @@ export const AddLocation = () => {
     }
     return valid;
   };
-
+// Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {

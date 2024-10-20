@@ -25,6 +25,7 @@ export const Locations = () => {
   const { sidenavColor } = controller;
   const [loading, setLoading] = useState(false);
 
+  // Fetch locations
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -40,6 +41,7 @@ export const Locations = () => {
     fetchData();
   }, []);
 
+  // Delete a location
   const handleDelete = async (id) => {
     Swal.fire({
       title: "Are you sure?",

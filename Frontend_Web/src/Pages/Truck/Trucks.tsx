@@ -39,6 +39,7 @@ export const Trucks = () => {
   const { sidenavColor } = controller;
   const [loading, setLoading] = useState(false);
 
+  // Fetch trucks and employees
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -57,6 +58,7 @@ export const Trucks = () => {
     fetchData();
   }, []);
 
+  // Delete a truck
   const handleDelete = async (id) => {
     Swal.fire({
       title: "Are you sure?",
@@ -87,6 +89,7 @@ export const Trucks = () => {
     });
   };
 
+  // Open the assign employee modal
   const openModal = (truckId) => {
     setSelectedTruckId(truckId);
     const selectedTruck = trucks.find((truck) => truck.id === truckId);
@@ -97,11 +100,13 @@ export const Trucks = () => {
     setIsModalOpen(true);
   };
 
+  // Close the assign employee modal
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedEmployeeIds([]);
   };
 
+  // Assign employees to a truck
   const handleAssignEmployee = async () => {
     if (!selectedTruckId || !selectedEmployeeIds) return;
     console.log("selected length ", selectedEmployeeIds.length);
@@ -127,6 +132,7 @@ export const Trucks = () => {
     }
   };
 
+  // Toggle employee selection
   const toggleEmployeeSelection = (employeeId) => {
     setSelectedEmployeeIds((prevSelected) =>
       prevSelected.includes(employeeId)
@@ -135,6 +141,7 @@ export const Trucks = () => {
     );
   };
 
+  // Render
   return (
     <div className="mt-12 mb-8 flex flex-col gap-12 min-h-screen">
       <Card>

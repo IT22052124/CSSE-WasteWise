@@ -5,7 +5,7 @@ import { db } from "../storage/firebase"; // Your Firebase config
 import { isWithinInterval } from 'date-fns'; // Importing necessary functions
 
 
-export const fetchWasteCollectionData = async (fromDate, toDate) => {
+export const fetchWasteCollectionData = async (fromDate, toDate) => { // Fetch waste collection data
   const q = query(
     collection(db, "wasteCollection"),
     where("collectedAt", ">=", new Date(fromDate)),
@@ -47,7 +47,7 @@ export const fetchWasteCollectionData = async (fromDate, toDate) => {
   return result;
 };
 
-export const fetchRouteOptimizationData = async (fromDate, toDate) => {
+export const fetchRouteOptimizationData = async (fromDate, toDate) => { // Fetch route optimization data
   const q = query(
     collection(db, "routeCollection"),
     where("timestamp", ">=", new Date(fromDate)),
@@ -63,7 +63,7 @@ export const fetchRouteOptimizationData = async (fromDate, toDate) => {
   return data;
 };
 
-export const fetchWasteTrendsData = async (fromDate, toDate) => {
+export const fetchWasteTrendsData = async (fromDate, toDate) => { // Fetch waste trends data
   const q = query(
     collection(db, "wasteCollection"),
     where("collectedAt", ">=", new Date(fromDate)),
@@ -99,7 +99,7 @@ export const fetchWasteTrendsData = async (fromDate, toDate) => {
 };
 
 
-export const fetchRecyclableWasteData = async (fromDate, toDate) => {
+export const fetchRecyclableWasteData = async (fromDate, toDate) => { // Fetch recyclable waste data
   const q = query(
     collection(db, "wasteCollection"),
     where("collectedAt", ">=", new Date(fromDate)),
@@ -116,7 +116,7 @@ export const fetchRecyclableWasteData = async (fromDate, toDate) => {
 };
 
 
-export const fetchAccountPaymentData = async (fromDate, toDate) => {
+export const fetchAccountPaymentData = async (fromDate, toDate) => { // Fetch account payment data
   const q = query(
     collection(db, "payments"),
     where("status", "==", "Success") // Filter by status "Success"

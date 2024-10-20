@@ -16,6 +16,7 @@ export const AddTruck = () => {
   const [controller] = useMaterialTailwindController();
   const navigate = useNavigate();
   const { sidenavColor } = controller;
+  // Form data
   const [formData, setFormData] = useState({
     numberPlate: "",
     capacity: "",
@@ -28,7 +29,7 @@ export const AddTruck = () => {
       DriverLicense: "",
     },
   });
-
+// Form errors
   const [errors, setErrors] = useState({
     numberPlate: "",
     capacity: "",
@@ -42,6 +43,7 @@ export const AddTruck = () => {
   const [selectedLocations, setSelectedLocations] = useState([]);
   const [driverAdd, setDriverAdd] = useState(false);
 
+  // Fetch locations
   useEffect(() => {
     const fetchLocations = async () => {
       try {
@@ -55,11 +57,13 @@ export const AddTruck = () => {
     fetchLocations();
   }, []);
 
+  // Validate
   const validateNumberPlate = (numberPlate: string) => {
     const regex = /^[A-Za-z]{2,3}-\d{4}$/;
     return regex.test(numberPlate);
   };
 
+  // Handle form changes
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -94,6 +98,7 @@ export const AddTruck = () => {
     }
   };
 
+  // Handle driver changes
   const handleChangeDriver = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -133,6 +138,7 @@ export const AddTruck = () => {
     }
   };
 
+  // Handle vehicle type change
   const handleVehicleTypeChange = (value: string) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -140,16 +146,19 @@ export const AddTruck = () => {
     }));
   };
 
+  // Handle location change
   const handleLocationChange = (selected: any) => {
     setSelectedLocations((prevLocations) => [...prevLocations, selected]);
   };
 
+  // Remove location
   const removeLocation = (locationToRemove: string) => {
     setSelectedLocations((prevLocations) =>
       prevLocations.filter((location) => location !== locationToRemove)
     );
   };
 
+  // Check if form is valid
   const isFormValid = () => {
     const isVehicleInfoValid =
       formData.numberPlate &&
@@ -174,14 +183,16 @@ export const AddTruck = () => {
     );
   };
 
+  // Handle
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!isFormValid()) {
       return;
     }
+    // Add truck
     let finalFormData;
-    if (driverAdd) {
+    if (driverAdd) { // Add driver details
       finalFormData = {
         ...formData,
         locations: selectedLocations.map((location) => location.id),
@@ -190,12 +201,13 @@ export const AddTruck = () => {
           AddDriver: driverAdd,
         },
       };
-    } else {
+    } else { // No driver details
       finalFormData = {
         ...formData,
         locations: selectedLocations.map((location) => location.id),
       };
     }
+    // Add truck
     try {
       await addTruck(finalFormData);
       navigate("/dashboard/trucks");

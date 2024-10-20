@@ -9,7 +9,7 @@ import {
   getPageViewsForTodayAndYesterday,
   getPageViewsForLast7Days,
   getLast9MonthsPaymentTotals,
-} from "@/controllers/DashboardController";
+} from "@/controllers/DashboardController"; // Import the controller functions
 import { BanknotesIcon, ClockIcon } from "@heroicons/react/24/solid";
 import { chartsConfig } from "@/configs";
 import { Loader } from "@/components/Loader";
@@ -24,6 +24,7 @@ export const Home = () => {
     yesterdayViews: 0,
   });
 
+  // Get the names of the last 7 days
   const getLast7DaysNames = () => {
     const today = new Date();
     const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -33,7 +34,7 @@ export const Home = () => {
       return daysOfWeek[date.getDay()];
     }).reverse();
   };
-
+// Get the names of the last 9 months
   const getLast9Months = () => {
     const today = new Date();
     const months = [
@@ -67,6 +68,7 @@ export const Home = () => {
   const [last7DaysViews, setLast7DaysViews] = useState([]);
   const [last12MonthsPayments, setLast12MonthsPayments] = useState([]);
 
+  // Fetch data on component mount
   useEffect(() => {
     const fetch = async () => {
       setLoading(true);
@@ -105,6 +107,7 @@ export const Home = () => {
     fetch();
   }, []);
 
+  // Calculate the percentage change between two values
   const calculatePercentageChange = (current, last) => {
     if (last === 0) return current > 0 ? 100 : 0;
     return ((current - last) / last) * 100;
@@ -115,6 +118,7 @@ export const Home = () => {
     monthlyPaymentTotals.lastMonthTotal
   );
 
+  // Chart data
   const websiteViewsChart = {
     type: "bar",
     height: 220,

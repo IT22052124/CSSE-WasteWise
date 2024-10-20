@@ -26,8 +26,10 @@ interface BinType {
 }
 
 export const addWasteType = async (wasteTypeData) => {
+  // Add a new waste type
   try {
     const docRef = await addDoc(collection(db, "wasteTypes"), {
+      // Add the new waste type
       ...wasteTypeData,
       createdAt: serverTimestamp(),
     });
@@ -47,6 +49,7 @@ export const getWasteTypesWithBinInfo = async (): Promise<
     Bin?: boolean;
   })[]
 > => {
+  // Fetch waste types with bin info
   try {
     // Fetch waste types
     const wasteTypeCollection = collection(db, "wasteTypes");
@@ -72,6 +75,7 @@ export const getWasteTypesWithBinInfo = async (): Promise<
 
       if (matchingBinType) {
         return {
+          // Return the waste type with bin info
           ...wasteType,
           binType: matchingBinType.binType,
           chargingPerKg: matchingBinType.chargingPerKg,
@@ -80,10 +84,10 @@ export const getWasteTypesWithBinInfo = async (): Promise<
           Bin: true,
         };
       }
-      return wasteType;
+      return wasteType; // Return the waste type without bin info
     });
 
-    return wasteTypesWithBinInfo;
+    return wasteTypesWithBinInfo; // Return the waste types with bin info
   } catch (error) {
     console.error("Error retrieving waste types with bin info:", error);
     throw new Error("Failed to fetch waste types and bin info");
@@ -91,6 +95,7 @@ export const getWasteTypesWithBinInfo = async (): Promise<
 };
 
 export const updateWasteType = async (id, updatedWasteTypeData) => {
+  // Update a waste type by ID
   try {
     const wasteTypeRef = doc(db, "wasteTypes", id);
     await updateDoc(wasteTypeRef, {
@@ -104,6 +109,7 @@ export const updateWasteType = async (id, updatedWasteTypeData) => {
 };
 
 export const deleteWasteType = async (id) => {
+  // Delete a waste type by ID
   try {
     const wasteTypeRef = doc(db, "wasteTypes", id);
     await deleteDoc(wasteTypeRef);
@@ -114,6 +120,7 @@ export const deleteWasteType = async (id) => {
 };
 
 export const getWasteTypeById = async (id: string) => {
+  // Fetch a waste type by ID
   const wasteTypeRef = doc(db, "wasteTypes", id);
   const wasteTypeDoc = await getDoc(wasteTypeRef);
 

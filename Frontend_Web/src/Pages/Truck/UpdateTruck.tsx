@@ -10,7 +10,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import Toast from "@/components/Toast/Toast";
 import { getLocations } from "@/controllers/LocationController";
 import {
-  getAllTrucks,
   updateTruck,
   getTruckById,
 } from "@/controllers/TruckController";
@@ -48,6 +47,7 @@ export const UpdateTruck = () => {
   const [selectedLocations, setSelectedLocations] = useState([]);
   const [driverAdd, setDriverAdd] = useState(false);
 
+  // Fetch locations
   useEffect(() => {
     const fetchLocations = async () => {
       try {
@@ -65,11 +65,13 @@ export const UpdateTruck = () => {
     fetchLocations();
   }, [id]);
 
+  // Validate number plate
   const validateNumberPlate = (numberPlate: string) => {
     const regex = /^[A-Za-z]{2,3}-\d{4}$/;
     return regex.test(numberPlate);
   };
 
+  // Handle form input changes
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -104,6 +106,7 @@ export const UpdateTruck = () => {
     }
   };
 
+  // Handle driver changes
   const handleChangeDriver = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -118,14 +121,14 @@ export const UpdateTruck = () => {
 
     if (name === "DriverPhone") {
       const isDriverPhone =
-        value !== "" && value.length === 10 && value.startsWith("07");
+        value !== "" && value.length === 10 && value.startsWith("07"); // Check if driver phone is 10 characters long and starts with 07
       setErrors((prevErrors) => ({
         ...prevErrors,
         DriverPhone: isDriverPhone
           ? ""
           : "Driver phone must be 10 characters long and start with 07",
       }));
-    } else if (name === "DriverLicense") {
+    } else if (name === "DriverLicense") { // Check if driver license is 8 characters long
       const isDriverLicense = value !== "" && value.length === 8;
       setErrors((prevErrors) => ({
         ...prevErrors,
@@ -143,6 +146,7 @@ export const UpdateTruck = () => {
     }
   };
 
+  // Handle vehicle type change
   const handleVehicleTypeChange = (value: string) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -150,10 +154,12 @@ export const UpdateTruck = () => {
     }));
   };
 
+  // Handle location change
   const handleLocationChange = (selected: any) => {
     setSelectedLocations((prevLocations) => [...prevLocations, selected]);
   };
 
+  // Remove location
   const removeLocation = (locationToRemove: string) => {
     setSelectedLocations((prevLocations) =>
       prevLocations.filter((location) => location !== locationToRemove)
@@ -184,12 +190,14 @@ export const UpdateTruck = () => {
     );
   };
 
+  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!isFormValid()) {
       return;
     }
+    // Check if driver details are added
     let finalFormData;
     if (driverAdd) {
       finalFormData = {
@@ -207,6 +215,7 @@ export const UpdateTruck = () => {
       };
     }
     try {
+      // Update truck
       await updateTruck(id, finalFormData);
       navigate("/dashboard/trucks");
       Toast("Truck Updated successfully", "success");
