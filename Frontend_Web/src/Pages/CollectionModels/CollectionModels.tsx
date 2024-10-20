@@ -60,6 +60,10 @@ export const CollectionModels = () => {
             await deleteCollectionModel(id); // Deleting the collection model
             const updatedCollectionModels = await getCollectionModels();
             setCollectionModels(updatedCollectionModels);
+            console.log(
+              "Collection model deleted with ID: ",
+              updatedCollectionModels
+            );
           };
           fetch();
         } catch (error) {
