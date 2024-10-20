@@ -15,7 +15,9 @@ import {
 import { db } from "../storage/firebase";
 
 
-
+interface wasteLevel {
+  id: String
+}
 // Function to add a new bin to Firestore
 export const addBin = async (binData) => {
   try {
