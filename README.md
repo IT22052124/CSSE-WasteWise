@@ -1,6 +1,6 @@
 # WasteWise ♻️ Smart Waste Management System
 
-Welcome to **WasteWise** – a smart, user-centric application designed to streamline waste bin management and waste collection. WasteWise leverages modern front-end frameworks for both web and mobile platforms to provide administrators, collectors, and users with an interactive experience for handling waste bin types, purchases, collections, and more. The project uses React with TypeScript, Material Tailwind for sleek UI components, and Expo & React Native for mobile experiences, while integrating with Firebase for backend data management (fileciteturn0file3).
+Welcome to **WasteWise** – a smart, user-centric application designed to streamline waste bin management and waste collection. WasteWise leverages modern front-end frameworks for both web and mobile platforms to provide administrators, collectors, and users with an interactive experience for handling waste bin types, purchases, collections, and more. The project uses React with TypeScript, Material Tailwind for sleek UI components, and Expo & React Native for mobile experiences, while integrating with Firebase for backend data management.
 
 -----------------------------------------------------------
 ## 🚀 Introduction
