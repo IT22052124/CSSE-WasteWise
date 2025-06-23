@@ -18,16 +18,16 @@ The repository contains separate projects for web interfaces (e.g., Frontend_Web
 ## ✨ Features
 
 - **Bin Type Management:**  
-  Create and update various waste bin types, including options for recyclable bins. Detailed forms and table views make it easy to see bin details, pricing, and capacity options (fileciteturn0file5).
+  Create and update various waste bin types, including options for recyclable bins. Detailed forms and table views make it easy to see bin details, pricing, and capacity options .
 
 - **Waste Collection and Tracking:**  
-  Enable collectors to record waste levels, update bin conditions, and automatically update waste levels using real-time data. The mobile collector screens include QR code generation, waste summary data and collection history (fileciteturn0file10).
+  Enable collectors to record waste levels, update bin conditions, and automatically update waste levels using real-time data. The mobile collector screens include QR code generation, waste summary data and collection history.
 
 - **Responsive UI and Dashboard:**  
-  Seamless integration using Material Tailwind, with components such as IconButton, Typography, and Chip for visually appealing dashboards. Real-time notifications and data updates enhance user interaction (fileciteturn0file2).
+  Seamless integration using Material Tailwind, with components such as IconButton, Typography, and Chip for visually appealing dashboards. Real-time notifications and data updates enhance user interaction .
 
 - **PDF Receipts and Reports:**  
-  Generate and share customizable PDF receipts directly from the app, built using the Expo ecosystem for mobile support (fileciteturn0file8).
+  Generate and share customizable PDF receipts directly from the app, built using the Expo ecosystem for mobile support .
 
 - **Easy Integration with Firebase:**  
   Uses Firebase for data storage and authentication, ensuring secure and scalable backend services.
