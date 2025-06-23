@@ -1,4 +1,4 @@
-# WasteWise ♻️ Smart Waste Management System
+#  WasteWise ♻️🚮 Smart Waste Management System
 
 Welcome to **WasteWise** – a smart, user-centric application designed to streamline waste bin management and waste collection. WasteWise leverages modern front-end frameworks for both web and mobile platforms to provide administrators, collectors, and users with an interactive experience for handling waste bin types, purchases, collections, and more. The project uses React with TypeScript, Material Tailwind for sleek UI components, and Expo & React Native for mobile experiences, while integrating with Firebase for backend data management.
 
@@ -55,79 +55,93 @@ Additionally, review the dependencies in the package.json files from the Fronten
 | Expo (for mobile)     | Latest          |
 
 -----------------------------------------------------------
-## 🔧 Installation
 
-Follow these steps to set up the WasteWise project locally on your machine:
+## 💾 Installation
 
-1. **Clone the Repository:**
+Follow these steps to install and run WasteWise on your local machine:
 
-   Run the following command in your terminal:
-   ------------------------------------------------------------------
-   git clone https://github.com/IT22052124/CSSE-WasteWise.git
-   ------------------------------------------------------------------
+### 1. Clone the Repository
 
-2. **Install Dependencies for Web:**
+```bash
+git clone https://github.com/IT22052124/CSSE-WasteWise.git
+cd CSSE-WasteWise
+```
 
-   Navigate to the Frontend_Web directory and install dependencies:
-   ------------------------------------------------------------------
-   cd CSSE-WasteWise/Frontend_Web
-   npm install   // or yarn install
-   ------------------------------------------------------------------
-   
-   The web project leverages Vite as a build tool as seen in the package.json and postcss configuration (fileciteturn0file16, fileciteturn0file17).
+### 2. Install Dependencies
 
-3. **Install Dependencies for Mobile Projects:**
+There are separate directories for the web and mobile applications:
 
-   For the mobile versions (both Frontend_User and Frontend_mobile), follow these steps:
-   - Navigate to the respective directories:
-     ------------------------------------------------------------------
-     cd CSSE-WasteWise/Frontend_User   // or Frontend_mobile
-     ------------------------------------------------------------------
-   - Install dependencies using Expo CLI:
-     ------------------------------------------------------------------
-     npm install   // or yarn install
-     expo start
-     ------------------------------------------------------------------
+#### For the Web Application
 
-4. **Firebase Setup:**
+```bash
+cd Frontend_Web
+npm install
+# or if you're using yarn
+yarn install
+```
 
-   Create a Firebase project and set up Firestore. Update your Firebase configuration in the project files where required. Refer to your Firebase project's configuration for proper integration.
+#### For the Mobile Application
+
+```bash
+cd ../Frontend_mobile
+npm install
+# or if you're using yarn
+yarn install
+```
+
+### 3. Configure Firebase
+
+- Create a Firebase Project and enable Firestore.
+- Set up the required Firebase configuration in a new file (e.g., `firebaseConfig.js` or within your environment variables).
+- Ensure that the collection names such as "bins", "wasteTypes", "binTypes", and "users" are correctly configured as per the code references .
+
+### 4. Start the Applications
+
+#### For Web
+
+```bash
+cd Frontend_Web
+npm run dev
+```
+
+#### For Mobile (Expo)
+
+```bash
+cd Frontend_mobile
+expo start
+```
+
+Your web app will launch on your default browser and the mobile app can be previewed using the Expo client.
 
 -----------------------------------------------------------
+
 ## 🤝 Contributing
 
-We welcome contributions from the community to improve WasteWise. To contribute:
+We welcome contributions from the community! Feel free to open issues or submit pull requests for improvements, bug fixes, or new feature additions.
 
-- **Fork the repository** on GitHub.
-- **Clone your fork** to your local machine.
-- **Create a new branch** for your feature or bug fix:
-  ------------------------------------------------------------------
-  git checkout -b feature/my-new-feature
-  ------------------------------------------------------------------
-- **Commit your changes** with clear and descriptive commit messages.
-- **Push your branch** to GitHub:
-  ------------------------------------------------------------------
-  git push origin feature/my-new-feature
-  ------------------------------------------------------------------
-- Open a **Pull Request** detailing your changes. Please follow the project's coding standards and ensure your code is properly tested.
+**Guidelines for Contributing:**
+- Fork the repository and create a new branch for your feature or bug fix.
+- Write clear, concise commit messages.
+- Ensure your code follows the existing style conventions (Tailwind CSS and Material Tailwind for styling, React standards, etc.).
+- Submit a pull request with a detailed description of your changes.
 
-Your contributions help in making WasteWise better for everyone! 😀✨
+For more details, refer to the repository’s CONTRIBUTING.md file if provided, or follow our GitHub contribution guidelines.
 
 -----------------------------------------------------------
-## ⚙️ Configuration
 
-Before running the app, ensure all configuration files and environment variables are correctly set up. This includes:
+## 🔧 Configuration
 
-- **Firebase Settings:**  
-  Update your Firebase configuration parameters in the respective config files. Some parts of the code rely on Firestore queries (for example, bin type queries and waste collection controllers).
+WasteWise is built to be highly configurable. Common configuration scope includes:
 
-- **Tailwind CSS Configuration:**  
-  The web project uses a PostCSS configuration file (Frontend_Web/postcss.config.js) that must be present for Tailwind to work properly (fileciteturn0file17).
+- **Firebase Configuration:**  
+  Place your Firebase API keys and settings in a configuration file. Adjust the Firebase initialization inside controllers such as `BinsController.ts` .
 
-- **Expo Settings:**  
-  Verify and adjust the Expo settings (in .expo/settings.json) if you encounter issues with the mobile app’s network or device connectivity (fileciteturn0file3).
+- **Tailwind and Material Tailwind Settings:**  
+  Customize your themes and styles in `tailwind.config.js` and from Material Tailwind components.  
+  Additionally, use the provided PostCSS configuration in `postcss.config.js` .
 
-Customize further configuration as required based on your environment.
+- **Environment Variables:**  
+  Set environment variables for API endpoints and secret keys. These are usually stored in a `.env` file at the root of each project segment.
 
 -----------------------------------------------------------
 ## 🏃 Usage
